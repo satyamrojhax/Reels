@@ -1,0 +1,226 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 8px;
+  --radius-xl: 8px;
+  --radius-2xl: 8px;
+  --radius-3xl: 9999px;
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  /* Recess palette */
+  --color-twilight-navy: #25385b;
+  --color-periwinkle-sky: #a2b0ff;
+  --color-dusk-indigo: #0a0a3a;
+  --color-cobalt-pop: #3252f4;
+  --color-coral-blush: #ff5a5a;
+  --color-cloud-white: #ffffff;
+  --color-cream-linen: #fffcef;
+  --color-slate-mist: #84849c;
+
+  /* Legacy aliases so existing components inherit the Recess palette */
+  --color-cream: #fffcef;
+  --color-dew: #a2b0ff;
+  --color-charcoal: #25385b;
+  --color-cocoa: #25385b;
+  --color-marker: #ff5a5a;
+  --color-sienna: #3252f4;
+  --color-sky-sticker: #3252f4;
+  --color-bubblegum-sticker: #ff5a5a;
+  --color-sprout-sticker: #a2b0ff;
+
+  --font-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-script: "Caveat", "Space Grotesk", cursive;
+
+  --shadow-paper: none;
+  --shadow-button: none;
+}
+
+:root {
+  --background: #fffcef;
+  --foreground: #25385b;
+  --card: #ffffff;
+  --card-foreground: #25385b;
+  --popover: #ffffff;
+  --popover-foreground: #25385b;
+  --primary: #25385b;
+  --primary-foreground: #ffffff;
+  --secondary: #a2b0ff;
+  --secondary-foreground: #25385b;
+  --muted: #f1f0fb;
+  --muted-foreground: #84849c;
+  --accent: #3252f4;
+  --accent-foreground: #ffffff;
+  --destructive: #ff5a5a;
+  --destructive-foreground: #ffffff;
+  --border: #25385b;
+  --input: #25385b;
+  --ring: #3252f4;
+}
+
+.dark {
+  --background: #0a0a3a;
+  --foreground: #fffcef;
+  --card: #141450;
+  --card-foreground: #fffcef;
+  --popover: #141450;
+  --popover-foreground: #fffcef;
+  --primary: #fffcef;
+  --primary-foreground: #0a0a3a;
+  --secondary: #25385b;
+  --secondary-foreground: #fffcef;
+  --muted: #1a1a4d;
+  --muted-foreground: #a2b0ff;
+  --accent: #a2b0ff;
+  --accent-foreground: #0a0a3a;
+  --destructive: #ff5a5a;
+  --destructive-foreground: #fffcef;
+  --border: #a2b0ff;
+  --input: #a2b0ff;
+  --ring: #a2b0ff;
+}
+
+@layer base {
+  * { border-color: var(--color-border); }
+  html { background-color: var(--color-background); }
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    letter-spacing: -0.015em;
+    color: var(--color-twilight-navy);
+    line-height: 1.05;
+  }
+  .dark h1, .dark h2, .dark h3, .dark h4 { color: var(--color-cream-linen); }
+}
+
+/* Recess ghost pill: cloud white fill, navy border + text */
+@utility btn-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 10px 24px;
+  border-radius: 9999px;
+  border: 1.5px solid var(--color-twilight-navy);
+  background: var(--color-cloud-white);
+  color: var(--color-twilight-navy);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  transition: background-color 120ms ease, transform 120ms ease;
+  cursor: pointer;
+  &:hover { background: var(--color-periwinkle-sky); }
+  &:active { transform: translateY(1px); }
+  &:disabled { opacity: 0.4; cursor: not-allowed; }
+}
+.dark .btn-pill { background: transparent; border-color: var(--color-periwinkle-sky); color: var(--color-cream-linen); }
+.dark .btn-pill:hover { background: var(--color-secondary); }
+
+/* Recess primary CTA — outlined rectangle */
+@utility btn-outlined {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 12px 24px;
+  border-radius: 6px;
+  border: 1.5px solid var(--color-twilight-navy);
+  background: transparent;
+  color: var(--color-twilight-navy);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background-color 120ms ease;
+  &:hover { background: var(--color-periwinkle-sky); }
+}
+
+@utility marker-underline {
+  background-image: linear-gradient(transparent 62%, rgba(50, 82, 244, 0.18) 62%, rgba(50, 82, 244, 0.18) 92%, transparent 92%);
+  color: var(--color-cobalt-pop);
+}
+
+@utility no-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar { display: none; }
+}
+
+/* Recess paper card — soft border, no shadow */
+@utility paper-card {
+  background: var(--color-cloud-white);
+  border: 1px solid var(--color-slate-mist);
+  border-radius: 8px;
+}
+.dark .paper-card { background: var(--card); border-color: var(--color-periwinkle-sky); }
+
+/* Full-bleed periwinkle atmospheric surface */
+@utility sky-surface {
+  background: linear-gradient(180deg, #a2b0ff 0%, #c4cdff 60%, #fffcef 100%);
+}
+
+/* Sunset gradient — cream → lavender → blush */
+@utility sunset-surface {
+  background: linear-gradient(135deg, #fffcef 0%, #d9dcff 50%, #ffd7d7 100%);
+}
+
+/* Top marquee — thin dark strip */
+@utility marquee-strip {
+  background: var(--color-twilight-navy);
+  color: var(--color-cloud-white);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 10px 0;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.font-script { font-family: var(--font-script); font-weight: 400; }
+
+/* Reel skeleton shimmer */
+@keyframes reel-shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+.skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.08) 50%,
+    transparent 100%
+  );
+  animation: reel-shimmer 1.6s ease-in-out infinite;
+}
