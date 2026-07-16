@@ -1,0 +1,12 @@
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/manifest.json
+  Content-Type: application/json
+  Cache-Control: public, max-age=86400
+
+/PWA_ICON.png
+  Cache-Control: public, max-age=31536000, immutable
+
+/logo.png
+  Cache-Control: public, max-age=31536000, immutable
