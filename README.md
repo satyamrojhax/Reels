@@ -94,6 +94,32 @@ The app uses a PIN-based authentication system:
 
 Designed and developed by **Satyam RojhaX**
 
+## Deployment
+
+### Cloudflare Pages
+
+This project is configured for Cloudflare Pages deployment:
+
+1. Connect your GitHub repository to Cloudflare Pages
+2. Set build command: `npm run build`
+3. Set output directory: `dist`
+4. Set Node.js version: `18`
+5. Deploy!
+
+The project includes:
+- `wrangler.toml` for Cloudflare Pages configuration
+- `_redirects` file for SPA routing
+- `manifest.json` for PWA support
+
+### Manual Deployment
+
+```bash
+# Build the project
+npm run build
+
+# Deploy the dist folder to your hosting service
+```
+
 ## License
 
 This project is private and proprietary.
