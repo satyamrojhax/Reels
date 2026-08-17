@@ -224,3 +224,25 @@
   );
   animation: reel-shimmer 1.6s ease-in-out infinite;
 }
+
+.neon {
+  --background: #09090b;
+  --foreground: #f4f4f5;
+  --card: #09090b;
+  --card-foreground: #f4f4f5;
+  --popover: #09090b;
+  --popover-foreground: #f4f4f5;
+  --primary: #f472b6;
+  --primary-foreground: #09090b;
+  --secondary: #22d3ee;
+  --secondary-foreground: #09090b;
+  --muted: #27272a;
+  --muted-foreground: #a1a1aa;
+  --accent: #22d3ee;
+  --accent-foreground: #09090b;
+  --destructive: #ef4444;
+  --destructive-foreground: #fafafa;
+  --border: #f472b6;
+  --input: #22d3ee;
+  --ring: #f472b6;
+}

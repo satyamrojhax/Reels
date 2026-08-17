@@ -1,12 +1,14 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Home, Film, Heart, Bookmark, Settings } from "lucide-react";
+import { Home, Film, Heart, Bookmark, Settings, ShoppingBag, BadgeCheck } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import { hasUnlocked } from "@/lib/storage";
 
-const items: { to: "/home" | "/reels" | "/liked" | "/saved" | "/settings"; label: string; icon: LucideIcon }[] = [
+const items: { to: any; label: string; icon: LucideIcon }[] = [
   { to: "/home", label: "home", icon: Home },
   { to: "/reels", label: "reels", icon: Film },
   { to: "/liked", label: "liked", icon: Heart },
   { to: "/saved", label: "saved", icon: Bookmark },
+  { to: "/shop", label: "shop", icon: ShoppingBag },
   { to: "/settings", label: "settings", icon: Settings },
 ];
 
@@ -23,6 +25,7 @@ function BrandMark({ size = 36 }: { size?: number }) {
 
 export function Sidebar({ username }: { username: string | null }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const isVerified = hasUnlocked("badge_verified");
   return (
     <aside className="fixed left-0 top-0 z-30 hidden h-screen w-[244px] flex-col border-r border-twilight-navy bg-cloud-white px-6 py-8 md:flex dark:bg-dusk-indigo dark:border-periwinkle-sky/40">
       <Link to="/home" className="mb-10 block">
@@ -55,7 +58,10 @@ export function Sidebar({ username }: { username: string | null }) {
             {username[0]?.toUpperCase()}
           </div>
           <div className="min-w-0">
-            <div className="truncate text-sm font-medium text-twilight-navy dark:text-cream-linen">@{username}</div>
+            <div className="flex items-center gap-1 truncate text-sm font-medium text-twilight-navy dark:text-cream-linen">
+              @{username}
+              {isVerified && <BadgeCheck className="h-4 w-4 text-blue-500 flex-shrink-0" />}
+            </div>
             <div className="text-[10px] font-medium uppercase tracking-[0.18em] text-slate-mist">signed in</div>
           </div>
         </div>

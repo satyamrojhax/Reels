@@ -21,6 +21,7 @@ import { Route as AppLikedRouteImport } from './routes/_app.liked'
 import { Route as AppHomeRouteImport } from './routes/_app.home'
 import { Route as AppSavedRouteImport } from './routes/_app.saved'
 import { Route as AppAboutRouteImport } from './routes/_app.about'
+import { Route as AppShopRouteImport } from './routes/_app.shop'
 
 const PinSetupRoute = PinSetupRouteImport.update({
   id: '/pin-setup',
@@ -81,6 +82,11 @@ const AppAboutRoute = AppAboutRouteImport.update({
   path: '/about',
   getParentRoute: () => AppRoute,
 } as any)
+const AppShopRoute = AppShopRouteImport.update({
+  id: '/shop',
+  path: '/shop',
+  getParentRoute: () => AppRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -94,6 +100,7 @@ export interface FileRoutesByFullPath {
   '/saved': typeof AppSavedRoute
   '/settings': typeof AppSettingsRoute
   '/about': typeof AppAboutRoute
+  '/shop': typeof AppShopRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -107,6 +114,7 @@ export interface FileRoutesByTo {
   '/saved': typeof AppSavedRoute
   '/settings': typeof AppSettingsRoute
   '/about': typeof AppAboutRoute
+  '/shop': typeof AppShopRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -122,6 +130,7 @@ export interface FileRoutesById {
   '/_app/saved': typeof AppSavedRoute
   '/_app/settings': typeof AppSettingsRoute
   '/_app/about': typeof AppAboutRoute
+  '/_app/shop': typeof AppShopRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -137,6 +146,7 @@ export interface FileRouteTypes {
     | '/saved'
     | '/settings'
     | '/about'
+    | '/shop'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -150,6 +160,7 @@ export interface FileRouteTypes {
     | '/saved'
     | '/settings'
     | '/about'
+    | '/shop'
   id:
     | '__root__'
     | '/'
@@ -164,6 +175,7 @@ export interface FileRouteTypes {
     | '/_app/saved'
     | '/_app/settings'
     | '/_app/about'
+    | '/_app/shop'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -261,6 +273,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAboutRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/shop': {
+      id: '/_app/shop'
+      path: '/shop'
+      fullPath: '/shop'
+      preLoaderRoute: typeof AppShopRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
@@ -271,6 +290,7 @@ interface AppRouteChildren {
   AppSavedRoute: typeof AppSavedRoute
   AppSettingsRoute: typeof AppSettingsRoute
   AppAboutRoute: typeof AppAboutRoute
+  AppShopRoute: typeof AppShopRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
@@ -280,6 +300,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppSavedRoute: AppSavedRoute,
   AppSettingsRoute: AppSettingsRoute,
   AppAboutRoute: AppAboutRoute,
+  AppShopRoute: AppShopRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)

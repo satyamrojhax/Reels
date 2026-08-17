@@ -4,7 +4,8 @@ import { useAuth } from "@/hooks/use-auth";
 import { useTheme, type Theme } from "@/hooks/use-theme";
 import { getLiked, getSaved, KEYS, get, set, setLiked, setSaved, getCoins } from "@/lib/storage";
 import { useHydrated } from "@/hooks/use-hydrated";
-import { Eye, EyeOff, LogOut, Moon, Sun, Monitor, Trash2, Coins } from "lucide-react";
+import { usePwa } from "@/hooks/use-pwa";
+import { Eye, EyeOff, LogOut, Moon, Sun, Monitor, Trash2, Coins, Download } from "lucide-react";
 
 export const Route = createFileRoute("/_app/settings")({
   component: SettingsPage,
@@ -13,6 +14,7 @@ export const Route = createFileRoute("/_app/settings")({
 function SettingsPage() {
   const navigate = useNavigate();
   const { username, logout } = useAuth();
+  const { canInstall, install } = usePwa();
   const { theme, setTheme } = useTheme();
   const hydrated = useHydrated();
   const [showPin, setShowPin] = useState(false);
@@ -126,6 +128,22 @@ function SettingsPage() {
           })}
         </div>
       </section>
+
+      {/* App */}
+      {canInstall && (
+        <section className="mt-4">
+          <button
+            onClick={() => install()}
+            className="paper-card flex w-full items-center justify-between p-5 text-left transition hover:bg-dew dark:hover:bg-secondary"
+          >
+            <div>
+              <div className="font-display text-lg lowercase text-cocoa dark:text-cream">install app</div>
+              <div className="text-sm text-charcoal/70 dark:text-cream/70">add to home screen for a better experience.</div>
+            </div>
+            <Download className="h-5 w-5 text-cocoa dark:text-cream" />
+          </button>
+        </section>
+      )}
 
       {/* About */}
       <section className="mt-4">

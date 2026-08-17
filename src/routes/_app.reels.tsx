@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useInfiniteQuery, useQueryClient, type InfiniteData } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { fetchReelsPage, type Reel } from "@/lib/reels";
+import { fetchReelsPage, type Reel, type FeedFilter } from "@/lib/reels";
 import { ReelPlayer } from "@/components/reel-player";
 import { KEYS, get, set, getCoins, getAutoScroll } from "@/lib/storage";
 import { AlertTriangle, RefreshCw, RotateCcw, X, Coins } from "lucide-react";
@@ -26,13 +26,13 @@ function ReelsPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [coins, setCoins] = useState(0);
+  const [filter, setFilter] = useState<FeedFilter>("all");
 
   useEffect(() => {
     setCoins(getCoins());
-  }, []);
-
-  const updateCoins = useCallback(() => {
-    setCoins(getCoins());
+    const handleCoinsChange = () => setCoins(getCoins());
+    window.addEventListener("coins-change", handleCoinsChange);
+    return () => window.removeEventListener("coins-change", handleCoinsChange);
   }, []);
 
   const {
@@ -45,11 +45,11 @@ function ReelsPage() {
     error,
     refetch,
     isRefetching,
-  } = useInfiniteQuery<PageData, Error, FeedData, [string], number>({
-    queryKey: ["reels-feed"],
-    queryFn: ({ pageParam }) => fetchReelsPage(pageParam),
+  } = useInfiniteQuery<PageData, Error, FeedData, [string, FeedFilter], number>({
+    queryKey: ["reels-feed", filter],
+    queryFn: ({ pageParam }) => fetchReelsPage(pageParam, filter),
     initialPageParam: 1,
-    getNextPageParam: (last, all) => (last.items.length ? all.length + 1 : undefined),
+    getNextPageParam: (last) => last.nextPage,
     staleTime: 10 * 60_000,
     gcTime: 30 * 60_000,
     retry: 3,
@@ -161,20 +161,6 @@ function ReelsPage() {
     if (reels.length - activeIdx <= 10) fetchNextPage();
   }, [activeIdx, reels.length, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  // Idle-time warm fetch of one extra page
-  useEffect(() => {
-    if (reels.length === 0 || !hasNextPage || isFetchingNextPage) return;
-    const w = window as Window & {
-      requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
-      cancelIdleCallback?: (id: number) => void;
-    };
-    const schedule = w.requestIdleCallback ?? ((cb: () => void) => window.setTimeout(cb, 500));
-    const id = schedule(() => fetchNextPage(), { timeout: 2000 });
-    return () => {
-      if (w.cancelIdleCallback) w.cancelIdleCallback(id as number);
-      else window.clearTimeout(id as number);
-    };
-  }, [reels.length, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   // Safe cache eviction: cap in-memory pages. When we're deep enough into the
   // feed that the oldest page is far behind the viewer, drop the front pages
@@ -189,7 +175,7 @@ function ReelsPage() {
     if (activeIdx < firstPageLen + 3) return; // keep a small buffer
 
     const droppedItems = firstPageLen;
-    queryClient.setQueryData<FeedData>(["reels-feed"], (old) => {
+    queryClient.setQueryData<FeedData>(["reels-feed", filter], (old) => {
       if (!old) return old;
       return {
         pages: old.pages.slice(1),
@@ -204,7 +190,7 @@ function ReelsPage() {
       root.scrollTop = Math.max(0, root.scrollTop - droppedItems * slideH);
     }
     setActiveIdx((i) => Math.max(0, i - droppedItems));
-  }, [data, activeIdx, queryClient]);
+  }, [data, activeIdx, queryClient, filter]);
 
   // Track reel-length changes to reset refs sizing
   useEffect(() => {
@@ -228,6 +214,7 @@ function ReelsPage() {
       setTimeout(() => {
         if (activeIdx < reels.length - 1) {
           scrollToIdx(activeIdx + 1, "smooth");
+          if (typeof navigator !== "undefined" && navigator.vibrate) navigator.vibrate([30, 50, 30]);
         }
       }, 500);
     }
@@ -270,26 +257,27 @@ function ReelsPage() {
 
   if (isLoading) {
     return (
-      <div className="relative h-[100dvh] w-full overflow-hidden bg-dusk-indigo">
-        {/* Shimmer skeletons stacked like reel slides */}
-        <div className="absolute inset-0 flex flex-col">
-          {[0, 1].map((k) => (
-            <div key={k} className="relative h-1/2 w-full overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-white/10 to-white/5" />
-              <div className="skeleton-shimmer absolute inset-0" />
-              <div className="absolute bottom-6 left-4 right-20 space-y-2">
-                <div className="h-3 w-2/3 rounded bg-white/10" />
-                <div className="h-3 w-1/2 rounded bg-white/10" />
-              </div>
-              <div className="absolute bottom-16 right-3 flex flex-col gap-4">
-                <div className="h-10 w-10 rounded-full bg-white/10" />
-                <div className="h-10 w-10 rounded-full bg-white/10" />
-              </div>
-            </div>
-          ))}
+      <div className="relative h-[100dvh] w-full overflow-hidden bg-black">
+        <div className="absolute inset-0 animate-pulse bg-zinc-900" />
+        
+        {/* Right action buttons skeleton */}
+        <div className="absolute bottom-24 right-3 z-20 flex flex-col items-center gap-6">
+          <div className="h-10 w-10 animate-pulse rounded-full bg-zinc-800" />
+          <div className="h-10 w-10 animate-pulse rounded-full bg-zinc-800" />
+          <div className="h-10 w-10 animate-pulse rounded-full bg-zinc-800" />
+          <div className="h-10 w-10 animate-pulse rounded-full bg-zinc-800" />
         </div>
-        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-          <div className="h-10 w-10 animate-spin rounded-full border-2 border-periwinkle-sky/40 border-t-periwinkle-sky" />
+        
+        {/* Bottom text skeleton */}
+        <div className="absolute inset-x-0 bottom-0 z-10 p-4 pr-20 pb-6">
+          <div className="mb-4 flex items-center gap-3">
+            <div className="h-10 w-10 animate-pulse rounded-full bg-zinc-800" />
+            <div className="h-4 w-32 animate-pulse rounded bg-zinc-800" />
+          </div>
+          <div className="space-y-3">
+            <div className="h-3 w-3/4 animate-pulse rounded bg-zinc-800" />
+            <div className="h-3 w-1/2 animate-pulse rounded bg-zinc-800" />
+          </div>
         </div>
       </div>
     );
@@ -300,8 +288,27 @@ function ReelsPage() {
       ref={containerRef}
       className="no-scrollbar relative h-[100dvh] snap-y snap-mandatory overflow-y-scroll bg-dusk-indigo"
     >
+      {/* Category Pills */}
+      <div className="absolute left-0 right-0 top-16 z-30 flex w-full justify-center px-4 md:top-6">
+        <div className="no-scrollbar flex w-full max-w-full items-center justify-start gap-2 overflow-x-auto sm:justify-center sm:gap-3">
+          {(["all", "local", "trending"] as FeedFilter[]).map(f => (
+            <button
+              key={f}
+              onClick={() => setFilter(f)}
+              className={`shrink-0 rounded-full px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider transition sm:px-4 sm:text-xs sm:tracking-widest ${
+                filter === f
+                  ? "bg-white text-black"
+                  : "bg-black/50 text-white backdrop-blur hover:bg-black/70"
+              }`}
+            >
+              {f}
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* Coins display */}
-      <div className="fixed top-4 right-4 z-30 flex items-center gap-2 rounded-full bg-black/50 px-3 py-1.5 backdrop-blur md:top-6 md:right-auto md:left-[calc(244px+1rem)]">
+      <div className="fixed top-4 left-4 z-30 flex items-center gap-2 rounded-full bg-black/50 px-3 py-1.5 backdrop-blur md:top-6 md:left-[calc(244px+1rem)]">
         <Coins className="h-5 w-5 text-yellow-400" />
         <span className="text-sm font-semibold text-white">{coins}</span>
       </div>
@@ -348,11 +355,11 @@ function ReelsPage() {
                 key={`player::${r.id}`}
                 reel={r}
                 active={i === activeIdx}
+                distance={Math.abs(i - activeIdx)}
                 muted={muted}
                 onToggleMute={toggleMute}
                 onEnded={handleReelEnd}
                 onWatched={bumpWatched}
-                onCoinsUpdate={updateCoins}
               />
             ) : (
               <div key={`ph::${r.id}`} className="h-full w-full bg-dusk-indigo">

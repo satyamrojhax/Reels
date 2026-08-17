@@ -16,6 +16,7 @@ export const KEYS = {
   autoScroll: "ig.auto_scroll",
   lastReelId: "ig.last_reel_id",
   lastReelIdx: "ig.last_reel_idx",
+  unlocks: "ig.unlocks",
 } as const;
 
 export const isBrowser = () => typeof window !== "undefined";
@@ -95,6 +96,7 @@ export function addCoins(amount: number): number {
   const current = getCoins();
   const newAmount = current + amount;
   set(KEYS.coins, newAmount);
+  if (isBrowser()) window.dispatchEvent(new Event("coins-change"));
   return newAmount;
 }
 
@@ -102,6 +104,7 @@ export function spendCoins(amount: number): boolean {
   const current = getCoins();
   if (current < amount) return false;
   set(KEYS.coins, current - amount);
+  if (isBrowser()) window.dispatchEvent(new Event("coins-change"));
   return true;
 }
 
@@ -112,3 +115,20 @@ export function getAutoScroll(): boolean {
 export function setAutoScroll(value: boolean): void {
   set(KEYS.autoScroll, value);
 }
+
+export function getUnlocks(): string[] {
+  return get<string[]>(KEYS.unlocks, []);
+}
+
+export function hasUnlocked(id: string): boolean {
+  return getUnlocks().includes(id);
+}
+
+export function unlockItem(id: string): void {
+  const current = getUnlocks();
+  if (!current.includes(id)) {
+    current.push(id);
+    set(KEYS.unlocks, current);
+  }
+}
+

@@ -2,7 +2,8 @@ import { createFileRoute, Outlet, useNavigate, useRouterState } from "@tanstack/
 import { useEffect } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useTheme } from "@/hooks/use-theme";
-import { Sidebar, BottomNav, MarqueeStrip, Footer } from "@/components/nav";
+import { Sidebar, BottomNav, Footer } from "@/components/nav";
+import { InstallPwa } from "@/components/install-pwa";
 
 export const Route = createFileRoute("/_app")({
   component: AppLayout,
@@ -32,7 +33,6 @@ function AppLayout() {
 
   return (
     <div className="min-h-screen bg-background">
-      {!isReels && <MarqueeStrip />}
       <Sidebar username={username} />
       <main
         className={
@@ -42,6 +42,7 @@ function AppLayout() {
         <Outlet />
       </main>
       {!isReels && <BottomNav />}
+      <InstallPwa />
     </div>
   );
 }

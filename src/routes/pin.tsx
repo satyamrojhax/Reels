@@ -54,15 +54,15 @@ function PinPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-cream px-6 py-10">
+    <div className="flex min-h-screen items-center justify-center bg-background px-6 py-10">
       <div className="w-full max-w-md">
-        <p className="font-display text-marker text-xl lowercase italic">almost there,</p>
-        <h1 className="mt-2 font-display text-[56px] leading-[1.05] lowercase text-cocoa">
+        <p className="font-display text-destructive text-xl lowercase italic">almost there,</p>
+        <h1 className="mt-2 font-display text-[56px] leading-[1.05] lowercase text-foreground">
           punch in your <span className="marker-underline">pin.</span>
         </h1>
-        <p className="mt-4 text-[17px] text-charcoal/80">
+        <p className="mt-4 text-[17px] text-foreground/80">
           welcome{" "}
-          <span className="font-medium text-cocoa">@{username}</span>. six digits, from your date of birth.
+          <span className="font-medium text-foreground">@{username}</span>. six digits, from your date of birth.
         </p>
 
         <div className="mt-8 flex flex-wrap gap-2">
@@ -76,7 +76,7 @@ function PinPage() {
               value={d}
               onChange={(e) => onChange(i, e.target.value)}
               onKeyDown={(e) => onKey(i, e)}
-              className="h-16 w-12 rounded-lg border-[1.5px] border-charcoal bg-cream text-center font-display text-3xl text-cocoa outline-none transition focus:bg-dew"
+              className="h-16 w-12 rounded-lg border-[1.5px] border-foreground/30 bg-background text-center font-display text-3xl text-foreground outline-none transition focus:bg-muted"
             />
           ))}
         </div>

@@ -1,6 +1,8 @@
+import localDbRaw from "../../assets/v1-reels-db.json";
+
 export type Reel = {
   id: string;
-  source: "v1" | "v2" | "v3" | "v4" | "xreels";
+  source: "v1" | "v2" | "v4" | "local";
   videoUrl: string;
   thumbnail?: string;
   title?: string;
@@ -23,20 +25,11 @@ type XvideoItem = {
   uploadDate?: string;
 };
 
-type XreelsItem = {
-  url: string;
-  views?: number;
-  likes?: number;
-};
-
 const XVIDEO_BASES = [
-  { key: "v1" as const, url: "https://xvideos-backend-reels.vercel.app/v1/xvideos" },
-  { key: "v2" as const, url: "https://xvideos-backend-reels.vercel.app/v2/xvideos" },
-  { key: "v3" as const, url: "https://xvideos-backend-reels.vercel.app/v3/xvideos" },
-  { key: "v4" as const, url: "https://xvideos-backend-reels.vercel.app/v4/xvideos" },
+  { key: "v1" as const, url: "https://xvideos-backend-reels.vercel.app/v1/xvideos", maxPage: 67 },
+  { key: "v2" as const, url: "https://xvideos-backend-reels.vercel.app/v2/xvideos", maxPage: 67 },
+  { key: "v4" as const, url: "https://xvideos-backend-reels.vercel.app/v4/xvideos", maxPage: 62 },
 ];
-
-const XREELS_URL = "https://piewallah-proxy.satyamrojhax.workers.dev/?quest=https://xreels.co/videos.json";
 
 function shuffle<T>(arr: T[]): T[] {
   const a = arr.slice();
@@ -47,22 +40,33 @@ function shuffle<T>(arr: T[]): T[] {
   return a;
 }
 
-async function fetchWithRetry(url: string, attempts = 3): Promise<Response | null> {
+function hashCode(s: string): string {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) h = (h << 5) - h + s.charCodeAt(i), (h |= 0);
+  return Math.abs(h).toString(36);
+}
+
+const localDb: Reel[] = shuffle((localDbRaw as any[]).map((v, i) => ({
+  id: `local-${i}-${hashCode(v.url)}`,
+  source: "local" as const,
+  videoUrl: v.url,
+  views: v.views,
+  likes: v.likes,
+  title: "Watch Reels 18+",
+})));
+
+async function fetchWithRetry(url: string, attempts = 2): Promise<Response | null> {
   let delay = 400;
   for (let i = 0; i < attempts; i++) {
     try {
       const headers: Record<string, string> = {
         "User-Agent": "Mozilla/5.0 (Linux; Android 15; Pixel 9) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Mobile Safari/537.36",
         "Accept": "*/*",
-        "Accept-Encoding": "gzip, deflate, br, zstd",
-        "Accept-Language": "en-GB,en-US;q=0.9,en;q=0.8",
-        "Referer": "https://xreels.co/",
       };
-      
       const res = await fetch(url, { headers });
       if (res.ok) return res;
       if (res.status >= 400 && res.status < 500 && res.status !== 429) return null;
-    } catch {}
+    } catch { }
     if (i < attempts - 1) {
       await new Promise((r) => setTimeout(r, delay + Math.random() * 200));
       delay *= 2;
@@ -72,7 +76,8 @@ async function fetchWithRetry(url: string, attempts = 3): Promise<Response | nul
 }
 
 async function fetchXvideos(base: (typeof XVIDEO_BASES)[number], page: number): Promise<Reel[]> {
-  const res = await fetchWithRetry(`${base.url}?page=${page}`);
+  const safePage = ((page - 1) % base.maxPage) + 1;
+  const res = await fetchWithRetry(`${base.url}?page=${safePage}`);
   if (!res) return [];
   try {
     const json = (await res.json()) as { videos?: XvideoItem[] };
@@ -92,73 +97,66 @@ async function fetchXvideos(base: (typeof XVIDEO_BASES)[number], page: number): 
   }
 }
 
-let xreelsCache: Reel[] | null = null;
-async function fetchXreels(): Promise<Reel[]> {
-  if (xreelsCache) return xreelsCache;
-  const res = await fetchWithRetry(XREELS_URL);
-  if (!res) return [];
-  try {
-    const arr = (await res.json()) as XreelsItem[];
-    xreelsCache = arr.map((v, i) => ({
-      id: `xreels-${i}-${hashCode(v.url)}`,
-      source: "xreels" as const,
-      videoUrl: v.url,
-      views: v.views,
-      likes: v.likes,
-      title: "Xreels Short",
-    }));
-    return xreelsCache;
-  } catch {
-    return [];
-  }
-}
+let localDbOffset = 0;
 
-function hashCode(s: string): string {
-  let h = 0;
-  for (let i = 0; i < s.length; i++) h = (h << 5) - h + s.charCodeAt(i), (h |= 0);
-  return Math.abs(h).toString(36);
-}
+export type FeedFilter = "all" | "local" | "trending";
 
-export async function fetchReelsPage(page: number): Promise<{ items: Reel[]; nextPage: number }> {
-  // Fetch from all sources in parallel
-  const xvideoTasks = XVIDEO_BASES.map((b) => fetchXvideos(b, page));
-  const xreelsTask = page === 1 ? fetchXreels() : Promise.resolve([]);
-  
-  const [xvideoResults, xreelsResults] = await Promise.all([
-    Promise.all(xvideoTasks),
-    xreelsTask,
-  ]);
-  
-  const xvideoMerged = xvideoResults.flat();
-  
-  // Mix ratios: 30% xreels, 20% v1, 20% v2, 20% v3, 10% v4
-  // Calculate how many to take from each source
-  const totalTarget = 50; // Target total reels per page
-  const xreelsCount = Math.floor(totalTarget * 0.3);
-  const v1Count = Math.floor(totalTarget * 0.2);
-  const v2Count = Math.floor(totalTarget * 0.2);
-  const v3Count = Math.floor(totalTarget * 0.2);
-  const v4Count = Math.floor(totalTarget * 0.1);
-  
-  // Take reels from each source according to ratios
+export async function fetchReelsPage(page: number, filter: FeedFilter = "all"): Promise<{ items: Reel[]; nextPage: number }> {
   const selectedReels: Reel[] = [];
-  
-  // Add xreels reels (primary source)
-  if (xreelsResults.length > 0) {
-    selectedReels.push(...shuffle(xreelsResults).slice(0, xreelsCount));
+
+  // Helper to grab local reels
+  const grabLocalReels = (count: number) => {
+    let slice = localDb.slice(localDbOffset, localDbOffset + count);
+    if (slice.length < count) {
+      slice = [...slice, ...localDb.slice(0, count - slice.length)];
+    }
+    localDbOffset = (localDbOffset + count) % localDb.length;
+    return shuffle(slice);
+  };
+
+  if (filter === "local") {
+    selectedReels.push(...grabLocalReels(30));
+  } else if (filter === "trending") {
+    const offset = page - 1;
+    const sourceIndex = offset % 3;
+    const apiPage = Math.floor(offset / 3) + 1;
+
+    const base = XVIDEO_BASES[sourceIndex];
+    const safePage = ((apiPage - 1) % base.maxPage) + 1;
+
+    const res = await fetchXvideos(base, safePage);
+
+    if (res.length > 0) {
+      selectedReels.push(...shuffle(res));
+    } else {
+      selectedReels.push(...grabLocalReels(30));
+    }
+  } else {
+    // filter === "all"
+    if (page === 1) {
+      selectedReels.push(...grabLocalReels(34));
+    } else if (page === 2) {
+      selectedReels.push(...grabLocalReels(33));
+    } else if (page === 3) {
+      selectedReels.push(...grabLocalReels(33));
+    } else {
+      const offset = page - 4;
+      const sourceIndex = offset % 3;
+      const apiPage = Math.floor(offset / 3) + 1;
+
+      const base = XVIDEO_BASES[sourceIndex];
+      const safePage = ((apiPage - 1) % base.maxPage) + 1;
+
+      const res = await fetchXvideos(base, safePage);
+
+      if (res.length > 0) {
+        selectedReels.push(...shuffle(res));
+      } else {
+        selectedReels.push(...grabLocalReels(30));
+      }
+    }
   }
-  
-  // Add xvideos reels by source
-  const v1Reels = xvideoResults[0] || [];
-  const v2Reels = xvideoResults[1] || [];
-  const v3Reels = xvideoResults[2] || [];
-  const v4Reels = xvideoResults[3] || [];
-  
-  selectedReels.push(...shuffle(v1Reels).slice(0, v1Count));
-  selectedReels.push(...shuffle(v2Reels).slice(0, v2Count));
-  selectedReels.push(...shuffle(v3Reels).slice(0, v3Count));
-  selectedReels.push(...shuffle(v4Reels).slice(0, v4Count));
-  
+
   // Deduplicate by video URL
   const seen = new Set<string>();
   const deduped = selectedReels.filter((r) => {
@@ -166,17 +164,10 @@ export async function fetchReelsPage(page: number): Promise<{ items: Reel[]; nex
     seen.add(r.videoUrl);
     return true;
   });
-  
-  // If we don't have enough, fill with remaining from any source
-  if (deduped.length < 10) {
-    const allReels = [...xreelsResults, ...xvideoMerged];
-    const remaining = shuffle(allReels).filter((r) => !seen.has(r.videoUrl));
-    deduped.push(...remaining.slice(0, 20 - deduped.length));
-  }
-  
+
   if (deduped.length === 0) {
     throw new Error("Couldn't load reels. Please check your connection and try again.");
   }
-  
-  return { items: shuffle(deduped), nextPage: page + 1 };
+
+  return { items: deduped, nextPage: page + 1 };
 }

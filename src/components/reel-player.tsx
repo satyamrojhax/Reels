@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import type { Reel } from "@/lib/reels";
-import { Heart, Share2, Volume2, VolumeX, Play, MoreHorizontal, Bookmark, BookmarkCheck, Coins, Flag, Copy, ToggleLeft, ToggleRight } from "lucide-react";
+import { Heart, Share2, Volume2, VolumeX, Play, MoreHorizontal, Bookmark, BookmarkCheck, Coins, Flag, Copy, ToggleLeft, ToggleRight, Eye, MonitorUp, Loader2 } from "lucide-react";
 import { isLiked as checkLiked, toggleLike, isSaved as checkSaved, toggleSave, addCoins, getAutoScroll, setAutoScroll } from "@/lib/storage";
 
 type Props = {
@@ -10,10 +10,10 @@ type Props = {
   onToggleMute: () => void;
   onEnded: () => void;
   onWatched: () => void;
-  onCoinsUpdate?: () => void;
+  distance: number;
 };
 
-export function ReelPlayer({ reel, active, muted, onToggleMute, onEnded, onWatched, onCoinsUpdate }: Props) {
+export function ReelPlayer({ reel, active, muted, onToggleMute, onEnded, onWatched, distance }: Props) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [liked, setLiked] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -23,6 +23,7 @@ export function ReelPlayer({ reel, active, muted, onToggleMute, onEnded, onWatch
   const [expand, setExpand] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
   const [autoScroll, setAutoScrollState] = useState(true);
+  const [isBuffering, setIsBuffering] = useState(true);
   const coinsAwarded = useRef(false);
   const holdTimer = useRef<number | null>(null);
   const holdStart = useRef<number>(0);
@@ -36,6 +37,7 @@ export function ReelPlayer({ reel, active, muted, onToggleMute, onEnded, onWatch
     setAutoScrollState(getAutoScroll());
     coinsAwarded.current = false; // Reset coins awarded flag when reel changes
   }, [reel.id]);
+
 
   useEffect(() => {
     const v = videoRef.current;
@@ -57,16 +59,15 @@ export function ReelPlayer({ reel, active, muted, onToggleMute, onEnded, onWatch
     }
   }, [active, muted, onWatched]);
 
-  // Award coins when video is watched (at 50% progress)
+  // Award coins only when video is fully watched
   useEffect(() => {
     const v = videoRef.current;
     if (!v || !active || coinsAwarded.current) return;
     
     const checkProgress = () => {
-      if (v.duration && !isNaN(v.duration) && v.currentTime >= v.duration * 0.5) {
+      if (v.duration && !isNaN(v.duration) && v.currentTime >= v.duration - 0.2) {
         addCoins(2);
         coinsAwarded.current = true;
-        onCoinsUpdate?.();
       }
     };
     
@@ -75,7 +76,7 @@ export function ReelPlayer({ reel, active, muted, onToggleMute, onEnded, onWatch
     return () => {
       v.removeEventListener('timeupdate', checkProgress);
     };
-  }, [active, reel.id, onCoinsUpdate]);
+  }, [active, reel.id]);
 
   const doLike = () => {
     const now = toggleLike(reel);
@@ -97,6 +98,7 @@ export function ReelPlayer({ reel, active, muted, onToggleMute, onEnded, onWatch
       setShowHeart(true);
       window.setTimeout(() => setShowHeart(false), 700);
     }
+    if (typeof navigator !== "undefined" && navigator.vibrate) navigator.vibrate(50);
   };
 
   const onPointerDown = () => {
@@ -191,8 +193,8 @@ export function ReelPlayer({ reel, active, muted, onToggleMute, onEnded, onWatch
         poster={reel.thumbnail}
         className="absolute inset-0 h-full w-full object-contain"
         playsInline
-        loop
-        preload="auto"
+        loop={!autoScroll}
+        preload={distance <= 1 ? "auto" : "metadata"}
         onEnded={onEnded}
         onClick={togglePlay}
         onDoubleClick={onDoubleClick}
@@ -201,6 +203,10 @@ export function ReelPlayer({ reel, active, muted, onToggleMute, onEnded, onWatch
         onPointerLeave={clearHold}
         onPointerCancel={clearHold}
         onContextMenu={onContextMenu}
+        onWaiting={() => setIsBuffering(true)}
+        onPlaying={() => setIsBuffering(false)}
+        onCanPlay={() => setIsBuffering(false)}
+        onLoadStart={() => setIsBuffering(true)}
       />
 
       {/* mute toggle */}
@@ -220,9 +226,16 @@ export function ReelPlayer({ reel, active, muted, onToggleMute, onEnded, onWatch
       )}
 
       {/* pause overlay icon */}
-      {paused && (
+      {paused && !isBuffering && (
         <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center">
           <Play className="h-20 w-20 fill-white/80 text-white/80" />
+        </div>
+      )}
+
+      {/* buffering overlay icon */}
+      {isBuffering && (
+        <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center">
+          <Loader2 className="h-12 w-12 animate-spin text-white/80" />
         </div>
       )}
 
@@ -240,8 +253,11 @@ export function ReelPlayer({ reel, active, muted, onToggleMute, onEnded, onWatch
             className={`h-8 w-8 transition ${liked ? "fill-[var(--color-marker)] text-[var(--color-marker)] scale-110" : "text-white"}`}
             strokeWidth={2}
           />
-          <span className="text-xs font-medium lowercase text-white">{liked ? "liked" : "like"}</span>
+          <span className="text-xs font-medium lowercase text-white">
+            {reel.likes ? formatCount(reel.likes + (liked ? 1 : 0)) : (liked ? "liked" : "like")}
+          </span>
         </button>
+
         <button onClick={doSave} className="flex flex-col items-center gap-1">
           {saved ? (
             <BookmarkCheck className="h-8 w-8 fill-white text-white" strokeWidth={2} />
@@ -273,6 +289,18 @@ export function ReelPlayer({ reel, active, muted, onToggleMute, onEnded, onWatch
               >
                 {autoScroll ? <ToggleRight className="h-4 w-4" /> : <ToggleLeft className="h-4 w-4" />}
                 <span className="text-sm">Auto scroll {autoScroll ? 'on' : 'off'}</span>
+              </button>
+              <button
+                onClick={() => {
+                  setShowMenu(false);
+                  if (videoRef.current && document.pictureInPictureEnabled) {
+                    videoRef.current.requestPictureInPicture().catch(() => {});
+                  }
+                }}
+                className="flex w-full items-center gap-2 rounded px-3 py-2 text-left text-white hover:bg-white/10"
+              >
+                <MonitorUp className="h-4 w-4" />
+                <span className="text-sm">Picture-in-Picture</span>
               </button>
               <button
                 onClick={reportReel}
@@ -311,6 +339,7 @@ export function ReelPlayer({ reel, active, muted, onToggleMute, onEnded, onWatch
           {reel.timeAgo && <span>{reel.timeAgo}</span>}
         </div>
       </div>
+
     </div>
   );
 }

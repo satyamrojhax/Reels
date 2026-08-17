@@ -70,34 +70,34 @@ function PinSetupPage() {
 
   if (generated) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-cream px-6 py-10">
+      <div className="flex min-h-screen items-center justify-center bg-background px-6 py-10">
         <div className="w-full max-w-md">
-          <p className="font-display text-marker text-xl lowercase italic">all set,</p>
-          <h1 className="mt-2 font-display text-[56px] leading-[1.05] lowercase text-cocoa">
+          <p className="font-display text-destructive text-xl lowercase italic">all set,</p>
+          <h1 className="mt-2 font-display text-[56px] leading-[1.05] lowercase text-foreground">
             your <span className="marker-underline">pin</span> is ready.
           </h1>
-          <p className="mt-4 text-[17px] text-charcoal/80">
+          <p className="mt-4 text-[17px] text-foreground/80">
             we made it from your date of birth (ddmmyy). this is the only time we'll show it — memorise it now.
           </p>
 
-          <div className="mt-8 rounded-2xl border-[1.5px] border-charcoal bg-dew px-6 py-8 text-center">
-            <p className="text-xs font-medium uppercase tracking-[0.25em] text-charcoal/60">
+          <div className="mt-8 rounded-2xl border-[1.5px] border-foreground/30 bg-muted px-6 py-8 text-center">
+            <p className="text-xs font-medium uppercase tracking-[0.25em] text-foreground/60">
               your pin
             </p>
-            <p className="mt-3 font-display text-[56px] tracking-[0.4em] text-cocoa">
+            <p className="mt-3 font-display text-[56px] tracking-[0.4em] text-foreground">
               {revealed ? generated : "••••••"}
             </p>
             {revealed && (
               <button
                 type="button"
                 onClick={() => setRevealed(false)}
-                className="mt-4 text-xs font-medium uppercase tracking-[0.2em] text-charcoal/60 underline underline-offset-4 hover:text-cocoa"
+                className="mt-4 text-xs font-medium uppercase tracking-[0.2em] text-foreground/60 underline underline-offset-4 hover:text-foreground"
               >
                 hide pin
               </button>
             )}
             {!revealed && (
-              <p className="mt-4 text-xs text-charcoal/50">
+              <p className="mt-4 text-xs text-foreground/50">
                 hidden. reveal only shows once — reset from the pin screen if forgotten.
               </p>
             )}
@@ -118,19 +118,19 @@ function PinSetupPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-cream px-6 py-10">
+    <div className="flex min-h-screen items-center justify-center bg-background px-6 py-10">
       <div className="w-full max-w-md">
-        <p className="font-display text-marker text-xl lowercase italic">quick setup,</p>
-        <h1 className="mt-2 font-display text-[56px] leading-[1.05] lowercase text-cocoa">
+        <p className="font-display text-destructive text-xl lowercase italic">quick setup,</p>
+        <h1 className="mt-2 font-display text-[56px] leading-[1.05] lowercase text-foreground">
           let's make your <span className="marker-underline">pin.</span>
         </h1>
-        <p className="mt-4 text-[17px] text-charcoal/80">
+        <p className="mt-4 text-[17px] text-foreground/80">
           tell us your real name and date of birth. everything stays on this device. must be 18+.
         </p>
 
         <form onSubmit={submit} className="mt-8 space-y-4">
           <label className="block">
-            <span className="mb-2 block text-xs font-medium uppercase tracking-[0.2em] text-charcoal/60">
+            <span className="mb-2 block text-xs font-medium uppercase tracking-[0.2em] text-foreground/60">
               real name
             </span>
             <input
@@ -139,11 +139,11 @@ function PinSetupPage() {
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g. priya sharma"
               maxLength={80}
-              className="w-full rounded-lg border-[1.5px] border-charcoal bg-cream px-4 py-3 text-lg text-charcoal placeholder:text-charcoal/40 outline-none transition focus:bg-dew"
+              className="w-full rounded-lg border-[1.5px] border-foreground/30 bg-background px-4 py-3 text-lg text-foreground placeholder:text-foreground/40 outline-none transition focus:bg-muted"
             />
           </label>
           <label className="block">
-            <span className="mb-2 block text-xs font-medium uppercase tracking-[0.2em] text-charcoal/60">
+            <span className="mb-2 block text-xs font-medium uppercase tracking-[0.2em] text-foreground/60">
               date of birth
             </span>
             <input
@@ -152,7 +152,7 @@ function PinSetupPage() {
               min="1900-01-01"
               max={maxDob || today}
               onChange={(e) => setDobLocal(e.target.value)}
-              className="w-full rounded-lg border-[1.5px] border-charcoal bg-cream px-4 py-3 text-lg text-charcoal outline-none transition focus:bg-dew"
+              className="w-full rounded-lg border-[1.5px] border-foreground/30 bg-background px-4 py-3 text-lg text-foreground outline-none transition focus:bg-muted"
             />
           </label>
 
@@ -165,7 +165,7 @@ function PinSetupPage() {
             <button
               type="button"
               onClick={() => navigate({ to: "/pin" })}
-              className="text-sm text-charcoal/60 underline underline-offset-4 hover:text-cocoa"
+              className="text-sm text-foreground/60 underline underline-offset-4 hover:text-foreground"
             >
               i already have a pin
             </button>
