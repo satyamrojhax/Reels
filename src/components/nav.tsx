@@ -81,6 +81,7 @@ export function BottomNav() {
           <Link
             key={it.to}
             to={it.to}
+            replace={true}
             className={`flex h-10 min-w-10 items-center justify-center rounded-full px-3 text-twilight-navy transition dark:text-cream-linen ${
               active ? "bg-periwinkle-sky dark:bg-secondary" : ""
             }`}

@@ -3,7 +3,7 @@ import { useInfiniteQuery, useQueryClient, type InfiniteData } from "@tanstack/r
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { fetchReelsPage, type Reel, type FeedFilter } from "@/lib/reels";
 import { ReelPlayer } from "@/components/reel-player";
-import { KEYS, get, set, getCoins, getAutoScroll } from "@/lib/storage";
+import { KEYS, get, set, getCoins, getAutoScroll, getLiked, getSaved } from "@/lib/storage";
 import { AlertTriangle, RefreshCw, RotateCcw, X, Coins } from "lucide-react";
 
 type ReelsSearch = { start?: string };
@@ -59,12 +59,24 @@ function ReelsPage() {
   const reels = useMemo<Reel[]>(() => {
     const all = data?.pages.flatMap((p) => p.items) ?? [];
     const seen = new Set<string>();
-    return all.filter((r) => {
-      if (seen.has(r.id)) return false;
+    const finalReels: Reel[] = [];
+
+    if (start && all.findIndex(r => r.id === start) === -1) {
+       const likedAndSaved = [...getLiked(), ...getSaved()];
+       const target = likedAndSaved.find(r => r.id === start);
+       if (target) {
+         finalReels.push(target);
+         seen.add(target.id);
+       }
+    }
+
+    for (const r of all) {
+      if (seen.has(r.id)) continue;
       seen.add(r.id);
-      return true;
-    });
-  }, [data]);
+      finalReels.push(r);
+    }
+    return finalReels;
+  }, [data, start]);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const slideRefs = useRef<Array<HTMLElement | null>>([]);

@@ -2,10 +2,10 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useTheme, type Theme } from "@/hooks/use-theme";
-import { getLiked, getSaved, KEYS, get, set, setLiked, setSaved, getCoins } from "@/lib/storage";
+import { getLiked, getSaved, KEYS, get, set, setLiked, setSaved, getCoins, hasUnlocked } from "@/lib/storage";
 import { useHydrated } from "@/hooks/use-hydrated";
 import { usePwa } from "@/hooks/use-pwa";
-import { Eye, EyeOff, LogOut, Moon, Sun, Monitor, Trash2, Coins, Download } from "lucide-react";
+import { Eye, EyeOff, LogOut, Moon, Sun, Monitor, Trash2, Coins, Download, BadgeCheck } from "lucide-react";
 
 export const Route = createFileRoute("/_app/settings")({
   component: SettingsPage,
@@ -52,7 +52,10 @@ function SettingsPage() {
             {username?.[0]?.toUpperCase()}
           </div>
           <div>
-            <div className="font-display text-2xl lowercase text-cocoa dark:text-cream">@{username}</div>
+            <div className="flex items-center gap-2 font-display text-2xl lowercase text-cocoa dark:text-cream">
+              @{username}
+              {hasUnlocked("badge_verified") && <BadgeCheck className="h-6 w-6 text-blue-500" />}
+            </div>
             <div className="text-sm text-marker">a reels reader</div>
           </div>
         </div>

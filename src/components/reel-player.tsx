@@ -66,7 +66,7 @@ export function ReelPlayer({ reel, active, muted, onToggleMute, onEnded, onWatch
     
     const checkProgress = () => {
       if (v.duration && !isNaN(v.duration) && v.currentTime >= v.duration - 0.2) {
-        addCoins(2);
+        addCoins(5);
         coinsAwarded.current = true;
       }
     };
@@ -157,11 +157,7 @@ export function ReelPlayer({ reel, active, muted, onToggleMute, onEnded, onWatch
   };
 
   const copyLink = () => {
-    const deepLink =
-      typeof window !== "undefined"
-        ? `${window.location.origin}/reels?start=${encodeURIComponent(reel.id)}`
-        : reel.videoUrl;
-    navigator.clipboard.writeText(deepLink);
+    navigator.clipboard.writeText(reel.videoUrl);
     setShowMenu(false);
   };
 
@@ -299,8 +295,8 @@ export function ReelPlayer({ reel, active, muted, onToggleMute, onEnded, onWatch
                 }}
                 className="flex w-full items-center gap-2 rounded px-3 py-2 text-left text-white hover:bg-white/10"
               >
-                <MonitorUp className="h-4 w-4" />
-                <span className="text-sm">Picture-in-Picture</span>
+                <MonitorUp className="h-4 w-4 shrink-0" />
+                <span className="text-sm truncate">Picture-in-Picture</span>
               </button>
               <button
                 onClick={reportReel}

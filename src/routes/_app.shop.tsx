@@ -11,7 +11,7 @@ type ShopItem = {
   id: string;
   name: string;
   description: string;
-  icon: React.FC<{ className?: string }>;
+  icon: React.FC<{ className?: string; strokeWidth?: number }>;
   cost: number;
   onApply?: () => void;
 };
@@ -22,14 +22,14 @@ const ITEMS: ShopItem[] = [
     name: "Verified Badge",
     description: "Get a glowing blue checkmark next to your name.",
     icon: CheckCircle,
-    cost: 10000,
+    cost: 99,
   },
   {
     id: "theme_neon",
     name: "Neon Cyberpunk Theme",
     description: "Unlock a dark futuristic aesthetic with pink and cyan glows.",
     icon: Palette,
-    cost: 50000,
+    cost: 499,
     onApply: () => {
       set("ig.theme", "neon");
       window.dispatchEvent(new Event("theme-change"));
@@ -51,8 +51,17 @@ function ShopPage() {
     setActiveTheme(raw ? JSON.parse(raw) : "system");
 
     const handleCoinsChange = () => setCoins(getCoins());
+    const handleThemeChange = () => {
+      const current = localStorage.getItem("ig.theme");
+      setActiveTheme(current ? JSON.parse(current) : "system");
+    };
+
     window.addEventListener("coins-change", handleCoinsChange);
-    return () => window.removeEventListener("coins-change", handleCoinsChange);
+    window.addEventListener("theme-change", handleThemeChange);
+    return () => {
+      window.removeEventListener("coins-change", handleCoinsChange);
+      window.removeEventListener("theme-change", handleThemeChange);
+    };
   }, []);
 
   const handlePurchase = (item: ShopItem) => {
@@ -60,7 +69,7 @@ function ShopPage() {
       if (item.onApply) item.onApply();
       return;
     }
-    
+
     if (spendCoins(item.cost)) {
       unlockItem(item.id);
       setCoins(getCoins());
@@ -72,70 +81,64 @@ function ShopPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background pb-20 pt-10 md:pl-[244px] md:pt-0">
-      <div className="mx-auto max-w-2xl px-6 py-10 md:py-16">
-        <div className="mb-10 flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h1 className="flex items-center gap-3 text-3xl font-bold text-foreground md:text-4xl">
-              <ShoppingBag className="h-8 w-8 text-primary" />
-              Coin Shop
-            </h1>
-            <p className="mt-2 text-foreground/70">
-              Spend your hard-earned coins on exclusive unlockables.
-            </p>
-          </div>
-          <div className="flex w-full items-center justify-between rounded-xl bg-card p-4 sm:w-auto sm:flex-col sm:items-end sm:bg-transparent sm:p-0">
-            <span className="text-sm font-semibold uppercase tracking-widest text-foreground/50">Balance</span>
-            <span className="text-2xl font-bold text-yellow-500 sm:text-3xl">{formatCoins(coins)} 🪙</span>
-          </div>
+    <div className="mx-auto max-w-[1200px] px-6 py-10 pb-24 md:pl-[268px]">
+      <div className="mb-8 flex flex-col items-start gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <p className="font-display text-marker text-xl lowercase italic">treat yourself —</p>
+          <h1 className="mt-2 font-display text-[48px] leading-[1.05] lowercase text-cocoa md:text-[64px] dark:text-cream">
+            coin shop
+          </h1>
         </div>
+        <div className="flex w-full sm:w-auto items-center justify-between sm:justify-start gap-3 rounded-full border-[1.5px] border-charcoal bg-cream px-5 py-2 dark:border-cream dark:bg-charcoal">
+          <span className="font-display text-lg lowercase text-charcoal/70 dark:text-cream/70">balance:</span>
+          <span className="font-display text-2xl text-marker">{formatCoins(coins)} 🪙</span>
+        </div>
+      </div>
 
-        <div className="grid gap-6 sm:grid-cols-2">
-          {ITEMS.map((item) => {
-            const isUnlocked = unlocks.includes(item.id);
-            const canAfford = coins >= item.cost;
-            
-            return (
-              <div 
-                key={item.id}
-                className={`relative overflow-hidden rounded-2xl border-[1.5px] p-6 transition-all ${
-                  isUnlocked 
-                    ? "border-primary bg-primary/5" 
-                    : canAfford 
-                      ? "border-foreground/20 bg-card hover:border-primary/50" 
-                      : "border-foreground/10 bg-muted/50 opacity-80"
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {ITEMS.map((item) => {
+          const isUnlocked = unlocks.includes(item.id);
+          const canAfford = coins >= item.cost;
+
+          return (
+            <div
+              key={item.id}
+              className={`paper-card flex flex-col relative overflow-hidden p-6 transition-transform ${isUnlocked
+                ? "border-marker bg-marker/5"
+                : canAfford
+                  ? "hover:-translate-y-1 hover:shadow-[4px_4px_0px_rgba(255,107,107,0.3)]"
+                  : "opacity-80"
                 }`}
-              >
-                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-foreground/10">
-                  <item.icon className={`h-6 w-6 ${isUnlocked ? "text-primary" : "text-foreground/70"}`} />
-                </div>
-                <h3 className="mb-2 text-xl font-bold text-foreground">{item.name}</h3>
-                <p className="mb-6 text-sm text-foreground/70">{item.description}</p>
-                
-                <button
-                  onClick={() => handlePurchase(item)}
-                  disabled={!isUnlocked && !canAfford}
-                  className={`flex w-full items-center justify-center gap-2 rounded-full py-3 text-sm font-bold uppercase tracking-wider transition ${
-                    isUnlocked
-                      ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                      : canAfford
-                        ? "bg-yellow-500 text-black hover:bg-yellow-400"
-                        : "bg-foreground/20 text-foreground/50 cursor-not-allowed"
-                  }`}
-                >
-                  {isUnlocked ? (
-                    item.id === "theme_neon" && activeTheme === "neon" ? "Applied" : "Apply"
-                  ) : (
-                    <>
-                      {canAfford ? <Zap className="h-4 w-4" /> : <Lock className="h-4 w-4" />}
-                      Unlock for {formatCoins(item.cost)} 🪙
-                    </>
-                  )}
-                </button>
+            >
+              <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full border-[1.5px] border-charcoal bg-cream text-cocoa dark:border-cream dark:bg-charcoal dark:text-cream">
+                <item.icon className={`h-7 w-7 ${isUnlocked ? "text-marker" : ""}`} strokeWidth={1.5} />
               </div>
-            );
-          })}
-        </div>
+              <h3 className="font-display text-2xl lowercase text-cocoa dark:text-cream mb-2">{item.name}</h3>
+              <p className="mb-8 flex-1 text-sm text-charcoal/70 dark:text-cream/70 leading-relaxed">{item.description}</p>
+
+              <button
+                onClick={() => handlePurchase(item)}
+                disabled={!isUnlocked && !canAfford}
+                className={`btn-pill w-full justify-center flex items-center gap-2 ${isUnlocked
+                  ? "bg-marker text-white border-marker hover:bg-marker/90"
+                  : canAfford
+                    ? ""
+                    : "opacity-50 cursor-not-allowed"
+                  }`}
+              >
+                {isUnlocked ? (
+                  item.id === "badge_verified" ? "equipped" :
+                    item.id === "theme_neon" && activeTheme === "neon" ? "applied" : "apply"
+                ) : (
+                  <>
+                    {canAfford ? <Zap className="h-4 w-4" /> : <Lock className="h-4 w-4" />}
+                    unlock for {formatCoins(item.cost)}
+                  </>
+                )}
+              </button>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
