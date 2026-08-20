@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import type { Reel } from "@/lib/reels";
 import { Heart, Share2, Volume2, VolumeX, Play, MoreHorizontal, Bookmark, BookmarkCheck, Coins, Flag, Copy, ToggleLeft, ToggleRight, Eye, MonitorUp, Loader2 } from "lucide-react";
-import { isLiked as checkLiked, toggleLike, isSaved as checkSaved, toggleSave, addCoins, getAutoScroll, setAutoScroll } from "@/lib/storage";
+import { isLiked as checkLiked, toggleLike, isSaved as checkSaved, toggleSave, addCoins, getAutoScroll, setAutoScroll, hasUnlocked } from "@/lib/storage";
+import confetti from "canvas-confetti";
 
 type Props = {
   reel: Reel;
@@ -98,6 +99,22 @@ export function ReelPlayer({ reel, active, muted, onToggleMute, onEnded, onWatch
       setShowHeart(true);
       window.setTimeout(() => setShowHeart(false), 700);
     }
+    
+    if (hasUnlocked("effect_confetti")) {
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 },
+        zIndex: 9999
+      });
+    }
+
+    if (localStorage.getItem("ig.meme_sounds") === "true") {
+      const audio = new Audio("https://www.myinstants.com/media/sounds/bruh.mp3");
+      audio.volume = 0.5;
+      audio.play().catch(() => {});
+    }
+
     if (typeof navigator !== "undefined" && navigator.vibrate) navigator.vibrate(50);
   };
 
@@ -244,7 +261,14 @@ export function ReelPlayer({ reel, active, muted, onToggleMute, onEnded, onWatch
 
       {/* right action rail */}
       <div className="absolute bottom-24 right-3 z-20 flex flex-col items-center gap-5">
-        <button onClick={doLike} className="flex flex-col items-center gap-1">
+        <button onClick={() => {
+          doLike();
+          if (!liked && localStorage.getItem("ig.meme_sounds") === "true") {
+            const audio = new Audio("https://www.myinstants.com/media/sounds/anime-wow-sound-effect.mp3");
+            audio.volume = 0.5;
+            audio.play().catch(() => {});
+          }
+        }} className="flex flex-col items-center gap-1">
           <Heart
             className={`h-8 w-8 transition ${liked ? "fill-[var(--color-marker)] text-[var(--color-marker)] scale-110" : "text-white"}`}
             strokeWidth={2}

@@ -1,5 +1,5 @@
 import { createFileRoute, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useTheme } from "@/hooks/use-theme";
 import { Sidebar, BottomNav, Footer } from "@/components/nav";
@@ -15,6 +15,16 @@ function AppLayout() {
   const { ready, ageOk, username, pinOk } = useAuth();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const isReels = pathname === "/reels";
+
+  const [activeCrt, setActiveCrt] = useState(false);
+  useEffect(() => {
+    setActiveCrt(localStorage.getItem("ig.crt") === "true");
+    const handleEffectsChange = () => {
+      setActiveCrt(localStorage.getItem("ig.crt") === "true");
+    };
+    window.addEventListener("effects-change", handleEffectsChange);
+    return () => window.removeEventListener("effects-change", handleEffectsChange);
+  }, []);
 
   useEffect(() => {
     if (!ready) return;
@@ -32,7 +42,7 @@ function AppLayout() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className={`min-h-screen bg-background ${activeCrt ? 'crt-filter' : ''}`}>
       <Sidebar username={username} />
       <main
         className={

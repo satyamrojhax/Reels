@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { getCoins, spendCoins, getUnlocks, unlockItem, hasUnlocked, set } from "@/lib/storage";
-import { ShoppingBag, CheckCircle, Zap, Palette, Lock } from "lucide-react";
+import { ShoppingBag, CheckCircle, Zap, Palette, Lock, Sparkles, Tv, Music, Terminal, PartyPopper } from "lucide-react";
 
 export const Route = createFileRoute("/_app/shop")({
   component: ShopPage,
@@ -35,12 +35,63 @@ const ITEMS: ShopItem[] = [
       window.dispatchEvent(new Event("theme-change"));
     },
   },
+  {
+    id: "theme_matrix",
+    name: "Matrix Hacker Theme",
+    description: "Enter the mainframe. Green text on black background.",
+    icon: Terminal,
+    cost: 999,
+    onApply: () => {
+      set("ig.theme", "matrix");
+      window.dispatchEvent(new Event("theme-change"));
+    },
+  },
+  {
+    id: "badge_vip",
+    name: "VIP Golden Username",
+    description: "Your username turns shiny gold with a crown across the app.",
+    icon: Sparkles,
+    cost: 2000,
+  },
+  {
+    id: "effect_confetti",
+    name: "Confetti Likes",
+    description: "Double tap to explode confetti instead of a boring heart.",
+    icon: PartyPopper,
+    cost: 300,
+  },
+  {
+    id: "filter_crt",
+    name: "CRT Retro Filter",
+    description: "Adds scanlines and screen curvature to the video player.",
+    icon: Tv,
+    cost: 500,
+    onApply: () => {
+      const current = localStorage.getItem("ig.crt") === "true";
+      set("ig.crt", !current);
+      window.dispatchEvent(new Event("effects-change"));
+    },
+  },
+  {
+    id: "sound_meme",
+    name: "Meme Soundboard",
+    description: "Plays goofy sounds occasionally.",
+    icon: Music,
+    cost: 750,
+    onApply: () => {
+      const current = localStorage.getItem("ig.meme_sounds") === "true";
+      set("ig.meme_sounds", !current);
+      window.dispatchEvent(new Event("effects-change"));
+    },
+  },
 ];
 
 function ShopPage() {
   const [coins, setCoins] = useState(0);
   const [unlocks, setUnlocks] = useState<string[]>([]);
   const [activeTheme, setActiveTheme] = useState("");
+  const [activeCrt, setActiveCrt] = useState(false);
+  const [activeMeme, setActiveMeme] = useState(false);
 
   const formatCoins = (num: number) => new Intl.NumberFormat("en-IN").format(num);
 
@@ -49,18 +100,26 @@ function ShopPage() {
     setUnlocks(getUnlocks());
     const raw = localStorage.getItem("ig.theme");
     setActiveTheme(raw ? JSON.parse(raw) : "system");
+    setActiveCrt(localStorage.getItem("ig.crt") === "true");
+    setActiveMeme(localStorage.getItem("ig.meme_sounds") === "true");
 
     const handleCoinsChange = () => setCoins(getCoins());
     const handleThemeChange = () => {
       const current = localStorage.getItem("ig.theme");
       setActiveTheme(current ? JSON.parse(current) : "system");
     };
+    const handleEffectsChange = () => {
+      setActiveCrt(localStorage.getItem("ig.crt") === "true");
+      setActiveMeme(localStorage.getItem("ig.meme_sounds") === "true");
+    };
 
     window.addEventListener("coins-change", handleCoinsChange);
     window.addEventListener("theme-change", handleThemeChange);
+    window.addEventListener("effects-change", handleEffectsChange);
     return () => {
       window.removeEventListener("coins-change", handleCoinsChange);
       window.removeEventListener("theme-change", handleThemeChange);
+      window.removeEventListener("effects-change", handleEffectsChange);
     };
   }, []);
 
@@ -128,7 +187,11 @@ function ShopPage() {
               >
                 {isUnlocked ? (
                   item.id === "badge_verified" ? "equipped" :
-                    item.id === "theme_neon" && activeTheme === "neon" ? "applied" : "apply"
+                  item.id === "badge_vip" ? "equipped" :
+                  item.id === "effect_confetti" ? "equipped" :
+                  item.id.startsWith("theme_") ? (activeTheme === item.id.replace("theme_", "") ? "applied" : "apply") :
+                  item.id === "filter_crt" ? (activeCrt ? "disable" : "enable") :
+                  item.id === "sound_meme" ? (activeMeme ? "disable" : "enable") : "apply"
                 ) : (
                   <>
                     {canAfford ? <Zap className="h-4 w-4" /> : <Lock className="h-4 w-4" />}

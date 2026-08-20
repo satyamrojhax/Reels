@@ -26,6 +26,7 @@ function BrandMark({ size = 36 }: { size?: number }) {
 export function Sidebar({ username }: { username: string | null }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const isVerified = hasUnlocked("badge_verified");
+  const isVip = hasUnlocked("badge_vip");
   return (
     <aside className="fixed left-0 top-0 z-30 hidden h-screen w-[244px] flex-col border-r border-twilight-navy bg-cloud-white px-6 py-8 md:flex dark:bg-dusk-indigo dark:border-periwinkle-sky/40">
       <Link to="/home" className="mb-10 block">
@@ -59,7 +60,8 @@ export function Sidebar({ username }: { username: string | null }) {
           </div>
           <div className="min-w-0">
             <div className="flex items-center gap-1 truncate text-sm font-medium text-twilight-navy dark:text-cream-linen">
-              @{username}
+              <span className={isVip ? "vip-text" : ""}>@{username}</span>
+              {isVip && <span title="VIP">👑</span>}
               {isVerified && <BadgeCheck className="h-4 w-4 text-blue-500 flex-shrink-0" />}
             </div>
             <div className="text-[10px] font-medium uppercase tracking-[0.18em] text-slate-mist">signed in</div>

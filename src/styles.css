@@ -245,4 +245,60 @@
   --border: #f472b6;
   --input: #22d3ee;
   --ring: #f472b6;
+}.matrix {
+  --background: #000000;
+  --foreground: #00ff00;
+  --card: #001100;
+  --card-foreground: #00ff00;
+  --popover: #001100;
+  --popover-foreground: #00ff00;
+  --primary: #00ff00;
+  --primary-foreground: #000000;
+  --secondary: #003300;
+  --secondary-foreground: #00ff00;
+  --muted: #001a00;
+  --muted-foreground: #008800;
+  --accent: #003300;
+  --accent-foreground: #00ff00;
+  --destructive: #ff0000;
+  --destructive-foreground: #ffffff;
+  --border: #00ff00;
+  --input: #00ff00;
+  --ring: #00ff00;
+}
+.matrix * {
+  font-family: monospace !important;
+}
+
+.vip-text {
+  background: linear-gradient(90deg, #BF953F, #FCF6BA, #B38728, #FBF5B7, #AA771C);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: bold;
+}
+
+.crt-filter {
+  animation: flicker 0.15s infinite;
+  pointer-events: none;
+}
+.crt-filter::before {
+  content: ' ';
+  display: block;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background: linear-gradient(
+    rgba(18, 16, 16, 0) 50%,
+    rgba(0, 0, 0, 0.25) 50%
+  );
+  background-size: 100% 4px;
+  z-index: 50;
+  pointer-events: none;
+}
+@keyframes flicker {
+  0% { opacity: 0.95; }
+  50% { opacity: 0.85; }
+  100% { opacity: 0.95; }
 }
