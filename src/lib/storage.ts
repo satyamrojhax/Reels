@@ -7,6 +7,8 @@ export const KEYS = {
   pinCode: "ig.pin_code",
   realName: "ig.real_name",
   dob: "ig.dob",
+  email: "ig.email",
+  mobile: "ig.mobile",
   liked: "ig.liked",
   saved: "ig.saved",
   watched: "ig.watched_count",

@@ -8,6 +8,7 @@ export const Route = createFileRoute("/age")({
 function AgePage() {
   const navigate = useNavigate();
   const { confirmAge } = useAuth();
+
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background px-6 py-10">
       <Sticker className="left-6 top-8 rotate-[-12deg]" color="var(--color-sky-sticker)" shape="bolt" />
@@ -22,6 +23,7 @@ function AgePage() {
         <p className="mt-5 max-w-md text-[17px] leading-relaxed text-foreground/80">
           this playground is stitched together from adult reels. pinky-promise you're 18+ and we'll let you in.
         </p>
+
         <div className="mt-8 flex flex-wrap gap-3">
           <button
             onClick={() => {

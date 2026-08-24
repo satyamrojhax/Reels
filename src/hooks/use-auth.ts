@@ -19,7 +19,8 @@ export function useAuth() {
   const [pinCode, setPinCodeState] = useState<string | null>(null);
   const [realName, setRealName] = useState<string | null>(null);
   const [dob, setDob] = useState<string | null>(null);
-
+  const [email, setEmail] = useState<string | null>(null);
+  const [mobile, setMobile] = useState<string | null>(null);
   useEffect(() => {
     setAgeOk(get<boolean>(KEYS.age, false));
     setUsername(get<string | null>(KEYS.username, null));
@@ -29,6 +30,8 @@ export function useAuth() {
     setPinCodeState(get<string | null>(KEYS.pinCode, null));
     setRealName(get<string | null>(KEYS.realName, null));
     setDob(get<string | null>(KEYS.dob, null));
+    setEmail(get<string | null>(KEYS.email, null));
+    setMobile(get<string | null>(KEYS.mobile, null));
     setReady(true);
   }, []);
 
@@ -40,6 +43,8 @@ export function useAuth() {
     pinCode,
     realName,
     dob,
+    email,
+    mobile,
     confirmAge: () => {
       set(KEYS.age, true);
       setAgeOk(true);
@@ -53,13 +58,17 @@ export function useAuth() {
       sessionStorage.setItem(SESSION_PIN_KEY, ok ? "true" : "false");
       setPinOk(ok);
     },
-    savePinSetup: (name: string, dobStr: string) => {
+    savePinSetup: (name: string, dobStr: string, emailStr?: string, mobileStr?: string) => {
       const code = generatePinFromDob(dobStr);
       set(KEYS.realName, name);
       set(KEYS.dob, dobStr);
+      if (emailStr) set(KEYS.email, emailStr);
+      if (mobileStr) set(KEYS.mobile, mobileStr);
       set(KEYS.pinCode, code);
       setRealName(name);
       setDob(dobStr);
+      if (emailStr) setEmail(emailStr);
+      if (mobileStr) setMobile(mobileStr);
       setPinCodeState(code);
       return code;
     },
