@@ -48,13 +48,16 @@ function LoginPage() {
               autoFocus
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="e.g. Mr_Hawasi"
+              placeholder="e.g. Satyam RojhaX"
               className="w-full rounded-lg border-[1.5px] border-foreground/30 bg-background px-4 py-3 text-lg text-foreground placeholder:text-foreground/40 outline-none transition focus:bg-muted"
             />
           </label>
           <button type="submit" disabled={!name.trim()} className="btn-pill">
             continue →
           </button>
+          <p className="mt-4 text-[12px] text-foreground/80">
+            This is only for you, no one will ever see this. It's just a nickname stuck to your device.
+          </p>
         </form>
       </div>
     </div>

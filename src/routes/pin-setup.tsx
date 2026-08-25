@@ -164,7 +164,7 @@ function PinSetupPage() {
               autoFocus
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="e.g. priya sharma"
+              placeholder="e.g. Satyam RojhaX"
               maxLength={80}
               className="w-full rounded-lg border-[1.5px] border-foreground/30 bg-background px-4 py-3 text-lg text-foreground placeholder:text-foreground/40 outline-none transition focus:bg-muted"
             />
@@ -190,7 +190,7 @@ function PinSetupPage() {
               type="email"
               value={email}
               onChange={(e) => setEmailLocal(e.target.value)}
-              placeholder="e.g. hello@example.com"
+              placeholder="e.g. epowerxlabs@gmail.com"
               className="w-full rounded-lg border-[1.5px] border-foreground/30 bg-background px-4 py-3 text-lg text-foreground placeholder:text-foreground/40 outline-none transition focus:bg-muted"
             />
           </label>
@@ -202,10 +202,13 @@ function PinSetupPage() {
               type="tel"
               value={mobile}
               onChange={(e) => setMobileLocal(e.target.value)}
-              placeholder="e.g. +91 9876543210"
+              placeholder="e.g. +91 9988776655"
               className="w-full rounded-lg border-[1.5px] border-foreground/30 bg-background px-4 py-3 text-lg text-foreground placeholder:text-foreground/40 outline-none transition focus:bg-muted"
             />
           </label>
+          <p className="mt-4 text-[12px] text-foreground/80">
+            This is only for you, no one will ever see this. It's just a phone number stuck to your device.
+          </p>
 
           <label className="mt-4 flex items-start gap-3 rounded-xl border-[1.5px] border-foreground/30 bg-muted/50 p-4 transition-colors hover:bg-muted">
             <input
