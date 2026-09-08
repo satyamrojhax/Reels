@@ -22,8 +22,6 @@ export const KEYS = {
   unlocks: "ig.unlocks",
   randomMode: "ig.random_mode",
   recOffset: "ig.rec_offset",
-  chatHistory: "ig.chat_history",
-  chatInstruction: "ig.chat_instruction",
 } as const;
 
 export const isBrowser = () => typeof window !== "undefined";
@@ -153,49 +151,5 @@ export function getRecommendedOffset(): number {
 
 export function setRecommendedOffset(value: number): void {
   set(KEYS.recOffset, value);
-}
-
-export type ChatMessage = { role: "user" | "model"; content: string; image?: string | null };
-export type ChatSession = { id: string; title: string; messages: ChatMessage[]; updatedAt: number };
-
-export function getChatSessions(): ChatSession[] {
-  const data = get<any[]>(KEYS.chatHistory, []);
-  if (!Array.isArray(data)) return [];
-  
-  if (data.length > 0 && !('messages' in data[0])) {
-    // Backwards compatibility: if it's an array of raw messages, convert to a single session
-    const session: ChatSession = {
-      id: Date.now().toString(),
-      title: data.length > 1 ? data[1].content.slice(0, 30) + "..." : "Legacy Chat",
-      messages: data as ChatMessage[],
-      updatedAt: Date.now()
-    };
-    return [session];
-  }
-  
-  return data as ChatSession[];
-}
-
-export function saveChatSession(session: ChatSession): void {
-  const sessions = getChatSessions();
-  const existingIndex = sessions.findIndex((s) => s.id === session.id);
-  if (existingIndex >= 0) {
-    sessions[existingIndex] = session;
-  } else {
-    sessions.unshift(session);
-  }
-  set(KEYS.chatHistory, sessions);
-}
-
-export function deleteChatSession(id: string): void {
-  const sessions = getChatSessions();
-  set(KEYS.chatHistory, sessions.filter((s) => s.id !== id));
-}
-
-export function getChatInstruction(): string {
-  return get<string>(KEYS.chatInstruction, "You are a helpful, friendly AI assistant. Answer in easy Hinglish.");
-}
-export function setChatInstruction(instruction: string): void {
-  set(KEYS.chatInstruction, instruction);
 }
 
