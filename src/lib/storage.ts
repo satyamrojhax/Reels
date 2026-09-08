@@ -7,8 +7,9 @@ export const KEYS = {
   pinCode: "ig.pin_code",
   realName: "ig.real_name",
   dob: "ig.dob",
-  email: "ig.email",
-  mobile: "ig.mobile",
+  hash: "ig.hash",
+  deviceId: "ig.device_id",
+  fingerprint: "ig.fingerprint",
   liked: "ig.liked",
   saved: "ig.saved",
   watched: "ig.watched_count",
@@ -19,6 +20,8 @@ export const KEYS = {
   lastReelId: "ig.last_reel_id",
   lastReelIdx: "ig.last_reel_idx",
   unlocks: "ig.unlocks",
+  randomMode: "ig.random_mode",
+  recOffset: "ig.rec_offset",
 } as const;
 
 export const isBrowser = () => typeof window !== "undefined";
@@ -132,5 +135,21 @@ export function unlockItem(id: string): void {
     current.push(id);
     set(KEYS.unlocks, current);
   }
+}
+
+export function getRandomMode(): boolean {
+  return get<boolean>(KEYS.randomMode, false);
+}
+
+export function setRandomMode(value: boolean): void {
+  set(KEYS.randomMode, value);
+}
+
+export function getRecommendedOffset(): number {
+  return get<number>(KEYS.recOffset, 0);
+}
+
+export function setRecommendedOffset(value: number): void {
+  set(KEYS.recOffset, value);
 }
 

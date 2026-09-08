@@ -1,8 +1,10 @@
 import localDbRaw from "../../assets/v1-reels-db.json";
+import recommendedDbRaw from "../../assets/recommended_data.json";
+import { getRandomMode, getRecommendedOffset, setRecommendedOffset } from "./storage";
 
 export type Reel = {
   id: string;
-  source: "v1" | "v2" | "v4" | "local";
+  source: "v1" | "v2" | "v4" | "local" | "rojha_ji";
   videoUrl: string;
   thumbnail?: string;
   title?: string;
@@ -55,6 +57,14 @@ const localDb: Reel[] = shuffle((localDbRaw as any[]).map((v, i) => ({
   title: "Watch Reels 18+",
 })));
 
+const recommendedDb: Reel[] = (recommendedDbRaw as any[]).map((v: any) => ({
+  id: `recommended-${v.id}`,
+  source: "rojha_ji" as const,
+  videoUrl: v.video_url,
+  thumbnail: v.image,
+  title: v.title,
+}));
+
 async function fetchWithRetry(url: string, attempts = 2): Promise<Response | null> {
   let delay = 400;
   for (let i = 0; i < attempts; i++) {
@@ -99,65 +109,84 @@ async function fetchXvideos(base: (typeof XVIDEO_BASES)[number], page: number): 
 
 let localDbOffset = 0;
 
-export type FeedFilter = "all" | "local" | "trending";
+export type FeedFilter = "all" | "local" | "trending" | "recommended";
 
 export async function fetchReelsPage(page: number, filter: FeedFilter = "all"): Promise<{ items: Reel[]; nextPage: number }> {
   const selectedReels: Reel[] = [];
+  const isRandom = getRandomMode();
 
-  // Helper to grab local reels
-  const grabLocalReels = (count: number) => {
-    let slice = localDb.slice(localDbOffset, localDbOffset + count);
-    if (slice.length < count) {
-      slice = [...slice, ...localDb.slice(0, count - slice.length)];
+  if (isRandom) {
+    selectedReels.push(...shuffle(localDb).slice(0, 10));
+    selectedReels.push(...shuffle(recommendedDb).slice(0, 10));
+
+    const randomBaseIndex = Math.floor(Math.random() * XVIDEO_BASES.length);
+    const base = XVIDEO_BASES[randomBaseIndex];
+    const randomPage = Math.floor(Math.random() * base.maxPage) + 1;
+    const res = await fetchXvideos(base, randomPage);
+    selectedReels.push(...shuffle(res));
+
+    const seen = new Set<string>();
+    const deduped = shuffle(selectedReels).filter((r) => {
+      if (seen.has(r.videoUrl)) return false;
+      seen.add(r.videoUrl);
+      return true;
+    });
+    if (deduped.length === 0) throw new Error("Couldn't load reels.");
+    return { items: deduped, nextPage: page + 1 };
+  }
+
+  // LINE BY LINE MODE (OFF)
+  if (filter === "recommended") {
+    let offset = getRecommendedOffset();
+    let slice = recommendedDb.slice(offset, offset + 15);
+    if (slice.length < 15) {
+      slice = [...slice, ...recommendedDb.slice(0, 15 - slice.length)];
     }
-    localDbOffset = (localDbOffset + count) % localDb.length;
-    return shuffle(slice);
-  };
-
-  if (filter === "local") {
-    selectedReels.push(...grabLocalReels(30));
+    setRecommendedOffset((offset + 15) % recommendedDb.length);
+    selectedReels.push(...slice);
+  } else if (filter === "local") {
+    let slice = localDb.slice(localDbOffset, localDbOffset + 30);
+    if (slice.length < 30) {
+      slice = [...slice, ...localDb.slice(0, 30 - slice.length)];
+    }
+    localDbOffset = (localDbOffset + 30) % localDb.length;
+    selectedReels.push(...slice);
   } else if (filter === "trending") {
     const offset = page - 1;
     const sourceIndex = offset % 3;
     const apiPage = Math.floor(offset / 3) + 1;
-
     const base = XVIDEO_BASES[sourceIndex];
     const safePage = ((apiPage - 1) % base.maxPage) + 1;
 
     const res = await fetchXvideos(base, safePage);
-
     if (res.length > 0) {
-      selectedReels.push(...shuffle(res));
+      selectedReels.push(...res);
     } else {
-      selectedReels.push(...grabLocalReels(30));
+      let slice = localDb.slice(localDbOffset, localDbOffset + 30);
+      localDbOffset = (localDbOffset + 30) % localDb.length;
+      selectedReels.push(...slice);
     }
   } else {
     // filter === "all"
-    if (page === 1) {
-      selectedReels.push(...grabLocalReels(34));
-    } else if (page === 2) {
-      selectedReels.push(...grabLocalReels(33));
-    } else if (page === 3) {
-      selectedReels.push(...grabLocalReels(33));
-    } else {
-      const offset = page - 4;
-      const sourceIndex = offset % 3;
-      const apiPage = Math.floor(offset / 3) + 1;
+    let slice = localDb.slice(localDbOffset, localDbOffset + 20);
+    if (slice.length < 20) {
+      slice = [...slice, ...localDb.slice(0, 20 - slice.length)];
+    }
+    localDbOffset = (localDbOffset + 20) % localDb.length;
+    selectedReels.push(...slice);
 
-      const base = XVIDEO_BASES[sourceIndex];
-      const safePage = ((apiPage - 1) % base.maxPage) + 1;
+    const offset = page - 1;
+    const sourceIndex = offset % 3;
+    const apiPage = Math.floor(offset / 3) + 1;
+    const base = XVIDEO_BASES[sourceIndex];
+    const safePage = ((apiPage - 1) % base.maxPage) + 1;
 
-      const res = await fetchXvideos(base, safePage);
-
-      if (res.length > 0) {
-        selectedReels.push(...shuffle(res));
-      } else {
-        selectedReels.push(...grabLocalReels(30));
-      }
+    const res = await fetchXvideos(base, safePage);
+    if (res.length > 0) {
+      selectedReels.push(...res);
     }
   }
 
-  // Deduplicate by video URL
   const seen = new Set<string>();
   const deduped = selectedReels.filter((r) => {
     if (seen.has(r.videoUrl)) return false;

@@ -41,8 +41,6 @@ function PinSetupPage() {
   const { ready, ageOk, username, savePinSetup } = useAuth();
   const [name, setName] = useState("");
   const [dob, setDobLocal] = useState("");
-  const [email, setEmailLocal] = useState("");
-  const [mobile, setMobileLocal] = useState("");
   const [generated, setGenerated] = useState<string | null>(null);
   const [revealed, setRevealed] = useState(true);
   const [error, setError] = useState("");
@@ -72,20 +70,16 @@ function PinSetupPage() {
     else if (!username) navigate({ to: "/login" });
   }, [ready, ageOk, username, navigate]);
 
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     if (!checked) return setError("please read and accept the consent check.");
     const trimmed = name.trim();
     if (trimmed.length < 2) return setError("please enter your real name.");
-    const trimmedEmail = email.trim();
-    if (!trimmedEmail) return setError("please enter your email id.");
-    const trimmedMobile = mobile.trim();
-    if (!trimmedMobile) return setError("please enter your mobile number.");
 
     const v = isValidDob(dob);
     if (!v.ok) return setError(v.reason ?? "invalid date.");
-    const code = savePinSetup(trimmed, dob, trimmedEmail, trimmedMobile);
+    const code = await savePinSetup(trimmed, dob);
     setGenerated(code);
     setRevealed(true);
   };
@@ -182,33 +176,7 @@ function PinSetupPage() {
               className="w-full rounded-lg border-[1.5px] border-foreground/30 bg-background px-4 py-3 text-lg text-foreground outline-none transition focus:bg-muted"
             />
           </label>
-          <label className="block">
-            <span className="mb-2 block text-xs font-medium uppercase tracking-[0.2em] text-foreground/60">
-              email id
-            </span>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmailLocal(e.target.value)}
-              placeholder="e.g. epowerxlabs@gmail.com"
-              className="w-full rounded-lg border-[1.5px] border-foreground/30 bg-background px-4 py-3 text-lg text-foreground placeholder:text-foreground/40 outline-none transition focus:bg-muted"
-            />
-          </label>
-          <label className="block">
-            <span className="mb-2 block text-xs font-medium uppercase tracking-[0.2em] text-foreground/60">
-              mobile number
-            </span>
-            <input
-              type="tel"
-              value={mobile}
-              onChange={(e) => setMobileLocal(e.target.value)}
-              placeholder="e.g. +91 9988776655"
-              className="w-full rounded-lg border-[1.5px] border-foreground/30 bg-background px-4 py-3 text-lg text-foreground placeholder:text-foreground/40 outline-none transition focus:bg-muted"
-            />
-          </label>
-          <p className="mt-4 text-[12px] text-foreground/80">
-            This is only for you, no one will ever see this. It's just a phone number stuck to your device.
-          </p>
+
 
           <label className="mt-4 flex items-start gap-3 rounded-xl border-[1.5px] border-foreground/30 bg-muted/50 p-4 transition-colors hover:bg-muted">
             <input

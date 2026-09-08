@@ -6,18 +6,7 @@ import {
   useRouter,
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
-
-function NotFoundComponent() {
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
-      <div className="max-w-md text-center">
-        <h1 className="text-7xl font-bold text-foreground">404</h1>
-        <p className="mt-4 text-muted-foreground">This page doesn't exist.</p>
-        <Link to="/" className="btn-pill mt-6">Go home</Link>
-      </div>
-    </div>
-  );
-}
+import { NotFoundComponent } from "@/components/not-found";
 
 function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   const router = useRouter();

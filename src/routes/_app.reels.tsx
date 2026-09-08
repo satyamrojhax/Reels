@@ -6,7 +6,7 @@ import { ReelPlayer } from "@/components/reel-player";
 import { KEYS, get, set, getCoins, getAutoScroll, getLiked, getSaved } from "@/lib/storage";
 import { AlertTriangle, RefreshCw, RotateCcw, X, Coins } from "lucide-react";
 
-type ReelsSearch = { start?: string };
+type ReelsSearch = { start?: string; tabs?: FeedFilter };
 
 /** How many pages we keep in memory before evicting old ones from the front. */
 const MAX_PAGES = 6;
@@ -14,6 +14,7 @@ const MAX_PAGES = 6;
 export const Route = createFileRoute("/_app/reels")({
   validateSearch: (s: Record<string, unknown>): ReelsSearch => ({
     start: typeof s.start === "string" ? s.start : undefined,
+    tabs: typeof s.tabs === "string" ? (s.tabs as FeedFilter) : undefined,
   }),
   component: ReelsPage,
 });
@@ -22,11 +23,13 @@ type PageData = { items: Reel[]; nextPage: number };
 type FeedData = InfiniteData<PageData, number>;
 
 function ReelsPage() {
-  const { start } = Route.useSearch();
-  const navigate = useNavigate();
+  const search = Route.useSearch();
+  const { start, tabs } = search;
+  const navigate = Route.useNavigate();
   const queryClient = useQueryClient();
   const [coins, setCoins] = useState(0);
-  const [filter, setFilter] = useState<FeedFilter>("all");
+  
+  const filter = tabs || "all";
 
   useEffect(() => {
     setCoins(getCoins());
@@ -89,13 +92,13 @@ function ReelsPage() {
   useEffect(() => {
     setMuted(get<boolean>(KEYS.muted, true));
   }, []);
-  const toggleMute = () => {
+  const toggleMute = useCallback(() => {
     setMuted((m) => {
       const next = !m;
       set(KEYS.muted, next);
       return next;
     });
-  };
+  }, []);
 
   const scrollToIdx = useCallback((i: number, behavior: ScrollBehavior = "auto") => {
     const el = slideRefs.current[i];
@@ -303,10 +306,10 @@ function ReelsPage() {
       {/* Category Pills */}
       <div className="absolute left-0 right-0 top-16 z-30 flex w-full justify-center px-4 md:top-6">
         <div className="no-scrollbar flex w-full max-w-full items-center justify-start gap-2 overflow-x-auto sm:justify-center sm:gap-3">
-          {(["all", "local", "trending"] as FeedFilter[]).map(f => (
+          {(["all", "recommended", "local", "trending"] as FeedFilter[]).map(f => (
             <button
               key={f}
-              onClick={() => setFilter(f)}
+              onClick={() => navigate({ search: (prev) => ({ ...prev, tabs: f }), replace: true })}
               className={`shrink-0 rounded-full px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider transition sm:px-4 sm:text-xs sm:tracking-widest ${
                 filter === f
                   ? "bg-white text-black"

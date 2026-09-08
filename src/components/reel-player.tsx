@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, memo } from "react";
 import type { Reel } from "@/lib/reels";
 import { Heart, Share2, Volume2, VolumeX, Play, MoreHorizontal, Bookmark, BookmarkCheck, Coins, Flag, Copy, ToggleLeft, ToggleRight, Eye, MonitorUp, Loader2 } from "lucide-react";
 import { isLiked as checkLiked, toggleLike, isSaved as checkSaved, toggleSave, addCoins, getAutoScroll, setAutoScroll, hasUnlocked } from "@/lib/storage";
@@ -14,14 +14,13 @@ type Props = {
   distance: number;
 };
 
-export function ReelPlayer({ reel, active, muted, onToggleMute, onEnded, onWatched, distance }: Props) {
+export const ReelPlayer = memo(function ReelPlayer({ reel, active, muted, onToggleMute, onEnded, onWatched, distance }: Props) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [liked, setLiked] = useState(false);
   const [saved, setSaved] = useState(false);
   const [showHeart, setShowHeart] = useState(false);
   const [is2x, setIs2x] = useState(false);
   const [paused, setPaused] = useState(false);
-  const [expand, setExpand] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
   const [autoScroll, setAutoScrollState] = useState(true);
   const [isBuffering, setIsBuffering] = useState(true);
@@ -206,8 +205,10 @@ export function ReelPlayer({ reel, active, muted, onToggleMute, onEnded, onWatch
         poster={reel.thumbnail}
         className="absolute inset-0 h-full w-full object-contain"
         playsInline
+        webkit-playsinline="true"
+        disableRemotePlayback
         loop={!autoScroll}
-        preload={distance <= 1 ? "auto" : "metadata"}
+        preload={distance <= 1 ? "auto" : "none"}
         onEnded={onEnded}
         onClick={togglePlay}
         onDoubleClick={onDoubleClick}
@@ -247,8 +248,10 @@ export function ReelPlayer({ reel, active, muted, onToggleMute, onEnded, onWatch
 
       {/* buffering overlay icon */}
       {isBuffering && (
-        <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center">
-          <Loader2 className="h-12 w-12 animate-spin text-white/80" />
+        <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center gap-1.5">
+          <div className="h-2.5 w-2.5 rounded-full bg-white/80 animate-bounce [animation-delay:-0.3s]"></div>
+          <div className="h-2.5 w-2.5 rounded-full bg-white/80 animate-bounce [animation-delay:-0.15s]"></div>
+          <div className="h-2.5 w-2.5 rounded-full bg-white/80 animate-bounce"></div>
         </div>
       )}
 
@@ -344,11 +347,10 @@ export function ReelPlayer({ reel, active, muted, onToggleMute, onEnded, onWatch
         </div>
         {reel.title && (
           <p
-            className={`mt-2 text-sm text-white break-words ${expand ? "" : "line-clamp-3"}`}
-            onClick={() => setExpand((e) => !e)}
+            className="mt-2 text-sm text-white whitespace-pre-wrap break-words break-all"
           >
             {reel.title}
-            {reel.description && expand && (
+            {reel.description && (
               <span className="mt-1 block text-white/80">{reel.description}</span>
             )}
           </p>
@@ -362,7 +364,7 @@ export function ReelPlayer({ reel, active, muted, onToggleMute, onEnded, onWatch
 
     </div>
   );
-}
+});
 
 function formatCount(n: number) {
   if (n >= 1_000_000) return (n / 1_000_000).toFixed(1) + "M";

@@ -85,13 +85,18 @@ function AboutPage() {
         <div className="paper-card p-6">
           <h2 className="font-display text-xl lowercase text-cocoa dark:text-cream">contact</h2>
           <p className="mt-3 text-sm text-charcoal/70 dark:text-cream/70 leading-relaxed">
-            For any questions, feedback, or support, please reach out to us at:
+            For any questions, feedback, or support, please reach out directly on Telegram:
           </p>
           <a 
-            href="mailto:epowerxlabs@gmail.com"
-            className="mt-3 inline-block text-sm font-medium text-marker hover:underline"
+            href="https://t.me/satyamrojha"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-4 inline-flex items-center gap-2 rounded-full bg-[#0088cc] px-6 py-2.5 text-sm font-medium text-white shadow-md shadow-[#0088cc]/20 transition hover:bg-[#0077b5] active:scale-95"
           >
-            epowerxlabs@gmail.com
+            <svg viewBox="0 0 24 24" className="h-5 w-5 fill-current" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.08-.19-.09-.05-.21-.02-.3.01-.13.04-2.26 1.45-6.38 4.23-.6.41-1.14.61-1.63.6-.53-.01-1.54-.3-2.29-.54-.92-.3-1.64-.46-1.59-.97.03-.26.41-.53 1.15-.81 4.53-1.97 7.55-3.27 9.05-3.89 4.3-1.78 5.2 2.08 5.16 2.09z"/>
+            </svg>
+            Contact Admin
           </a>
         </div>
       </section>

@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useTheme, type Theme } from "@/hooks/use-theme";
-import { getLiked, getSaved, KEYS, get, set, setLiked, setSaved, getCoins, hasUnlocked } from "@/lib/storage";
+import { getLiked, getSaved, KEYS, get, set, setLiked, setSaved, getCoins, hasUnlocked, getRandomMode, setRandomMode } from "@/lib/storage";
 import { useHydrated } from "@/hooks/use-hydrated";
 import { usePwa } from "@/hooks/use-pwa";
 import { Eye, EyeOff, LogOut, Moon, Sun, Monitor, Trash2, Coins, Download, BadgeCheck } from "lucide-react";
@@ -23,6 +23,7 @@ function SettingsPage() {
   const [savedCount, setSavedCount] = useState(0);
   const [watched, setWatched] = useState(0);
   const [coins, setCoins] = useState(0);
+  const [randomMode, setRandomModeState] = useState(false);
 
   useEffect(() => {
     if (!hydrated) return;
@@ -30,6 +31,7 @@ function SettingsPage() {
     setSavedCount(getSaved().length);
     setWatched(get<number>(KEYS.watched, 0));
     setCoins(getCoins());
+    setRandomModeState(getRandomMode());
   }, [hydrated]);
 
   const themes: { key: Theme; label: string; icon: typeof Sun }[] = [
@@ -129,6 +131,37 @@ function SettingsPage() {
               </button>
             );
           })}
+        </div>
+      </section>
+
+      {/* Playback */}
+      <section className="mt-4">
+        <div className="paper-card p-6">
+          <h2 className="text-[11px] font-medium uppercase tracking-[0.2em] text-charcoal/60 dark:text-cream/60">
+            playback
+          </h2>
+          <div className="mt-4 flex items-center justify-between">
+            <div>
+              <div className="font-display text-lg lowercase text-cocoa dark:text-cream">show random reels</div>
+              <div className="text-sm text-charcoal/70 dark:text-cream/70">mix all sources randomly across tabs.</div>
+            </div>
+            <button
+              onClick={() => {
+                const next = !randomMode;
+                setRandomModeState(next);
+                setRandomMode(next);
+              }}
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                randomMode ? "bg-marker" : "bg-charcoal/20 dark:bg-cream/20"
+              }`}
+            >
+              <span
+                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                  randomMode ? "translate-x-6" : "translate-x-1"
+                }`}
+              />
+            </button>
+          </div>
         </div>
       </section>
 

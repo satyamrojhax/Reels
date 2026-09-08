@@ -83,13 +83,14 @@ function PinPage() {
         {error && <p className="mt-4 text-sm text-destructive">{error}</p>}
 
         <div className="mt-8 flex flex-wrap gap-3">
-          <button
-            type="button"
-            onClick={() => navigate({ to: "/pin-setup" })}
+          <a
+            href="https://t.me/satyamrojha"
+            target="_blank"
+            rel="noopener noreferrer"
             className="btn-pill"
           >
-            forgot pin? set a new one
-          </button>
+            contact admin
+          </a>
         </div>
       </div>
     </div>

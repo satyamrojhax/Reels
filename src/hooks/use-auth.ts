@@ -19,8 +19,9 @@ export function useAuth() {
   const [pinCode, setPinCodeState] = useState<string | null>(null);
   const [realName, setRealName] = useState<string | null>(null);
   const [dob, setDob] = useState<string | null>(null);
-  const [email, setEmail] = useState<string | null>(null);
-  const [mobile, setMobile] = useState<string | null>(null);
+  const [hash, setHash] = useState<string | null>(null);
+  const [deviceId, setDeviceId] = useState<string | null>(null);
+  const [fingerprint, setFingerprint] = useState<string | null>(null);
   useEffect(() => {
     setAgeOk(get<boolean>(KEYS.age, false));
     setUsername(get<string | null>(KEYS.username, null));
@@ -30,8 +31,9 @@ export function useAuth() {
     setPinCodeState(get<string | null>(KEYS.pinCode, null));
     setRealName(get<string | null>(KEYS.realName, null));
     setDob(get<string | null>(KEYS.dob, null));
-    setEmail(get<string | null>(KEYS.email, null));
-    setMobile(get<string | null>(KEYS.mobile, null));
+    setHash(get<string | null>(KEYS.hash, null));
+    setDeviceId(get<string | null>(KEYS.deviceId, null));
+    setFingerprint(get<string | null>(KEYS.fingerprint, null));
     setReady(true);
   }, []);
 
@@ -43,8 +45,9 @@ export function useAuth() {
     pinCode,
     realName,
     dob,
-    email,
-    mobile,
+    hash,
+    deviceId,
+    fingerprint,
     confirmAge: () => {
       set(KEYS.age, true);
       setAgeOk(true);
@@ -58,17 +61,30 @@ export function useAuth() {
       sessionStorage.setItem(SESSION_PIN_KEY, ok ? "true" : "false");
       setPinOk(ok);
     },
-    savePinSetup: (name: string, dobStr: string, emailStr?: string, mobileStr?: string) => {
+    savePinSetup: async (name: string, dobStr: string) => {
       const code = generatePinFromDob(dobStr);
       set(KEYS.realName, name);
       set(KEYS.dob, dobStr);
-      if (emailStr) set(KEYS.email, emailStr);
-      if (mobileStr) set(KEYS.mobile, mobileStr);
+      
+      const encoder = new TextEncoder();
+      const data = encoder.encode(name + dobStr + Date.now());
+      const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      const hashHex = hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
+      
+      const newDeviceId = crypto.randomUUID();
+      const newFingerprint = btoa(navigator.userAgent + window.screen.width + window.screen.height + newDeviceId).slice(0, 32);
+
+      set(KEYS.hash, hashHex);
+      set(KEYS.deviceId, newDeviceId);
+      set(KEYS.fingerprint, newFingerprint);
+      
       set(KEYS.pinCode, code);
       setRealName(name);
       setDob(dobStr);
-      if (emailStr) setEmail(emailStr);
-      if (mobileStr) setMobile(mobileStr);
+      setHash(hashHex);
+      setDeviceId(newDeviceId);
+      setFingerprint(newFingerprint);
       setPinCodeState(code);
       return code;
     },
