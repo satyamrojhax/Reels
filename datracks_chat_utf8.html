@@ -1,0 +1,497 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- SEO Meta Tags -->
+    <title>Datracks.com - Chat</title>
+    <meta name="robots" content="noindex, nofollow" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="favicon.png">
+
+    
+    <script src="https://cdn.tailwindcss.com/"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#10a37f',
+                        secondary: '#202123',
+                        light: {
+                            bg: '#ffffff',
+                            text: '#343541',
+                            sidebar: '#f7f7f8',
+                            hover: '#e5e5e5'
+                        },
+                        dark: {
+                            bg: '#343541',
+                            text: '#ffffff',
+                            sidebar: '#202123',
+                            hover: '#2a2b32'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .typing-dots::after { content: ''; animation: typing 1.5s infinite; }
+        @keyframes typing { 0% { content: '.'; } 33% { content: '..'; } 66% { content: '...'; } 100% { content: '.'; } }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .markdown pre { background-color: #2d2d3a; border-radius: 6px; padding: 12px; margin: 12px 0; overflow-x: auto; position: relative; max-width: 100%; white-space: pre-wrap; word-wrap: break-word; }
+        .markdown code { font-family: monospace; }
+        .markdown p { margin-bottom: 12px; }
+        .markdown ol, .markdown ul { margin-left: 24px; margin-bottom: 12px; padding-left: 1rem; }
+        .markdown ol { list-style-type: decimal; }
+        .markdown ul { list-style-type: disc; }
+        .markdown h1, .markdown h2, .markdown h3, .markdown h4 { margin-top: 24px; margin-bottom: 16px; font-weight: bold; line-height: 1.25; }
+        .markdown h1 { font-size: 1.5rem; } .markdown h2 { font-size: 1.4rem; } .markdown h3 { font-size: 1.3rem; } .markdown h4 { font-size: 1.2rem; }
+        .code-block { margin: 16px 0; border-radius: 6px; overflow: hidden; border: 1px solid #4b5563; max-width: 100%; }
+        .code-header { background-color: #374151; padding: 8px 16px; display: flex; justify-content: space-between; align-items: center; }
+        .copy-code-btn { background: none; border: none; color: #9ca3af; cursor: pointer; font-size: 0.875rem; display: flex; align-items: center; gap: 6px; }
+        .copy-code-btn:hover { color: #f9fafb; }
+        .chat-item .rename-chat-btn, .chat-item .delete-chat-btn { opacity: 1 !important; }
+        .markdown table { border-collapse: collapse; width: 100%; margin: 16px 0; display: block; overflow-x: auto; }
+        .markdown th, .markdown td { border: 1px solid #ddd; padding: 8px; text-align: left; min-width: 120px; }
+        .markdown th { background-color: #f2f2f2; font-weight: bold; }
+        .dark .markdown th { background-color: #333; }
+        .dark .markdown th, .dark .markdown td { border-color: #444; }
+        #sidebar { z-index: 40; }
+        #sidebar-overlay { display: none; position: fixed; inset: 0; background-color: rgba(0,0,0,0.5); z-index: 35; }
+        #popup-banner { transition: transform 0.5s ease-in-out; }
+    </style>
+</head>
+<body class="h-screen flex flex-col bg-light-bg dark:bg-dark-bg text-light-text dark:text-dark-text transition-all">
+    
+    <div id="app" class="flex flex-1 overflow-hidden">
+        <div id="sidebar" class="fixed inset-0 lg:relative lg:flex z-40 transition-transform duration-300 lg:w-64" style="transform: translateX(-100%);">
+            <div class="flex flex-col h-full w-64 bg-light-sidebar dark:bg-dark-sidebar shadow-lg border-r border-gray-200 dark:border-gray-700">
+                <div class="p-3">
+					<a href="index.html" class="w-full flex items-center justify-center gap-2 p-3 bg-primary hover:bg-primary/90 text-white rounded-md transition">
+    <i class="fas fa-home"></i>
+    <span>Homepage</span>
+</a><br>
+                    <button id="new-chat-btn" class="w-full flex items-center justify-center gap-2 p-3 bg-primary hover:bg-primary/90 text-white rounded-md transition">
+                        <i class="fas fa-plus"></i>
+                        <span data-translate="newChat">New Chat</span>
+                    </button>
+                </div>
+                <div id="chat-history" class="flex-1 overflow-y-auto hide-scrollbar p-2"></div>
+                <div class="p-3 border-t border-gray-200 dark:border-gray-700">
+                    <div class="flex flex-col gap-1 mb-3">
+                      <a href="https://combopix.com" target="_blank" class="w-full flex items-center gap-3 p-2 rounded-md hover:bg-light-hover dark:hover:bg-dark-hover transition-colors text-sm"><i class="fas fa-image w-4 text-center"></i><span data-translate="createAiImages">Create AI Images</span></a>
+                      <a href="https://pixeditor.net" target="_blank" class="w-full flex items-center gap-3 p-2 rounded-md hover:bg-light-hover dark:hover:bg-dark-hover transition-colors text-sm"><i class="fas fa-camera w-4 text-center"></i><span data-translate="editAiImages">Edit AI Images</span></a>
+                      <a href="https://photoeditor.pro" target="_blank" class="w-full flex items-center gap-3 p-2 rounded-md hover:bg-light-hover dark:hover:bg-dark-hover transition-colors text-sm"><i class="fas fa-wand-magic-sparkles w-4 text-center"></i><span data-translate="restoreAiPhotos">Restore AI Photos</span></a>
+                      
+					  
+                    </div>
+                    <button id="theme-toggle" class="w-full flex items-center gap-2 p-3 rounded-md bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 transition-colors">
+                        <i class="fas fa-moon dark:hidden"></i>
+                        <i class="fas fa-sun hidden dark:block"></i>
+                        <span class="dark:hidden" data-translate="darkMode">Dark Mode</span>
+                        <span class="hidden dark:block" data-translate="lightMode">Light Mode</span>
+                    </button>
+                     <div id="language-selector" class="flex justify-center items-center gap-3 mt-4">
+                        <img src="https://flagsapi.com/GB/shiny/24.png" alt="English" title="English" data-lang="en" class="cursor-pointer hover:opacity-80 transition-opacity">
+                        <img src="https://flagsapi.com/IT/shiny/24.png" alt="Italiano" title="Italiano" data-lang="it" class="cursor-pointer hover:opacity-80 transition-opacity">
+                        <img src="https://flagsapi.com/ES/shiny/24.png" alt="Español" title="Español" data-lang="es" class="cursor-pointer hover:opacity-80 transition-opacity">
+                        <img src="https://flagsapi.com/FR/shiny/24.png" alt="Français" title="Français" data-lang="fr" class="cursor-pointer hover:opacity-80 transition-opacity">
+                        <img src="https://flagsapi.com/DE/shiny/24.png" alt="Deutsch" title="Deutsch" data-lang="de" class="cursor-pointer hover:opacity-80 transition-opacity">
+                    </div>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 text-center mt-2">© 2025 Datracks.com by <a href="https://websyrup.net" target="_blank">WebSyrup.net</a>  <a href="https://privacy.websyrup.net" target="_blank" class="underline hover:text-primary">Privacy Policy</a> - <a href="https://sedo.com/search/details/?domain=datracks.com" target="_blank">💰</a></p>
+                </div>
+            </div>
+            <div id="sidebar-overlay"></div>
+        </div>
+        
+        <div class="flex-1 flex flex-col h-full overflow-hidden">
+            <header class="p-4 flex items-center justify-between border-b border-gray-200 dark:border-gray-700">
+                <button id="menu-toggle" class="p-2 rounded-md hover:bg-light-hover dark:hover:bg-dark-hover"><i class="fas fa-bars"></i></button>
+                <h1 id="app-title" class="text-xl font-semibold text-center flex-1">Datracks.com</h1>
+                <div class="w-8"></div>
+            </header>
+            
+            <div id="chat-container" class="flex-1 overflow-y-auto hide-scrollbar p-4"><div id="chat-messages" class="max-w-3xl mx-auto"></div></div>
+            <div id="typing-indicator" class="hidden max-w-3xl mx-auto p-4 mb-4">
+                <div class="flex items-start gap-4">
+                    <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center flex-shrink-0"><i class="fas fa-robot text-white text-sm"></i></div>
+                    <div class="typing-dots text-gray-500" data-translate="thinking">Thinking</div>
+                </div>
+            </div>
+            
+            <div class="p-4 border-t border-gray-200 dark:border-gray-700">
+                <div class="max-w-3xl mx-auto">
+                    <div id="image-preview-container" class="hidden mb-2 p-2 border border-gray-300 dark:border-gray-600 rounded-lg relative w-28 h-28">
+                        <img id="image-preview" src="" class="w-full h-full object-cover rounded">
+                        <button id="remove-image-btn" type="button" class="absolute -top-2 -right-2 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center shadow-md">&times;</button>
+                    </div>
+
+                    <form id="chat-form" class="relative">
+                        <textarea id="message-input" class="w-full p-4 pl-12 pr-12 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-dark-hover resize-none focus:outline-none focus:ring-2 focus:ring-primary" rows="1"></textarea>
+                        
+                        <label for="image-upload" class="absolute left-3 bottom-3 p-2 text-gray-500 hover:text-primary rounded-md cursor-pointer">
+                            <i class="fas fa-paperclip"></i>
+                        </label>
+                        <input type="file" id="image-upload" class="hidden" accept="image/*">
+
+                        <button type="button" id="send-button" class="absolute right-3 bottom-3 p-2 text-primary hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md disabled:opacity-50" disabled><i class="fas fa-paper-plane"></i></button>
+                    </form>
+                    <p id="footer-notice" class="text-xs text-gray-500 dark:text-gray-400 text-center mt-2" data-translate="errorNotice">Datracks.com may make mistakes. Consider checking important information.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+    // --- App Elements ---
+    const sidebar = document.getElementById('sidebar'), sidebarOverlay = document.getElementById('sidebar-overlay');
+    const menuToggle = document.getElementById('menu-toggle'), chatContainer = document.getElementById('chat-container');
+    const chatMessages = document.getElementById('chat-messages'), chatForm = document.getElementById('chat-form');
+    const messageInput = document.getElementById('message-input'), sendButton = document.getElementById('send-button');
+    const newChatBtn = document.getElementById('new-chat-btn'), chatHistory = document.getElementById('chat-history');
+    const themeToggle = document.getElementById('theme-toggle'), typingIndicator = document.getElementById('typing-indicator');
+    const imageUpload = document.getElementById('image-upload'), imagePreviewContainer = document.getElementById('image-preview-container');
+    const imagePreview = document.getElementById('image-preview'), removeImageBtn = document.getElementById('remove-image-btn');
+    const languageSelector = document.getElementById('language-selector');
+
+    // --- App State ---
+    let chats = [], currentChatId = null, isSending = false, attachedImage = null, currentStrings = {};
+
+    // --- Translations ---
+    const translations = {
+        en: {
+            newChat: "New Chat", createAiImages: "Create AI Images", editAiImages: "Edit AI Images", restoreAiPhotos: "Restore AI Photos", generateAiRecipes: "Generate AI Recipes", trackShipment: "Track Shipment",
+            darkMode: "Dark Mode", lightMode: "Light Mode", thinking: "Thinking", messagePlaceholder: "Message Datracks.com... (or upload an image)", errorNotice: "Datracks.com may make mistakes. Consider checking important information.",
+            copy: "Copy", copied: "Copied!", default_chat_title: "New Chat", rename_prompt: "Enter a new name for this chat:", delete_confirm: "Are you sure you want to delete this chat?", no_conversations: "No conversations yet",
+            welcome_title: "Welcome to Datracks.com", welcome_subtitle: "Your AI-powered assistant", imageTooLarge: "The image is too large. Maximum limit 4MB.", errorOccurred: "Sorry, an error occurred. Please try again. Error: ",
+            prompts: [
+                { title: "Write a short story", subtitle: "about a cat traveling in space" }, { title: "Plan a 3-day itinerary", subtitle: "for a trip to Rome" },
+                { title: "How can I improve sleep quality?", subtitle: "Give me some practical tips" }, { title: "Give me 5 dinner ideas", subtitle: "quick, healthy, and tasty" }
+            ]
+        },
+        it: {
+            newChat: "Nuova Chat", createAiImages: "Crea Immagini AI", editAiImages: "Modifica Immagini AI", restoreAiPhotos: "Restaura Foto AI", generateAiRecipes: "Genera Ricette AI", trackShipment: "Cerca Spedizione",
+            darkMode: "Modalità Scura", lightMode: "Modalità Chiara", thinking: "Sto pensando", messagePlaceholder: "Messaggio a Datracks.com... (o carica un'immagine)", errorNotice: "Datracks.com può commettere errori. Considera di verificare le informazioni importanti.",
+            copy: "Copia", copied: "Copiato!", default_chat_title: "Nuova Chat", rename_prompt: "Inserisci un nuovo nome per questa chat:", delete_confirm: "Sei sicuro di voler eliminare questa chat?", no_conversations: "Nessuna conversazione ancora",
+            welcome_title: "Benvenuto su Datracks.com", welcome_subtitle: "Il tuo assistente basato su IA", imageTooLarge: "L'immagine è troppo grande. Limite massimo 4MB.", errorOccurred: "Spiacente, si è verificato un errore. Riprova. Errore: ",
+            prompts: [
+                { title: "Scrivi una breve storia", subtitle: "su un gatto che viaggia nello spazio" }, { title: "Organizza un itinerario di 3 giorni", subtitle: "per un viaggio a Roma" },
+                { title: "Come posso migliorare la qualità del sonno?", subtitle: "Dammi alcuni consigli pratici" }, { title: "Dammi 5 idee per cena", subtitle: "veloci, sane e gustose" }
+            ]
+        },
+        es: {
+            newChat: "Nuevo Chat", createAiImages: "Crear Imágenes con IA", editAiImages: "Editar Imágenes con IA", restoreAiPhotos: "Restaurar Fotos con IA", generateAiRecipes: "Generar Recetas con IA", trackShipment: "Rastrear Envío",
+            darkMode: "Modo Oscuro", lightMode: "Modo Claro", thinking: "Pensando", messagePlaceholder: "Mensaje a Datracks.com... (o sube una imagen)", errorNotice: "Datracks.com puede cometer errores. Considera verificar la información importante.",
+            copy: "Copiar", copied: "¡Copiado!", default_chat_title: "Nuevo Chat", rename_prompt: "Introduce un nuevo nombre para este chat:", delete_confirm: "¿Estás seguro de que quieres eliminar este chat?", no_conversations: "Aún no hay conversaciones",
+            welcome_title: "Bienvenido a Datracks.com", welcome_subtitle: "Tu asistente con tecnología de IA", imageTooLarge: "La imagen es demasiado grande. Límite máximo 4MB.", errorOccurred: "Lo siento, ocurrió un error. Por favor, inténtalo de nuevo. Error: ",
+            prompts: [
+                { title: "Escribe una historia corta", subtitle: "sobre un gato que viaja al espacio" }, { title: "Planea un itinerario de 3 días", subtitle: "para un viaje a Roma" },
+                { title: "¿Cómo puedo mejorar la calidad del sueño?", subtitle: "Dame algunos consejos prácticos" }, { title: "Dame 5 ideas para la cena", subtitle: "rápidas, saludables y sabrosas" }
+            ]
+        },
+        fr: {
+            newChat: "Nouveau Chat", createAiImages: "Créer des Images IA", editAiImages: "Modifier des Images IA", restoreAiPhotos: "Restaurer des Photos IA", generateAiRecipes: "Générer des Recettes IA", trackShipment: "Suivre l'Expédition",
+            darkMode: "Mode Sombre", lightMode: "Mode Clair", thinking: "Réflexion", messagePlaceholder: "Message à Datracks.com... (ou téléchargez une image)", errorNotice: "Datracks.com peut faire des erreurs. Pensez à vérifier les informations importantes.",
+            copy: "Copier", copied: "Copié !", default_chat_title: "Nouveau Chat", rename_prompt: "Entrez un nouveau nom pour ce chat :", delete_confirm: "Êtes-vous sûr de vouloir supprimer ce chat ?", no_conversations: "Aucune conversation pour le moment",
+            welcome_title: "Bienvenue sur Datracks.com", welcome_subtitle: "Votre assistant alimenté par l'IA", imageTooLarge: "L'image est trop grande. Limite maximale 4MB.", errorOccurred: "Désolé, une erreur s'est produite. Veuillez réessayer. Erreur: ",
+            prompts: [
+                { title: "Écrivez une nouvelle", subtitle: "sur un chat voyageant dans l'espace" }, { title: "Planifiez un itinéraire de 3 jours", subtitle: "pour un voyage à Rome" },
+                { title: "Comment puis-je améliorer la qualité du sommeil ?", subtitle: "Donnez-moi quelques conseils pratiques" }, { title: "Donnez-moi 5 idées de dîner", subtitle: "rapides, saines et savoureuses" }
+            ]
+        },
+        de: {
+            newChat: "Neuer Chat", createAiImages: "KI-Bilder Erstellen", editAiImages: "KI-Bilder Bearbeiten", restoreAiPhotos: "KI-Fotos Wiederherstellen", generateAiRecipes: "KI-Rezepte Generieren", trackShipment: "Sendung Verfolgen",
+            darkMode: "Dunkelmodus", lightMode: "Heller Modus", thinking: "Denken", messagePlaceholder: "Nachricht an Datracks.com... (oder lade ein Bild hoch)", errorNotice: "Datracks.com kann Fehler machen. Erwägen Sie, wichtige Informationen zu überprüfen.",
+            copy: "Kopieren", copied: "Kopiert!", default_chat_title: "Neuer Chat", rename_prompt: "Geben Sie einen neuen Namen für diesen Chat ein:", delete_confirm: "Sind Sie sicher, dass Sie diesen Chat löschen möchten?", no_conversations: "Noch keine Gespräche",
+            welcome_title: "Willkommen bei Datracks.com", welcome_subtitle: "Ihr KI-gestützter Assistent", imageTooLarge: "Das Bild ist zu groß. Maximales Limit 4MB.", errorOccurred: "Entschuldigung, ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut. Fehler: ",
+            prompts: [
+                { title: "Schreibe eine Kurzgeschichte", subtitle: "über eine Katze, die im Weltraum reist" }, { title: "Plane eine 3-tägige Reiseroute", subtitle: "für eine Reise nach Rom" },
+                { title: "Wie kann ich die Schlafqualität verbessern?", subtitle: "Gib mir einige praktische Tipps" }, { title: "Gib mir 5 Ideen für das Abendessen", subtitle: "schnell, gesund und lecker" }
+            ]
+        }
+    };
+    
+    // --- Core Functions ---
+    function setLanguage(lang) {
+        currentStrings = translations[lang] || translations['en'];
+        document.documentElement.lang = lang;
+        localStorage.setItem('datracks-language', lang);
+        
+        document.querySelectorAll('[data-translate]').forEach(el => {
+            const key = el.getAttribute('data-translate');
+            if (currentStrings[key]) el.textContent = currentStrings[key];
+        });
+
+        messageInput.placeholder = currentStrings.messagePlaceholder;
+        
+        renderChatHistory();
+        const currentChat = chats.find(c => c.id === currentChatId);
+        if (!currentChat || currentChat.messages.length === 0) showWelcomeScreen();
+    }
+    
+    function initApp() {
+        loadChats();
+        setupEventListeners();
+        checkThemePreference();
+        
+        const savedLang = localStorage.getItem('datracks-language');
+        const browserLang = (navigator.language || navigator.userLanguage).split('-')[0];
+        setLanguage(savedLang || browserLang);
+
+        if (window.innerWidth >= 1024) showSidebar(false); else hideSidebar();
+        if (chats.length === 0) createNewChat(); else loadChat(chats[0].id);
+        
+        messageInput.style.overflowY = 'hidden';
+        autoResizeTextarea();
+    }
+
+    function setupEventListeners() {
+        sendButton.addEventListener('click', handleSubmit);
+        chatForm.addEventListener('submit', (e) => { e.preventDefault(); handleSubmit(); });
+        messageInput.addEventListener('input', () => { sendButton.disabled = messageInput.value.trim() === '' && !attachedImage; autoResizeTextarea(); });
+        messageInput.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSubmit(); } });
+        newChatBtn.addEventListener('click', createNewChat);
+        themeToggle.addEventListener('click', toggleTheme);
+        menuToggle.addEventListener('click', toggleSidebar);
+        sidebarOverlay.addEventListener('click', hideSidebar);
+        imageUpload.addEventListener('change', handleImageUpload);
+        removeImageBtn.addEventListener('click', removeAttachedImage);
+        languageSelector.addEventListener('click', (e) => { if(e.target.dataset.lang) setLanguage(e.target.dataset.lang); });
+        chatMessages.addEventListener('click', (e) => {
+            const promptCard = e.target.closest('.prompt-card');
+            if (promptCard) {
+                messageInput.value = promptCard.dataset.prompt;
+                sendButton.disabled = false;
+                autoResizeTextarea();
+                messageInput.focus();
+            }
+        });
+        window.addEventListener('resize', () => { if (window.innerWidth >= 1024) showSidebar(false); else hideSidebar(); });
+    }
+    
+    // --- UI & Chat Logic ---
+    function autoResizeTextarea() {
+        messageInput.style.height = 'auto';
+        const newHeight = Math.min(messageInput.scrollHeight, 150);
+        messageInput.style.height = `${newHeight}px`;
+    }
+
+    function handleImageUpload(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        if (file.size > 4 * 1024 * 1024) { alert(currentStrings.imageTooLarge); return; }
+        const reader = new FileReader();
+        reader.onload = e => {
+            attachedImage = { data: e.target.result.split(',')[1], mimeType: file.type, previewUrl: e.target.result };
+            imagePreview.src = e.target.result;
+            imagePreviewContainer.classList.remove('hidden');
+            sendButton.disabled = false;
+        }
+        reader.readAsDataURL(file);
+    }
+
+    function removeAttachedImage() {
+        attachedImage = null;
+        imagePreview.src = '';
+        imagePreviewContainer.classList.add('hidden');
+        imageUpload.value = '';
+        sendButton.disabled = messageInput.value.trim() === '';
+    }
+
+    async function handleSubmit() {
+        const messageText = messageInput.value.trim();
+        if ((!messageText && !attachedImage) || isSending) return;
+        if (!currentChatId) createNewChat();
+        
+        isSending = true;
+        sendButton.disabled = true;
+        addMessageToUI('user', messageText, attachedImage ? attachedImage.previewUrl : null);
+        
+        const currentChat = chats.find(chat => chat.id === currentChatId);
+        currentChat.messages.push({ role: 'user', content: messageText });
+        if (currentChat.title === currentStrings.default_chat_title) {
+            currentChat.title = messageText.substring(0, 30) + (messageText.length > 30 ? '...' : '');
+        }
+        
+        const payload = { messages: currentChat.messages, image: attachedImage };
+        removeAttachedImage();
+        messageInput.value = '';
+        autoResizeTextarea();
+        scrollToBottom();
+        typingIndicator.classList.remove('hidden');
+
+        try {
+            const response = await getAIResponse(payload);
+            typingIndicator.classList.add('hidden');
+            addMessageToUI('assistant', response);
+            currentChat.messages.push({ role: 'assistant', content: response });
+            updateCurrentChat(currentChat);
+        } catch (error) {
+            console.error('Error:', error);
+            typingIndicator.classList.add('hidden');
+            addMessageToUI('assistant', currentStrings.errorOccurred + error.message);
+        } finally {
+            isSending = false;
+            sendButton.disabled = messageInput.value.trim() === '';
+            scrollToBottom();
+            messageInput.focus();
+        }
+    }
+
+    async function getAIResponse(payload) {
+        const response = await fetch('api-gemini.php', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) });
+        if (!response.ok) { const errorData = await response.json(); throw new Error(errorData.error?.message || 'API request failed'); }
+        const result = await response.json();
+        if (result.reply) return result.reply;
+        throw new Error("Invalid response structure from API.");
+    }
+
+    function addMessageToUI(role, content, imageUrl = null) {
+        if (chatMessages.querySelector('.welcome-screen')) chatMessages.innerHTML = '';
+        const messageDiv = document.createElement('div');
+        messageDiv.className = 'py-4 border-b border-gray-100 dark:border-gray-700';
+        const iconClass = role === 'user' ? 'fa-user' : 'fa-robot';
+        const bgColor = role === 'user' ? 'bg-gray-500' : 'bg-primary';
+        
+        let imageHTML = imageUrl ? `<img src="${imageUrl}" class="mt-2 rounded-lg max-w-xs border border-gray-200 dark:border-gray-700" alt="User upload">` : '';
+        const formattedContent = formatMessage(content);
+        messageDiv.innerHTML = `
+            <div class="flex items-start gap-4">
+                <div class="w-8 h-8 rounded-full ${bgColor} flex items-center justify-center flex-shrink-0"><i class="fas ${iconClass} text-white text-sm"></i></div>
+                <div class="flex-1 markdown">${imageHTML}${formattedContent}</div>
+            </div>`;
+        chatMessages.appendChild(messageDiv);
+        scrollToBottom();
+    }
+    
+    function formatMessage(content) {
+        if (!content) return '';
+        content = escapeHtml(content);
+        let formatted = content.replace(/```([\w]*)\n([\s\S]*?)```/g, (match, lang, code) => {
+            const langDisplay = lang || 'text';
+            return `</div></div><div class="code-block relative"><div class="code-header"><span class="font-mono">${langDisplay}</span><button class="copy-code-btn" onclick="copyToClipboard(this)" data-code="${encodeURIComponent(unescapeHtml(code))}"><i class="fas fa-copy"></i> <span data-translate="copy">${currentStrings.copy}</span></button></div><pre class="!mt-0 rounded-t-none"><code class="language-${langDisplay}">${unescapeHtml(code).trim()}</code></pre></div><div class="flex-1 markdown"><div>`;
+        });
+        formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>').replace(/`([^`]+)`/g, '<code class="bg-gray-100 dark:bg-gray-800 px-1 py-0.5 rounded text-sm">$1</code>');
+        return formatted.split('\n').map(p => p.trim() ? `<p>${p}</p>` : '').join('');
+    }
+
+    function escapeHtml(text) { return text.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'})[m]); }
+    function unescapeHtml(text) { return text.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#039;/g, "'");}
+
+    window.copyToClipboard = function(button) {
+        const code = decodeURIComponent(button.getAttribute('data-code'));
+        navigator.clipboard.writeText(code).then(() => {
+            button.innerHTML = `<i class="fas fa-check"></i> <span data-translate="copied">${currentStrings.copied}</span>`;
+            setTimeout(() => { button.innerHTML = `<i class="fas fa-copy"></i> <span data-translate="copy">${currentStrings.copy}</span>`; }, 2000);
+        });
+    }
+
+    function scrollToBottom() { setTimeout(() => { chatContainer.scrollTop = chatContainer.scrollHeight; }, 100); }
+
+    function createNewChat() {
+        const newChat = { id: Date.now().toString(), title: currentStrings.default_chat_title, messages: [] };
+        chats.unshift(newChat);
+        saveChats();
+        renderChatHistory();
+        loadChat(newChat.id);
+        if (window.innerWidth < 1024) hideSidebar();
+    }
+
+    function loadChat(chatId) {
+        currentChatId = chatId;
+        document.querySelectorAll('.chat-item').forEach(item => {
+            item.classList.toggle('bg-light-hover', item.dataset.id === chatId);
+            item.classList.toggle('dark:bg-dark-hover', item.dataset.id === chatId);
+        });
+        chatMessages.innerHTML = '';
+        removeAttachedImage();
+        const currentChat = chats.find(chat => chat.id === chatId);
+        if (currentChat.messages.length === 0) showWelcomeScreen();
+        else currentChat.messages.forEach(message => addMessageToUI(message.role, message.content));
+        if (window.innerWidth < 1024) hideSidebar();
+    }
+
+    function showWelcomeScreen() {
+        const prompts = [...currentStrings.prompts].sort(() => 0.5 - Math.random()).slice(0, 4);
+        const promptsHTML = prompts.map(p => `<div class="p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-light-hover dark:hover:bg-dark-hover cursor-pointer transition-colors prompt-card" data-prompt="${p.title} ${p.subtitle}"><h3 class="font-semibold mb-2">${p.title}</h3><p class="text-sm text-gray-600 dark:text-gray-400">${p.subtitle}</p></div>`).join('');
+        chatMessages.innerHTML = `<div class="flex flex-col items-center justify-center h-full text-center p-6 welcome-screen"><div class="mb-8"><i class="fas fa-robot text-5xl text-primary mb-4"></i><h2 class="text-2xl font-bold mb-2">${currentStrings.welcome_title}</h2><p class="text-gray-600 dark:text-gray-400">${currentStrings.welcome_subtitle}</p></div><div class="grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-2xl">${promptsHTML}</div></div>`;
+    }
+
+    function deleteChat(chatId) {
+        if (!confirm(currentStrings.delete_confirm)) return;
+        chats = chats.filter(chat => chat.id !== chatId);
+        saveChats();
+        renderChatHistory();
+        if (chats.length === 0) createNewChat();
+        else if (chatId === currentChatId) loadChat(chats[0].id);
+    }
+
+    function updateCurrentChat(chat) {
+        const index = chats.findIndex(c => c.id === chat.id);
+        if (index !== -1) {
+            chats[index] = chat;
+            if (index > 0) { chats.splice(index, 1); chats.unshift(chat); }
+            saveChats();
+            renderChatHistory();
+        }
+    }
+
+    function renderChatHistory() {
+        chatHistory.innerHTML = chats.length === 0 ? `<div class="text-center p-4 text-gray-500 dark:text-gray-400">${currentStrings.no_conversations}</div>` : '';
+        chats.forEach(chat => {
+            const chatItem = document.createElement('div');
+            chatItem.className = `chat-item p-3 rounded-md flex items-center justify-between cursor-pointer hover:bg-light-hover dark:hover:bg-dark-hover transition-colors`;
+            chatItem.dataset.id = chat.id;
+            if (chat.id === currentChatId) chatItem.classList.add('bg-light-hover', 'dark:bg-dark-hover');
+            chatItem.innerHTML = `<div class="flex items-center gap-2 overflow-hidden flex-1"><i class="far fa-comment-alt text-gray-500 dark:text-gray-400"></i><span class="chat-title truncate">${escapeHtml(chat.title)}</span></div><div class="flex items-center gap-1"><button class="rename-chat-btn text-gray-500 hover:text-blue-500 p-1"><i class="fas fa-edit"></i></button><button class="delete-chat-btn text-gray-500 hover:text-red-500 p-1"><i class="fas fa-trash-alt"></i></button></div>`;
+            chatItem.addEventListener('click', (e) => { if (!e.target.closest('button')) loadChat(chat.id); });
+            chatItem.querySelector('.delete-chat-btn').addEventListener('click', (e) => { e.stopPropagation(); deleteChat(chat.id); });
+            chatItem.querySelector('.rename-chat-btn').addEventListener('click', (e) => { e.stopPropagation(); renameChat(chat.id); });
+            chatHistory.appendChild(chatItem);
+        });
+    }
+
+    function renameChat(chatId) {
+        const chat = chats.find(c => c.id === chatId);
+        if (!chat) return;
+        const newTitle = prompt(currentStrings.rename_prompt, chat.title);
+        if (newTitle && newTitle.trim()) {
+            chat.title = newTitle.trim();
+            saveChats();
+            renderChatHistory();
+        }
+    }
+
+    function loadChats() { chats = JSON.parse(localStorage.getItem('datracks-chats')) || []; }
+    function saveChats() { localStorage.setItem('datracks-chats', JSON.stringify(chats)); }
+    function toggleSidebar() { if (sidebar.style.transform === 'translateX(0px)') hideSidebar(); else showSidebar(); }
+    function showSidebar(showOverlay = true) { sidebar.style.transform = 'translateX(0)'; if (showOverlay && window.innerWidth < 1024) sidebarOverlay.style.display = 'block'; }
+    function hideSidebar() { sidebar.style.transform = 'translateX(-100%)'; sidebarOverlay.style.display = 'none'; }
+    
+    function checkThemePreference() {
+        const savedTheme = localStorage.getItem('datracks-theme');
+        if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    }
+    
+    function toggleTheme() {
+        document.documentElement.classList.toggle('dark');
+        localStorage.setItem('datracks-theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+    }
+
+    document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>
+
+
+

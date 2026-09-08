@@ -8,10 +8,18 @@ self.addEventListener("install", (event) => {
 });
 
 self.addEventListener("fetch", (event) => {
+  if (event.request.method !== "GET") return;
+  if (!event.request.url.startsWith("http")) return;
+
   event.respondWith(
     caches.match(event.request).then((response) => {
       if (response) return response;
-      return fetch(event.request);
+      return fetch(event.request).catch((error) => {
+        if (event.request.mode === "navigate") {
+          return caches.match("/");
+        }
+        throw error;
+      });
     })
   );
 });

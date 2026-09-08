@@ -1,14 +1,24 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
-import tsconfigPaths from "vite-tsconfig-paths";
 
 export default defineConfig({
   plugins: [
     react(),
     tailwindcss(),
-    tsconfigPaths(),
   ],
+  resolve: {
+    tsconfigPaths: true,
+  },
+  server: {
+    proxy: {
+      '/api/gemini': {
+        target: 'https://datracks.com',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/gemini/, '/api-gemini.php'),
+      }
+    }
+  },
   build: {
     target: 'esnext',
     minify: 'terser',

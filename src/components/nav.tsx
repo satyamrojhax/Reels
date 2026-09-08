@@ -1,11 +1,12 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Home, Film, Heart, Bookmark, Settings, ShoppingBag, BadgeCheck } from "lucide-react";
+import { Home, Film, Heart, Bookmark, Settings, ShoppingBag, BadgeCheck, MessageCircle } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { hasUnlocked } from "@/lib/storage";
 
 const items: { to: any; label: string; icon: LucideIcon }[] = [
   { to: "/home", label: "home", icon: Home },
   { to: "/reels", label: "reels", icon: Film },
+  { to: "/chat", label: "chat", icon: MessageCircle },
   { to: "/liked", label: "liked", icon: Heart },
   { to: "/saved", label: "saved", icon: Bookmark },
   { to: "/shop", label: "shop", icon: ShoppingBag },

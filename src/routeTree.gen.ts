@@ -9,33 +9,28 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as PinSetupRouteImport } from './routes/pin-setup'
-import { Route as PinRouteImport } from './routes/pin'
-import { Route as LoginRouteImport } from './routes/login'
-import { Route as AgeRouteImport } from './routes/age'
-import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as AppSettingsRouteImport } from './routes/_app.settings'
-import { Route as AppReelsRouteImport } from './routes/_app.reels'
-import { Route as AppLikedRouteImport } from './routes/_app.liked'
-import { Route as AppHomeRouteImport } from './routes/_app.home'
-import { Route as AppSavedRouteImport } from './routes/_app.saved'
+import { Route as AppRouteImport } from './routes/_app'
+import { Route as AgeRouteImport } from './routes/age'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as PinRouteImport } from './routes/pin'
+import { Route as PinSetupRouteImport } from './routes/pin-setup'
 import { Route as AppAboutRouteImport } from './routes/_app.about'
+import { Route as AppChatRouteImport } from './routes/_app.chat'
+import { Route as AppHomeRouteImport } from './routes/_app.home'
+import { Route as AppLikedRouteImport } from './routes/_app.liked'
+import { Route as AppReelsRouteImport } from './routes/_app.reels'
+import { Route as AppSavedRouteImport } from './routes/_app.saved'
+import { Route as AppSettingsRouteImport } from './routes/_app.settings'
 import { Route as AppShopRouteImport } from './routes/_app.shop'
 
-const PinSetupRoute = PinSetupRouteImport.update({
-  id: '/pin-setup',
-  path: '/pin-setup',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PinRoute = PinRouteImport.update({
-  id: '/pin',
-  path: '/pin',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LoginRoute = LoginRouteImport.update({
-  id: '/login',
-  path: '/login',
+const AppRoute = AppRouteImport.update({
+  id: '/_app',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AgeRoute = AgeRouteImport.update({
@@ -43,28 +38,29 @@ const AgeRoute = AgeRouteImport.update({
   path: '/age',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AppRoute = AppRouteImport.update({
-  id: '/_app',
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const PinRoute = PinRouteImport.update({
+  id: '/pin',
+  path: '/pin',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AppSettingsRoute = AppSettingsRouteImport.update({
-  id: '/settings',
-  path: '/settings',
+const PinSetupRoute = PinSetupRouteImport.update({
+  id: '/pin-setup',
+  path: '/pin-setup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppAboutRoute = AppAboutRouteImport.update({
+  id: '/about',
+  path: '/about',
   getParentRoute: () => AppRoute,
 } as any)
-const AppReelsRoute = AppReelsRouteImport.update({
-  id: '/reels',
-  path: '/reels',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppLikedRoute = AppLikedRouteImport.update({
-  id: '/liked',
-  path: '/liked',
+const AppChatRoute = AppChatRouteImport.update({
+  id: '/chat',
+  path: '/chat',
   getParentRoute: () => AppRoute,
 } as any)
 const AppHomeRoute = AppHomeRouteImport.update({
@@ -72,14 +68,24 @@ const AppHomeRoute = AppHomeRouteImport.update({
   path: '/home',
   getParentRoute: () => AppRoute,
 } as any)
+const AppLikedRoute = AppLikedRouteImport.update({
+  id: '/liked',
+  path: '/liked',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppReelsRoute = AppReelsRouteImport.update({
+  id: '/reels',
+  path: '/reels',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppSavedRoute = AppSavedRouteImport.update({
   id: '/saved',
   path: '/saved',
   getParentRoute: () => AppRoute,
 } as any)
-const AppAboutRoute = AppAboutRouteImport.update({
-  id: '/about',
-  path: '/about',
+const AppSettingsRoute = AppSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
   getParentRoute: () => AppRoute,
 } as any)
 const AppShopRoute = AppShopRouteImport.update({
@@ -94,12 +100,13 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/pin': typeof PinRoute
   '/pin-setup': typeof PinSetupRoute
+  '/about': typeof AppAboutRoute
+  '/chat': typeof AppChatRoute
   '/home': typeof AppHomeRoute
   '/liked': typeof AppLikedRoute
   '/reels': typeof AppReelsRoute
   '/saved': typeof AppSavedRoute
   '/settings': typeof AppSettingsRoute
-  '/about': typeof AppAboutRoute
   '/shop': typeof AppShopRoute
 }
 export interface FileRoutesByTo {
@@ -108,12 +115,13 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/pin': typeof PinRoute
   '/pin-setup': typeof PinSetupRoute
+  '/about': typeof AppAboutRoute
+  '/chat': typeof AppChatRoute
   '/home': typeof AppHomeRoute
   '/liked': typeof AppLikedRoute
   '/reels': typeof AppReelsRoute
   '/saved': typeof AppSavedRoute
   '/settings': typeof AppSettingsRoute
-  '/about': typeof AppAboutRoute
   '/shop': typeof AppShopRoute
 }
 export interface FileRoutesById {
@@ -124,12 +132,13 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/pin': typeof PinRoute
   '/pin-setup': typeof PinSetupRoute
+  '/_app/about': typeof AppAboutRoute
+  '/_app/chat': typeof AppChatRoute
   '/_app/home': typeof AppHomeRoute
   '/_app/liked': typeof AppLikedRoute
   '/_app/reels': typeof AppReelsRoute
   '/_app/saved': typeof AppSavedRoute
   '/_app/settings': typeof AppSettingsRoute
-  '/_app/about': typeof AppAboutRoute
   '/_app/shop': typeof AppShopRoute
 }
 export interface FileRouteTypes {
@@ -140,12 +149,13 @@ export interface FileRouteTypes {
     | '/login'
     | '/pin'
     | '/pin-setup'
+    | '/about'
+    | '/chat'
     | '/home'
     | '/liked'
     | '/reels'
     | '/saved'
     | '/settings'
-    | '/about'
     | '/shop'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -154,12 +164,13 @@ export interface FileRouteTypes {
     | '/login'
     | '/pin'
     | '/pin-setup'
+    | '/about'
+    | '/chat'
     | '/home'
     | '/liked'
     | '/reels'
     | '/saved'
     | '/settings'
-    | '/about'
     | '/shop'
   id:
     | '__root__'
@@ -169,12 +180,13 @@ export interface FileRouteTypes {
     | '/login'
     | '/pin'
     | '/pin-setup'
+    | '/_app/about'
+    | '/_app/chat'
     | '/_app/home'
     | '/_app/liked'
     | '/_app/reels'
     | '/_app/saved'
     | '/_app/settings'
-    | '/_app/about'
     | '/_app/shop'
   fileRoutesById: FileRoutesById
 }
@@ -189,32 +201,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/pin-setup': {
-      id: '/pin-setup'
-      path: '/pin-setup'
-      fullPath: '/pin-setup'
-      preLoaderRoute: typeof PinSetupRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/pin': {
-      id: '/pin'
-      path: '/pin'
-      fullPath: '/pin'
-      preLoaderRoute: typeof PinRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/age': {
-      id: '/age'
-      path: '/age'
-      fullPath: '/age'
-      preLoaderRoute: typeof AgeRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_app': {
@@ -224,32 +215,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/age': {
+      id: '/age'
+      path: '/age'
+      fullPath: '/age'
+      preLoaderRoute: typeof AgeRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_app/settings': {
-      id: '/_app/settings'
-      path: '/settings'
-      fullPath: '/settings'
-      preLoaderRoute: typeof AppSettingsRouteImport
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pin': {
+      id: '/pin'
+      path: '/pin'
+      fullPath: '/pin'
+      preLoaderRoute: typeof PinRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pin-setup': {
+      id: '/pin-setup'
+      path: '/pin-setup'
+      fullPath: '/pin-setup'
+      preLoaderRoute: typeof PinSetupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_app/about': {
+      id: '/_app/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AppAboutRouteImport
       parentRoute: typeof AppRoute
     }
-    '/_app/reels': {
-      id: '/_app/reels'
-      path: '/reels'
-      fullPath: '/reels'
-      preLoaderRoute: typeof AppReelsRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/_app/liked': {
-      id: '/_app/liked'
-      path: '/liked'
-      fullPath: '/liked'
-      preLoaderRoute: typeof AppLikedRouteImport
+    '/_app/chat': {
+      id: '/_app/chat'
+      path: '/chat'
+      fullPath: '/chat'
+      preLoaderRoute: typeof AppChatRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/home': {
@@ -259,6 +264,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppHomeRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/liked': {
+      id: '/_app/liked'
+      path: '/liked'
+      fullPath: '/liked'
+      preLoaderRoute: typeof AppLikedRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/reels': {
+      id: '/_app/reels'
+      path: '/reels'
+      fullPath: '/reels'
+      preLoaderRoute: typeof AppReelsRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/saved': {
       id: '/_app/saved'
       path: '/saved'
@@ -266,11 +285,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppSavedRouteImport
       parentRoute: typeof AppRoute
     }
-    '/_app/about': {
-      id: '/_app/about'
-      path: '/about'
-      fullPath: '/about'
-      preLoaderRoute: typeof AppAboutRouteImport
+    '/_app/settings': {
+      id: '/_app/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AppSettingsRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/shop': {
@@ -284,22 +303,24 @@ declare module '@tanstack/react-router' {
 }
 
 interface AppRouteChildren {
+  AppAboutRoute: typeof AppAboutRoute
+  AppChatRoute: typeof AppChatRoute
   AppHomeRoute: typeof AppHomeRoute
   AppLikedRoute: typeof AppLikedRoute
   AppReelsRoute: typeof AppReelsRoute
   AppSavedRoute: typeof AppSavedRoute
   AppSettingsRoute: typeof AppSettingsRoute
-  AppAboutRoute: typeof AppAboutRoute
   AppShopRoute: typeof AppShopRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
+  AppAboutRoute: AppAboutRoute,
+  AppChatRoute: AppChatRoute,
   AppHomeRoute: AppHomeRoute,
   AppLikedRoute: AppLikedRoute,
   AppReelsRoute: AppReelsRoute,
   AppSavedRoute: AppSavedRoute,
   AppSettingsRoute: AppSettingsRoute,
-  AppAboutRoute: AppAboutRoute,
   AppShopRoute: AppShopRoute,
 }
 
