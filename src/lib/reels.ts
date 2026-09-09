@@ -2,7 +2,7 @@ import { getRandomMode, getRecommendedOffset, setRecommendedOffset } from "./sto
 
 export type Reel = {
   id: string;
-  source: "v1" | "v2" | "v4" | "local" | "rojha_ji";
+  source: "v1" | "v2" | "v4" | "local" | "insta_reels";
   videoUrl: string;
   thumbnail?: string;
   title?: string;
@@ -57,7 +57,7 @@ async function loadDatabases() {
       fetch("/assets/v1-reels-db.json"),
       fetch("/assets/recommended_data.json"),
     ]);
-    
+
     if (localRes.ok) {
       const localDbRaw = await localRes.json();
       localDb = shuffle((localDbRaw as any[]).map((v, i) => ({
@@ -69,18 +69,18 @@ async function loadDatabases() {
         title: "Watch Reels 18+",
       })));
     }
-    
+
     if (recRes.ok) {
       const recommendedDbRaw = await recRes.json();
       recommendedDb = (recommendedDbRaw as any[]).map((v: any) => ({
         id: `recommended-${v.id}`,
-        source: "rojha_ji" as const,
+        source: "insta_reels" as const,
         videoUrl: v.video_url,
         thumbnail: v.image,
         title: v.title,
       }));
     }
-    
+
     isDbLoaded = true;
   } catch (error) {
     console.error("Failed to load databases:", error);
@@ -154,7 +154,7 @@ export async function fetchReelsPage(page: number, filter: FeedFilter = "all"): 
       }
       break;
     }
-    
+
     case "local": {
       if (isRandom) {
         selectedReels.push(...shuffle(localDb).slice(0, 30));
