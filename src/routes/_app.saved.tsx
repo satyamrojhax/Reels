@@ -51,12 +51,23 @@ function SavedPage() {
             <div
               key={r.id}
               className="group relative aspect-[9/16] overflow-hidden rounded-xl border-[1.5px] border-charcoal bg-cocoa dark:border-cream"
-              style={{ transform: `rotate(${(i % 3 - 1) * 0.6}deg)` }}
+              style={{ transform: `rotate(${((i % 3) - 1) * 0.6}deg)` }}
             >
               {r.thumbnail ? (
-                <img src={r.thumbnail} alt={r.title ?? ""} className="h-full w-full object-cover" loading="lazy" />
+                <img
+                  src={r.thumbnail}
+                  alt={r.title ?? ""}
+                  className="h-full w-full object-cover"
+                  loading="lazy"
+                />
               ) : (
-                <video src={r.videoUrl} className="h-full w-full object-cover" muted playsInline preload="metadata" />
+                <video
+                  src={r.videoUrl}
+                  className="h-full w-full object-cover"
+                  muted
+                  playsInline
+                  preload="metadata"
+                />
               )}
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
               <Link

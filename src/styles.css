@@ -105,22 +105,34 @@
 }
 
 @layer base {
-  * { border-color: var(--color-border); }
-  html { background-color: var(--color-background); }
+  * {
+    border-color: var(--color-border);
+  }
+  html {
+    background-color: var(--color-background);
+  }
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
   }
-  h1, h2, h3, h4 {
+  h1,
+  h2,
+  h3,
+  h4 {
     font-family: var(--font-display);
     font-weight: 700;
     letter-spacing: -0.015em;
     color: var(--color-twilight-navy);
     line-height: 1.05;
   }
-  .dark h1, .dark h2, .dark h3, .dark h4 { color: var(--color-cream-linen); }
+  .dark h1,
+  .dark h2,
+  .dark h3,
+  .dark h4 {
+    color: var(--color-cream-linen);
+  }
 }
 
 /* Recess ghost pill: cloud white fill, navy border + text */
@@ -138,14 +150,29 @@
   font-size: 14px;
   font-weight: 500;
   letter-spacing: 0.02em;
-  transition: background-color 120ms ease, transform 120ms ease;
+  transition:
+    background-color 120ms ease,
+    transform 120ms ease;
   cursor: pointer;
-  &:hover { background: var(--color-periwinkle-sky); }
-  &:active { transform: translateY(1px); }
-  &:disabled { opacity: 0.4; cursor: not-allowed; }
+  &:hover {
+    background: var(--color-periwinkle-sky);
+  }
+  &:active {
+    transform: translateY(1px);
+  }
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
 }
-.dark .btn-pill { background: transparent; border-color: var(--color-periwinkle-sky); color: var(--color-cream-linen); }
-.dark .btn-pill:hover { background: var(--color-secondary); }
+.dark .btn-pill {
+  background: transparent;
+  border-color: var(--color-periwinkle-sky);
+  color: var(--color-cream-linen);
+}
+.dark .btn-pill:hover {
+  background: var(--color-secondary);
+}
 
 /* Recess primary CTA — outlined rectangle */
 @utility btn-outlined {
@@ -165,17 +192,26 @@
   text-transform: uppercase;
   cursor: pointer;
   transition: background-color 120ms ease;
-  &:hover { background: var(--color-periwinkle-sky); }
+  &:hover {
+    background: var(--color-periwinkle-sky);
+  }
 }
 
 @utility marker-underline {
-  background-image: linear-gradient(transparent 62%, rgba(50, 82, 244, 0.18) 62%, rgba(50, 82, 244, 0.18) 92%, transparent 92%);
+  background-image: linear-gradient(
+    transparent 62%,
+    rgba(50, 82, 244, 0.18) 62%,
+    rgba(50, 82, 244, 0.18) 92%,
+    transparent 92%
+  );
   color: var(--color-cobalt-pop);
 }
 
 @utility no-scrollbar {
   scrollbar-width: none;
-  &::-webkit-scrollbar { display: none; }
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 /* Recess paper card — soft border, no shadow */
@@ -184,7 +220,10 @@
   border: 1px solid var(--color-slate-mist);
   border-radius: 8px;
 }
-.dark .paper-card { background: var(--card); border-color: var(--color-periwinkle-sky); }
+.dark .paper-card {
+  background: var(--card);
+  border-color: var(--color-periwinkle-sky);
+}
 
 /* Full-bleed periwinkle atmospheric surface */
 @utility sky-surface {
@@ -208,12 +247,19 @@
   white-space: nowrap;
 }
 
-.font-script { font-family: var(--font-script); font-weight: 400; }
+.font-script {
+  font-family: var(--font-script);
+  font-weight: 400;
+}
 
 /* Reel skeleton shimmer */
 @keyframes reel-shimmer {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
 }
 .skeleton-shimmer {
   background: linear-gradient(
@@ -245,7 +291,8 @@
   --border: #f472b6;
   --input: #22d3ee;
   --ring: #f472b6;
-}.matrix {
+}
+.matrix {
   --background: #000000;
   --foreground: #00ff00;
   --card: #001100;
@@ -271,7 +318,7 @@
 }
 
 .vip-text {
-  background: linear-gradient(90deg, #BF953F, #FCF6BA, #B38728, #FBF5B7, #AA771C);
+  background: linear-gradient(90deg, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   font-weight: bold;
@@ -282,23 +329,26 @@
   pointer-events: none;
 }
 .crt-filter::before {
-  content: ' ';
+  content: " ";
   display: block;
   position: fixed;
   top: 0;
   left: 0;
   bottom: 0;
   right: 0;
-  background: linear-gradient(
-    rgba(18, 16, 16, 0) 50%,
-    rgba(0, 0, 0, 0.25) 50%
-  );
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
   background-size: 100% 4px;
   z-index: 50;
   pointer-events: none;
 }
 @keyframes flicker {
-  0% { opacity: 0.95; }
-  50% { opacity: 0.85; }
-  100% { opacity: 0.95; }
+  0% {
+    opacity: 0.95;
+  }
+  50% {
+    opacity: 0.85;
+  }
+  100% {
+    opacity: 0.95;
+  }
 }

@@ -1,7 +1,18 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { getCoins, spendCoins, getUnlocks, unlockItem, hasUnlocked, set } from "@/lib/storage";
-import { ShoppingBag, CheckCircle, Zap, Palette, Lock, Sparkles, Tv, Music, Terminal, PartyPopper } from "lucide-react";
+import {
+  ShoppingBag,
+  CheckCircle,
+  Zap,
+  Palette,
+  Lock,
+  Sparkles,
+  Tv,
+  Music,
+  Terminal,
+  PartyPopper,
+} from "lucide-react";
 
 export const Route = createFileRoute("/_app/shop")({
   component: ShopPage,
@@ -149,7 +160,9 @@ function ShopPage() {
           </h1>
         </div>
         <div className="flex w-full sm:w-auto items-center justify-between sm:justify-start gap-3 rounded-full border-[1.5px] border-charcoal bg-cream px-5 py-2 dark:border-cream dark:bg-charcoal">
-          <span className="font-display text-lg lowercase text-charcoal/70 dark:text-cream/70">balance:</span>
+          <span className="font-display text-lg lowercase text-charcoal/70 dark:text-cream/70">
+            balance:
+          </span>
           <span className="font-display text-2xl text-marker">{formatCoins(coins)} 🪙</span>
         </div>
       </div>
@@ -162,36 +175,66 @@ function ShopPage() {
           return (
             <div
               key={item.id}
-              className={`paper-card flex flex-col relative overflow-hidden p-6 transition-transform ${isUnlocked
-                ? "border-marker bg-marker/5"
-                : canAfford
-                  ? "hover:-translate-y-1 hover:shadow-[4px_4px_0px_rgba(255,107,107,0.3)]"
-                  : "opacity-80"
-                }`}
+              className={`paper-card flex flex-col relative overflow-hidden p-6 transition-transform ${
+                isUnlocked
+                  ? "border-marker bg-marker/5"
+                  : canAfford
+                    ? "hover:-translate-y-1 hover:shadow-[4px_4px_0px_rgba(255,107,107,0.3)]"
+                    : "opacity-80"
+              }`}
             >
               <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full border-[1.5px] border-charcoal bg-cream text-cocoa dark:border-cream dark:bg-charcoal dark:text-cream">
-                <item.icon className={`h-7 w-7 ${isUnlocked ? "text-marker" : ""}`} strokeWidth={1.5} />
+                <item.icon
+                  className={`h-7 w-7 ${isUnlocked ? "text-marker" : ""}`}
+                  strokeWidth={1.5}
+                />
               </div>
-              <h3 className="font-display text-2xl lowercase text-cocoa dark:text-cream mb-2">{item.name}</h3>
-              <p className="mb-8 flex-1 text-sm text-charcoal/70 dark:text-cream/70 leading-relaxed">{item.description}</p>
+              <h3 className="font-display text-2xl lowercase text-cocoa dark:text-cream mb-2">
+                {item.name}
+              </h3>
+              <p className="mb-8 flex-1 text-sm text-charcoal/70 dark:text-cream/70 leading-relaxed">
+                {item.description}
+              </p>
 
               <button
                 onClick={() => handlePurchase(item)}
                 disabled={!isUnlocked && !canAfford}
-                className={`btn-pill w-full justify-center flex items-center gap-2 ${isUnlocked
-                  ? "bg-marker text-white border-marker hover:bg-marker/90"
-                  : canAfford
-                    ? ""
-                    : "opacity-50 cursor-not-allowed"
-                  }`}
+                className={`btn-pill w-full justify-center flex items-center gap-2 ${
+                  isUnlocked
+                    ? "bg-marker text-white border-marker hover:bg-marker/90"
+                    : canAfford
+                      ? ""
+                      : "opacity-50 cursor-not-allowed"
+                }`}
               >
                 {isUnlocked ? (
-                  item.id === "badge_verified" ? "equipped" :
-                  item.id === "badge_vip" ? "equipped" :
-                  item.id === "effect_confetti" ? "equipped" :
-                  item.id.startsWith("theme_") ? (activeTheme === item.id.replace("theme_", "") ? "applied" : "apply") :
-                  item.id === "filter_crt" ? (activeCrt ? "disable" : "enable") :
-                  item.id === "sound_meme" ? (activeMeme ? "disable" : "enable") : "apply"
+                  item.id === "badge_verified" ? (
+                    "equipped"
+                  ) : item.id === "badge_vip" ? (
+                    "equipped"
+                  ) : item.id === "effect_confetti" ? (
+                    "equipped"
+                  ) : item.id.startsWith("theme_") ? (
+                    activeTheme === item.id.replace("theme_", "") ? (
+                      "applied"
+                    ) : (
+                      "apply"
+                    )
+                  ) : item.id === "filter_crt" ? (
+                    activeCrt ? (
+                      "disable"
+                    ) : (
+                      "enable"
+                    )
+                  ) : item.id === "sound_meme" ? (
+                    activeMeme ? (
+                      "disable"
+                    ) : (
+                      "enable"
+                    )
+                  ) : (
+                    "apply"
+                  )
                 ) : (
                   <>
                     {canAfford ? <Zap className="h-4 w-4" /> : <Lock className="h-4 w-4" />}

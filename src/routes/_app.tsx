@@ -42,13 +42,9 @@ function AppLayout() {
   }
 
   return (
-    <div className={`min-h-screen bg-background ${activeCrt ? 'crt-filter' : ''}`}>
+    <div className={`min-h-screen bg-background ${activeCrt ? "crt-filter" : ""}`}>
       <Sidebar username={username} />
-      <main
-        className={
-          isReels ? "md:pl-[244px]" : "pb-20 md:pb-0 md:pl-[244px]"
-        }
-      >
+      <main className={isReels ? "md:pl-[244px]" : "pb-20 md:pb-0 md:pl-[244px]"}>
         <Outlet />
       </main>
       {!isReels && <BottomNav />}
@@ -56,4 +52,3 @@ function AppLayout() {
     </div>
   );
 }
-

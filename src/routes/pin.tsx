@@ -61,15 +61,17 @@ function PinPage() {
           punch in your <span className="marker-underline">pin.</span>
         </h1>
         <p className="mt-4 text-[17px] text-foreground/80">
-          welcome{" "}
-          <span className="font-medium text-foreground">@{username}</span>. six digits, from your date of birth.
+          welcome <span className="font-medium text-foreground">@{username}</span>. six digits, from
+          your date of birth.
         </p>
 
         <div className="mt-8 flex flex-wrap gap-2">
           {digits.map((d, i) => (
             <input
               key={i}
-              ref={(el) => { refs.current[i] = el; }}
+              ref={(el) => {
+                refs.current[i] = el;
+              }}
               inputMode="numeric"
               type="password"
               maxLength={1}

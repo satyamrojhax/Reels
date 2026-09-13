@@ -19,8 +19,8 @@ function HomePage() {
           start <span className="marker-underline">exploring.</span>
         </h1>
         <p className="mt-6 max-w-xl text-[18px] leading-relaxed text-charcoal/80 dark:text-cream/70">
-          a stack of fresh reels waiting to be peeled. tap play, hold to double the speed, double-tap to
-          love it — everything stays on this device.
+          a stack of fresh reels waiting to be peeled. tap play, hold to double the speed,
+          double-tap to love it — everything stays on this device.
         </p>
         <div className="mt-8 flex flex-wrap items-center gap-4">
           <Link to="/reels" className="btn-pill">
@@ -58,7 +58,9 @@ function HomePage() {
 
       {/* Footer band */}
       <footer className="mt-20 -mx-6 rounded-t-[56px] bg-marker px-8 py-10 text-cream md:px-16">
-        <p className="font-display text-3xl lowercase md:text-4xl">that's all for now — go tap something.</p>
+        <p className="font-display text-3xl lowercase md:text-4xl">
+          that's all for now — go tap something.
+        </p>
         <p className="mt-2 text-sm opacity-80">reels · a warm little corner of the internet.</p>
       </footer>
     </div>

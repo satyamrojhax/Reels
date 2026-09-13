@@ -27,7 +27,7 @@ A modern, responsive web application for watching premium 18+ video content. Bui
 
 ### Prerequisites
 
-- Node.js 18+ 
+- Node.js 18+
 - Bun or npm
 
 ### Installation
@@ -80,6 +80,7 @@ src/
 ## Authentication
 
 The app uses a PIN-based authentication system:
+
 - Universal PIN: `000111` (for all users)
 - Personal PIN: Generated from date of birth (DDMMYY format)
 
@@ -107,6 +108,7 @@ This project is configured for Cloudflare Pages deployment:
 5. Deploy!
 
 The project includes:
+
 - `wrangler.toml` for Cloudflare Pages configuration
 - `_redirects` file for SPA routing
 - `manifest.json` for PWA support

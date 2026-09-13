@@ -152,4 +152,3 @@ export function getRecommendedOffset(): number {
 export function setRecommendedOffset(value: number): void {
   set(KEYS.recOffset, value);
 }
-

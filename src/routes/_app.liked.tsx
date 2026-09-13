@@ -28,7 +28,9 @@ function LikedPage() {
   return (
     <div className="mx-auto max-w-[1200px] px-6 py-10">
       <div className="mb-8">
-        <p className="font-display text-marker text-xl lowercase italic">your little collection —</p>
+        <p className="font-display text-marker text-xl lowercase italic">
+          your little collection —
+        </p>
         <h1 className="mt-2 font-display text-[48px] leading-[1.05] lowercase text-cocoa md:text-[64px] dark:text-cream">
           liked reels <span className="text-marker">({items.length})</span>
         </h1>
@@ -51,12 +53,23 @@ function LikedPage() {
             <div
               key={r.id}
               className="group relative aspect-[9/16] overflow-hidden rounded-xl border-[1.5px] border-charcoal bg-cocoa dark:border-cream"
-              style={{ transform: `rotate(${(i % 3 - 1) * 0.6}deg)` }}
+              style={{ transform: `rotate(${((i % 3) - 1) * 0.6}deg)` }}
             >
               {r.thumbnail ? (
-                <img src={r.thumbnail} alt={r.title ?? ""} className="h-full w-full object-cover" loading="lazy" />
+                <img
+                  src={r.thumbnail}
+                  alt={r.title ?? ""}
+                  className="h-full w-full object-cover"
+                  loading="lazy"
+                />
               ) : (
-                <video src={r.videoUrl} className="h-full w-full object-cover" muted playsInline preload="metadata" />
+                <video
+                  src={r.videoUrl}
+                  className="h-full w-full object-cover"
+                  muted
+                  playsInline
+                  preload="metadata"
+                />
               )}
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
               <Link

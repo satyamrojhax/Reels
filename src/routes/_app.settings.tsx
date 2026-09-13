@@ -2,10 +2,33 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useTheme, type Theme } from "@/hooks/use-theme";
-import { getLiked, getSaved, KEYS, get, set, setLiked, setSaved, getCoins, hasUnlocked, getRandomMode, setRandomMode } from "@/lib/storage";
+import {
+  getLiked,
+  getSaved,
+  KEYS,
+  get,
+  set,
+  setLiked,
+  setSaved,
+  getCoins,
+  hasUnlocked,
+  getRandomMode,
+  setRandomMode,
+} from "@/lib/storage";
 import { useHydrated } from "@/hooks/use-hydrated";
 import { usePwa } from "@/hooks/use-pwa";
-import { Eye, EyeOff, LogOut, Moon, Sun, Monitor, Trash2, Coins, Download, BadgeCheck } from "lucide-react";
+import {
+  Eye,
+  EyeOff,
+  LogOut,
+  Moon,
+  Sun,
+  Monitor,
+  Trash2,
+  Coins,
+  Download,
+  BadgeCheck,
+} from "lucide-react";
 
 export const Route = createFileRoute("/_app/settings")({
   component: SettingsPage,
@@ -63,8 +86,12 @@ function SettingsPage() {
         </div>
         <div className="mt-6 flex items-center justify-between rounded-lg border-[1.5px] border-charcoal/80 bg-dew px-4 py-3 dark:border-cream/50 dark:bg-secondary">
           <div>
-            <div className="text-[11px] font-medium uppercase tracking-[0.2em] text-charcoal/60 dark:text-cream/60">pin</div>
-            <div className="mt-0.5 font-mono text-base text-cocoa dark:text-cream">{showPin ? "000111" : "••••••"}</div>
+            <div className="text-[11px] font-medium uppercase tracking-[0.2em] text-charcoal/60 dark:text-cream/60">
+              pin
+            </div>
+            <div className="mt-0.5 font-mono text-base text-cocoa dark:text-cream">
+              {showPin ? "000111" : "••••••"}
+            </div>
           </div>
           <button
             onClick={() => setShowPin((s) => !s)}
@@ -142,8 +169,12 @@ function SettingsPage() {
           </h2>
           <div className="mt-4 flex items-center justify-between">
             <div>
-              <div className="font-display text-lg lowercase text-cocoa dark:text-cream">show random reels</div>
-              <div className="text-sm text-charcoal/70 dark:text-cream/70">mix all sources randomly across tabs.</div>
+              <div className="font-display text-lg lowercase text-cocoa dark:text-cream">
+                show random reels
+              </div>
+              <div className="text-sm text-charcoal/70 dark:text-cream/70">
+                mix all sources randomly across tabs.
+              </div>
             </div>
             <button
               onClick={() => {
@@ -173,8 +204,12 @@ function SettingsPage() {
             className="paper-card flex w-full items-center justify-between p-5 text-left transition hover:bg-dew dark:hover:bg-secondary"
           >
             <div>
-              <div className="font-display text-lg lowercase text-cocoa dark:text-cream">install app</div>
-              <div className="text-sm text-charcoal/70 dark:text-cream/70">add to home screen for a better experience.</div>
+              <div className="font-display text-lg lowercase text-cocoa dark:text-cream">
+                install app
+              </div>
+              <div className="text-sm text-charcoal/70 dark:text-cream/70">
+                add to home screen for a better experience.
+              </div>
             </div>
             <Download className="h-5 w-5 text-cocoa dark:text-cream" />
           </button>
@@ -188,8 +223,12 @@ function SettingsPage() {
           className="paper-card flex w-full items-center justify-between p-5 text-left transition hover:bg-dew dark:hover:bg-secondary"
         >
           <div>
-            <div className="font-display text-lg lowercase text-cocoa dark:text-cream">about us</div>
-            <div className="text-sm text-charcoal/70 dark:text-cream/70">learn more about this app.</div>
+            <div className="font-display text-lg lowercase text-cocoa dark:text-cream">
+              about us
+            </div>
+            <div className="text-sm text-charcoal/70 dark:text-cream/70">
+              learn more about this app.
+            </div>
           </div>
         </button>
       </section>
@@ -201,8 +240,12 @@ function SettingsPage() {
           className="paper-card flex w-full items-center justify-between p-5 text-left transition hover:bg-dew dark:hover:bg-secondary"
         >
           <div>
-            <div className="font-display text-lg lowercase text-cocoa dark:text-cream">reset all stats</div>
-            <div className="text-sm text-charcoal/70 dark:text-cream/70">clear all liked, saved, coins and watched reels.</div>
+            <div className="font-display text-lg lowercase text-cocoa dark:text-cream">
+              reset all stats
+            </div>
+            <div className="text-sm text-charcoal/70 dark:text-cream/70">
+              clear all liked, saved, coins and watched reels.
+            </div>
           </div>
           <Trash2 className="h-5 w-5 text-charcoal/60 dark:text-cream/60" />
         </button>
@@ -215,7 +258,9 @@ function SettingsPage() {
         >
           <div>
             <div className="font-display text-lg lowercase text-marker">log out</div>
-            <div className="text-sm text-charcoal/70 dark:text-cream/70">sign out of this device.</div>
+            <div className="text-sm text-charcoal/70 dark:text-cream/70">
+              sign out of this device.
+            </div>
           </div>
           <LogOut className="h-5 w-5 text-marker" />
         </button>
@@ -225,9 +270,12 @@ function SettingsPage() {
       {showResetConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
           <div className="paper-card max-w-sm w-full p-6">
-            <h2 className="font-display text-2xl lowercase text-cocoa dark:text-cream">reset all stats?</h2>
+            <h2 className="font-display text-2xl lowercase text-cocoa dark:text-cream">
+              reset all stats?
+            </h2>
             <p className="mt-2 text-sm text-charcoal/70 dark:text-cream/70">
-              this will clear all your liked reels, saved reels, coins and watch count. this action cannot be undone.
+              this will clear all your liked reels, saved reels, coins and watch count. this action
+              cannot be undone.
             </p>
             <div className="mt-6 flex gap-3">
               <button

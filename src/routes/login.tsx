@@ -56,7 +56,8 @@ function LoginPage() {
             continue →
           </button>
           <p className="mt-4 text-[12px] text-foreground/80">
-            This is only for you, no one will ever see this. It's just a nickname stuck to your device.
+            This is only for you, no one will ever see this. It's just a nickname stuck to your
+            device.
           </p>
         </form>
       </div>

@@ -1,9 +1,11 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useInfiniteQuery, useQueryClient, type InfiniteData } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { fetchReelsPage, type Reel, type FeedFilter } from "@/lib/reels";
+import { fetchReelsPage, warmAllFilters, type Reel, type FeedFilter } from "@/lib/reels";
 import { ReelPlayer } from "@/components/reel-player";
 import { KEYS, get, set, getCoins, getAutoScroll, getLiked, getSaved } from "@/lib/storage";
+import { warmCacheOnStartup } from "@/lib/video-cache";
+import { useVideoPrewarmer } from "@/hooks/use-video-prewarmer";
 import { AlertTriangle, RefreshCw, RotateCcw, X, Coins } from "lucide-react";
 
 type ReelsSearch = { start?: string; tabs?: FeedFilter };
@@ -22,13 +24,25 @@ export const Route = createFileRoute("/_app/reels")({
 type PageData = { items: Reel[]; nextPage: number };
 type FeedData = InfiniteData<PageData, number>;
 
+// Warm cache + all filter tabs once — called outside component so it's truly
+// run once per page load, not on every re-render.
+let warmupStarted = false;
+function ensureWarmedUp() {
+  if (warmupStarted) return;
+  warmupStarted = true;
+  warmCacheOnStartup().catch(() => {});
+  // Warm pages 1–2 of all four tabs in the background
+  warmAllFilters();
+}
+ensureWarmedUp();
+
 function ReelsPage() {
   const search = Route.useSearch();
   const { start, tabs } = search;
   const navigate = Route.useNavigate();
   const queryClient = useQueryClient();
   const [coins, setCoins] = useState(0);
-  
+
   const filter = tabs || "all";
 
   useEffect(() => {
@@ -53,8 +67,9 @@ function ReelsPage() {
     queryFn: ({ pageParam }) => fetchReelsPage(pageParam, filter),
     initialPageParam: 1,
     getNextPageParam: (last) => last.nextPage,
-    staleTime: 10 * 60_000,
-    gcTime: 30 * 60_000,
+    // 30 min stale-time: tab switches hit the cache, not the network
+    staleTime: 30 * 60_000,
+    gcTime: 60 * 60_000,
     retry: 3,
     retryDelay: (i) => Math.min(1000 * 2 ** i, 8000),
   });
@@ -64,13 +79,13 @@ function ReelsPage() {
     const seen = new Set<string>();
     const finalReels: Reel[] = [];
 
-    if (start && all.findIndex(r => r.id === start) === -1) {
-       const likedAndSaved = [...getLiked(), ...getSaved()];
-       const target = likedAndSaved.find(r => r.id === start);
-       if (target) {
-         finalReels.push(target);
-         seen.add(target.id);
-       }
+    if (start && all.findIndex((r) => r.id === start) === -1) {
+      const likedAndSaved = [...getLiked(), ...getSaved()];
+      const target = likedAndSaved.find((r) => r.id === start);
+      if (target) {
+        finalReels.push(target);
+        seen.add(target.id);
+      }
     }
 
     for (const r of all) {
@@ -92,6 +107,7 @@ function ReelsPage() {
   useEffect(() => {
     setMuted(get<boolean>(KEYS.muted, true));
   }, []);
+
   const toggleMute = useCallback(() => {
     setMuted((m) => {
       const next = !m;
@@ -108,8 +124,7 @@ function ReelsPage() {
     }
   }, []);
 
-  // Deep-link handling: ?start=<id> — jump to that reel every time it changes
-  // (works for hard refresh, client-nav, and browser back/forward).
+  // Deep-link: jump to ?start=<id>
   useEffect(() => {
     if (!start || reels.length === 0) return;
     const key = `start:${start}`;
@@ -117,15 +132,13 @@ function ReelsPage() {
     const i = reels.findIndex((r) => r.id === start);
     if (i >= 0) {
       restoredRef.current = key;
-      // Defer to next tick so refs are mounted
       requestAnimationFrame(() => scrollToIdx(i, "auto"));
     } else if (hasNextPage && !isFetchingNextPage) {
-      // Not found yet — keep loading more pages until it appears.
       fetchNextPage();
     }
   }, [start, reels, hasNextPage, isFetchingNextPage, fetchNextPage, scrollToIdx]);
 
-  // Resume banner: on first entry without ?start=, surface a saved reel to jump to.
+  // Resume banner
   useEffect(() => {
     if (start || resumeTarget !== null || restoredRef.current === "no-resume") return;
     if (reels.length === 0) return;
@@ -139,7 +152,6 @@ function ReelsPage() {
       restoredRef.current = "no-resume";
       setResumeTarget({ id: savedId, idx: i });
     } else if (i < 0 && hasNextPage && !isFetchingNextPage) {
-      // Load more so we can find the saved reel
       fetchNextPage();
     } else if (i === 0) {
       restoredRef.current = "no-resume";
@@ -164,30 +176,26 @@ function ReelsPage() {
           }
         });
       },
-      { root, threshold: [0.7] }
+      { root, threshold: [0.7] },
     );
     slideRefs.current.forEach((el) => el && obs.observe(el));
     return () => obs.disconnect();
   }, [reels]);
 
-  // Prefetch upcoming pages aggressively so scrolling feels instant
+  // Aggressive prefetch — start loading the next page when 15 reels remain
   useEffect(() => {
     if (!hasNextPage || isFetchingNextPage) return;
-    if (reels.length - activeIdx <= 10) fetchNextPage();
+    if (reels.length - activeIdx <= 15) fetchNextPage();
   }, [activeIdx, reels.length, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-
-  // Safe cache eviction: cap in-memory pages. When we're deep enough into the
-  // feed that the oldest page is far behind the viewer, drop the front pages
-  // and correct scroll + activeIdx so nothing visibly jumps.
+  // Safe cache eviction: cap in-memory pages
   useEffect(() => {
     const cache = data;
     if (!cache) return;
     if (cache.pages.length <= MAX_PAGES) return;
 
-    // How far behind does the active reel sit? Only trim if pages 0..N are safely off-screen.
     const firstPageLen = cache.pages[0]?.items.length ?? 0;
-    if (activeIdx < firstPageLen + 3) return; // keep a small buffer
+    if (activeIdx < firstPageLen + 3) return;
 
     const droppedItems = firstPageLen;
     queryClient.setQueryData<FeedData>(["reels-feed", filter], (old) => {
@@ -198,7 +206,6 @@ function ReelsPage() {
       };
     });
 
-    // Correct visual scroll so the currently-visible reel stays visible.
     const root = containerRef.current;
     if (root) {
       const slideH = root.clientHeight;
@@ -207,7 +214,10 @@ function ReelsPage() {
     setActiveIdx((i) => Math.max(0, i - droppedItems));
   }, [data, activeIdx, queryClient, filter]);
 
-  // Track reel-length changes to reset refs sizing
+  // Pre-warm CDN connections for upcoming reels
+  useVideoPrewarmer(reels, activeIdx);
+
+  // Track reel-length changes to resize refs array
   useEffect(() => {
     prevReelsLenRef.current = reels.length;
     slideRefs.current.length = reels.length;
@@ -216,6 +226,7 @@ function ReelsPage() {
   const goNext = useCallback(() => {
     scrollToIdx(activeIdx + 1, "smooth");
   }, [activeIdx, scrollToIdx]);
+  void goNext; // exported for future use
 
   const bumpWatched = useCallback(() => {
     const n = get<number>(KEYS.watched, 0);
@@ -224,12 +235,12 @@ function ReelsPage() {
 
   const handleReelEnd = useCallback(() => {
     bumpWatched();
-    // Auto-scroll to next reel after a short delay if enabled
     if (getAutoScroll()) {
       setTimeout(() => {
         if (activeIdx < reels.length - 1) {
           scrollToIdx(activeIdx + 1, "smooth");
-          if (typeof navigator !== "undefined" && navigator.vibrate) navigator.vibrate([30, 50, 30]);
+          if (typeof navigator !== "undefined" && navigator.vibrate)
+            navigator.vibrate([30, 50, 30]);
         }
       }, 500);
     }
@@ -237,13 +248,13 @@ function ReelsPage() {
 
   const jumpToResume = () => {
     if (!resumeTarget) return;
-    // Use current index by id in case eviction shifted it
     const i = reels.findIndex((r) => r.id === resumeTarget.id);
     if (i >= 0) scrollToIdx(i, "smooth");
     setResumeTarget(null);
-    // Reflect the deep link in the URL so back/forward returns here
     navigate({ to: "/reels", search: { start: resumeTarget.id }, replace: true });
   };
+
+  // ─── Error & Loading States ────────────────────────────────────────────────
 
   if (isError && reels.length === 0) {
     return (
@@ -274,7 +285,7 @@ function ReelsPage() {
     return (
       <div className="relative h-[100dvh] w-full overflow-hidden bg-black">
         <div className="absolute inset-0 animate-pulse bg-zinc-900" />
-        
+
         {/* Right action buttons skeleton */}
         <div className="absolute bottom-24 right-3 z-20 flex flex-col items-center gap-6">
           <div className="h-10 w-10 animate-pulse rounded-full bg-zinc-800" />
@@ -282,7 +293,7 @@ function ReelsPage() {
           <div className="h-10 w-10 animate-pulse rounded-full bg-zinc-800" />
           <div className="h-10 w-10 animate-pulse rounded-full bg-zinc-800" />
         </div>
-        
+
         {/* Bottom text skeleton */}
         <div className="absolute inset-x-0 bottom-0 z-10 p-4 pr-20 pb-6">
           <div className="mb-4 flex items-center gap-3">
@@ -298,6 +309,8 @@ function ReelsPage() {
     );
   }
 
+  // ─── Main Feed ─────────────────────────────────────────────────────────────
+
   return (
     <div
       ref={containerRef}
@@ -306,7 +319,7 @@ function ReelsPage() {
       {/* Category Pills */}
       <div className="absolute left-0 right-0 top-16 z-30 flex w-full justify-center px-4 md:top-6">
         <div className="no-scrollbar flex w-full max-w-full items-center justify-start gap-2 overflow-x-auto sm:justify-center sm:gap-3">
-          {(["all", "recommended", "local", "trending"] as FeedFilter[]).map(f => (
+          {(["all", "recommended", "local", "trending"] as FeedFilter[]).map((f) => (
             <button
               key={f}
               onClick={() => navigate({ search: (prev) => ({ ...prev, tabs: f }), replace: true })}
@@ -355,6 +368,7 @@ function ReelsPage() {
       )}
 
       {reels.map((r, i) => {
+        // Render the player for reels within distance 3; beyond that show thumbnail placeholder
         const near = Math.abs(i - activeIdx) <= 3;
         const composite = `reel::${r.source}::${r.id}::${i}`;
         return (
@@ -362,7 +376,9 @@ function ReelsPage() {
             key={composite}
             data-idx={i}
             data-reel-id={r.id}
-            ref={(el) => { slideRefs.current[i] = el; }}
+            ref={(el) => {
+              slideRefs.current[i] = el;
+            }}
             className="relative h-[100dvh] w-full snap-start snap-always"
           >
             {near ? (
@@ -379,13 +395,19 @@ function ReelsPage() {
             ) : (
               <div key={`ph::${r.id}`} className="h-full w-full bg-dusk-indigo">
                 {r.thumbnail && (
-                  <img src={r.thumbnail} alt="" className="h-full w-full object-cover opacity-40" loading="lazy" />
+                  <img
+                    src={r.thumbnail}
+                    alt=""
+                    className="h-full w-full object-cover opacity-40"
+                    loading="lazy"
+                  />
                 )}
               </div>
             )}
           </section>
         );
       })}
+
       {isFetchingNextPage && (
         <div className="flex h-24 items-center justify-center bg-dusk-indigo">
           <div className="h-6 w-6 animate-spin rounded-full border-2 border-periwinkle-sky/40 border-t-periwinkle-sky" />

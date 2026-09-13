@@ -22,11 +22,7 @@ function isValidDob(dob: string): { ok: boolean; reason?: string } {
   if (m < 1 || m > 12) return { ok: false, reason: "month must be 01–12." };
   if (d < 1 || d > 31) return { ok: false, reason: "day must be 01–31." };
   const dt = new Date(Date.UTC(y, m - 1, d));
-  if (
-    dt.getUTCFullYear() !== y ||
-    dt.getUTCMonth() + 1 !== m ||
-    dt.getUTCDate() !== d
-  ) {
+  if (dt.getUTCFullYear() !== y || dt.getUTCMonth() + 1 !== m || dt.getUTCDate() !== d) {
     return { ok: false, reason: "that date doesn't exist." };
   }
   if (dt.getTime() > Date.now()) return { ok: false, reason: "date can't be in the future." };
@@ -85,9 +81,7 @@ function PinSetupPage() {
   };
 
   const today = new Date().toISOString().slice(0, 10);
-  const maxDob = new Date(Date.now() - 18 * 365.25 * 24 * 3600 * 1000)
-    .toISOString()
-    .slice(0, 10);
+  const maxDob = new Date(Date.now() - 18 * 365.25 * 24 * 3600 * 1000).toISOString().slice(0, 10);
 
   if (generated) {
     return (
@@ -98,7 +92,8 @@ function PinSetupPage() {
             your <span className="marker-underline">pin</span> is ready.
           </h1>
           <p className="mt-4 text-[17px] text-foreground/80">
-            we made it from your date of birth (ddmmyy). this is the only time we'll show it — memorise it now.
+            we made it from your date of birth (ddmmyy). this is the only time we'll show it —
+            memorise it now.
           </p>
 
           <div className="mt-8 rounded-2xl border-[1.5px] border-foreground/30 bg-muted px-6 py-8 text-center">
@@ -125,11 +120,7 @@ function PinSetupPage() {
           </div>
 
           <div className="mt-8 flex flex-wrap gap-3">
-            <button
-              type="button"
-              onClick={() => navigate({ to: "/pin" })}
-              className="btn-pill"
-            >
+            <button type="button" onClick={() => navigate({ to: "/pin" })} className="btn-pill">
               got it, let me in →
             </button>
           </div>
@@ -177,7 +168,6 @@ function PinSetupPage() {
             />
           </label>
 
-
           <label className="mt-4 flex items-start gap-3 rounded-xl border-[1.5px] border-foreground/30 bg-muted/50 p-4 transition-colors hover:bg-muted">
             <input
               type="checkbox"
@@ -193,7 +183,11 @@ function PinSetupPage() {
           {error && <p className="text-sm text-destructive">{error}</p>}
 
           <div className="flex flex-wrap gap-3 pt-2">
-            <button type="submit" disabled={!checked} className="btn-pill disabled:opacity-50 disabled:cursor-not-allowed">
+            <button
+              type="submit"
+              disabled={!checked}
+              className="btn-pill disabled:opacity-50 disabled:cursor-not-allowed"
+            >
               generate my pin →
             </button>
             <button

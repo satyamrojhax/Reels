@@ -46,7 +46,7 @@ export function usePwa() {
         isInstalled,
       });
     };
-    
+
     listeners.add(handleUpdate);
     handleUpdate();
 

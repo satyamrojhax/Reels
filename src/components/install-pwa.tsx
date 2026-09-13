@@ -30,8 +30,12 @@ export function InstallPwa() {
           <Download className="h-5 w-5" />
         </div>
         <div className="flex-1">
-          <h3 className="text-sm font-semibold text-twilight-navy dark:text-cream-linen">Install App</h3>
-          <p className="text-xs text-slate-mist dark:text-cream-linen/70">Add to home screen for a better experience</p>
+          <h3 className="text-sm font-semibold text-twilight-navy dark:text-cream-linen">
+            Install App
+          </h3>
+          <p className="text-xs text-slate-mist dark:text-cream-linen/70">
+            Add to home screen for a better experience
+          </p>
         </div>
         <div className="flex items-center gap-2">
           <button

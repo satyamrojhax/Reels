@@ -65,20 +65,22 @@ export function useAuth() {
       const code = generatePinFromDob(dobStr);
       set(KEYS.realName, name);
       set(KEYS.dob, dobStr);
-      
+
       const encoder = new TextEncoder();
       const data = encoder.encode(name + dobStr + Date.now());
       const hashBuffer = await crypto.subtle.digest("SHA-256", data);
       const hashArray = Array.from(new Uint8Array(hashBuffer));
       const hashHex = hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
-      
+
       const newDeviceId = crypto.randomUUID();
-      const newFingerprint = btoa(navigator.userAgent + window.screen.width + window.screen.height + newDeviceId).slice(0, 32);
+      const newFingerprint = btoa(
+        navigator.userAgent + window.screen.width + window.screen.height + newDeviceId,
+      ).slice(0, 32);
 
       set(KEYS.hash, hashHex);
       set(KEYS.deviceId, newDeviceId);
       set(KEYS.fingerprint, newFingerprint);
-      
+
       set(KEYS.pinCode, code);
       setRealName(name);
       setDob(dobStr);

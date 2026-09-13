@@ -64,7 +64,9 @@ export function Sidebar({ username }: { username: string | null }) {
               {isVip && <span title="VIP">👑</span>}
               {isVerified && <BadgeCheck className="h-4 w-4 text-blue-500 flex-shrink-0" />}
             </div>
-            <div className="text-[10px] font-medium uppercase tracking-[0.18em] text-slate-mist">signed in</div>
+            <div className="text-[10px] font-medium uppercase tracking-[0.18em] text-slate-mist">
+              signed in
+            </div>
           </div>
         </div>
       )}
@@ -98,13 +100,12 @@ export function BottomNav() {
 }
 
 export function MarqueeStrip() {
-  const msg = "free shipping on daydreams · pastel sunsets · press hold for 2× · double-tap to like · ";
+  const msg =
+    "free shipping on daydreams · pastel sunsets · press hold for 2× · double-tap to like · ";
   const repeated = msg.repeat(6);
   return (
     <div className="marquee-strip">
-      <div className="animate-[marquee_45s_linear_infinite] inline-block">
-        {repeated}
-      </div>
+      <div className="animate-[marquee_45s_linear_infinite] inline-block">{repeated}</div>
       <style>{`@keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }`}</style>
     </div>
   );
@@ -112,8 +113,7 @@ export function MarqueeStrip() {
 
 export function Footer() {
   return (
-    <footer className="fixed bottom-0 left-0 right-0 z-20 bg-background py-3 px-4 text-center text-xs text-muted-foreground md:pl-[244px]">
-    </footer>
+    <footer className="fixed bottom-0 left-0 right-0 z-20 bg-background py-3 px-4 text-center text-xs text-muted-foreground md:pl-[244px]"></footer>
   );
 }
 

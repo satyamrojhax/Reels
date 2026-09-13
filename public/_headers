@@ -1,6 +1,16 @@
-/assets/*
+# Static JS/CSS bundles — immutable forever (content-hashed filenames)
+/assets/*.js
   Cache-Control: public, max-age=31536000, immutable
 
+/assets/*.css
+  Cache-Control: public, max-age=31536000, immutable
+
+# Local JSON databases — cache for 24h, serve stale while revalidating
+/assets/*.json
+  Cache-Control: public, max-age=86400, stale-while-revalidate=3600
+  Access-Control-Allow-Origin: *
+
+# PWA assets
 /manifest.json
   Content-Type: application/json
   Cache-Control: public, max-age=86400
@@ -10,3 +20,8 @@
 
 /logo.png
   Cache-Control: public, max-age=31536000, immutable
+
+# Service worker — MUST NOT be cached (must always be fresh)
+/sw.js
+  Cache-Control: no-cache, no-store, must-revalidate
+  Service-Worker-Allowed: /
