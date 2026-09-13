@@ -1,9 +1,10 @@
 {
-  "framework": "vite",
-  "cleanUrls": true,
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "framework": null,
   "rewrites": [
     {
-      "source": "/(.*)",
+      "source": "/((?!assets/|icons/|logo\\.png|PWA_ICON\\.png|manifest\\.json|favicon\\.|robots\\.txt|sitemap\\.).*)",
       "destination": "/index.html"
     }
   ],
