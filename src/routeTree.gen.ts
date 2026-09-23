@@ -15,13 +15,17 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as AgeRouteImport } from './routes/age'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppSkillsRouteImport } from './routes/_app.skills'
 import { Route as AppShopRouteImport } from './routes/_app.shop'
 import { Route as AppSettingsRouteImport } from './routes/_app.settings'
 import { Route as AppSavedRouteImport } from './routes/_app.saved'
 import { Route as AppReelsRouteImport } from './routes/_app.reels'
+import { Route as AppRedeemRouteImport } from './routes/_app.redeem'
+import { Route as AppMyCoursesRouteImport } from './routes/_app.my-courses'
 import { Route as AppLikedRouteImport } from './routes/_app.liked'
 import { Route as AppHomeRouteImport } from './routes/_app.home'
 import { Route as AppAboutRouteImport } from './routes/_app.about'
+import { Route as AppCourseSlugRouteImport } from './routes/_app.course.$slug'
 
 const PinSetupRoute = PinSetupRouteImport.update({
   id: '/pin-setup',
@@ -52,6 +56,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppSkillsRoute = AppSkillsRouteImport.update({
+  id: '/skills',
+  path: '/skills',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppShopRoute = AppShopRouteImport.update({
   id: '/shop',
   path: '/shop',
@@ -72,6 +81,16 @@ const AppReelsRoute = AppReelsRouteImport.update({
   path: '/reels',
   getParentRoute: () => AppRoute,
 } as any)
+const AppRedeemRoute = AppRedeemRouteImport.update({
+  id: '/redeem',
+  path: '/redeem',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppMyCoursesRoute = AppMyCoursesRouteImport.update({
+  id: '/my-courses',
+  path: '/my-courses',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppLikedRoute = AppLikedRouteImport.update({
   id: '/liked',
   path: '/liked',
@@ -87,6 +106,11 @@ const AppAboutRoute = AppAboutRouteImport.update({
   path: '/about',
   getParentRoute: () => AppRoute,
 } as any)
+const AppCourseSlugRoute = AppCourseSlugRouteImport.update({
+  id: '/course/$slug',
+  path: '/course/$slug',
+  getParentRoute: () => AppRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -97,10 +121,14 @@ export interface FileRoutesByFullPath {
   '/about': typeof AppAboutRoute
   '/home': typeof AppHomeRoute
   '/liked': typeof AppLikedRoute
+  '/my-courses': typeof AppMyCoursesRoute
+  '/redeem': typeof AppRedeemRoute
   '/reels': typeof AppReelsRoute
   '/saved': typeof AppSavedRoute
   '/settings': typeof AppSettingsRoute
   '/shop': typeof AppShopRoute
+  '/skills': typeof AppSkillsRoute
+  '/course/$slug': typeof AppCourseSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -111,10 +139,14 @@ export interface FileRoutesByTo {
   '/about': typeof AppAboutRoute
   '/home': typeof AppHomeRoute
   '/liked': typeof AppLikedRoute
+  '/my-courses': typeof AppMyCoursesRoute
+  '/redeem': typeof AppRedeemRoute
   '/reels': typeof AppReelsRoute
   '/saved': typeof AppSavedRoute
   '/settings': typeof AppSettingsRoute
   '/shop': typeof AppShopRoute
+  '/skills': typeof AppSkillsRoute
+  '/course/$slug': typeof AppCourseSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -127,10 +159,14 @@ export interface FileRoutesById {
   '/_app/about': typeof AppAboutRoute
   '/_app/home': typeof AppHomeRoute
   '/_app/liked': typeof AppLikedRoute
+  '/_app/my-courses': typeof AppMyCoursesRoute
+  '/_app/redeem': typeof AppRedeemRoute
   '/_app/reels': typeof AppReelsRoute
   '/_app/saved': typeof AppSavedRoute
   '/_app/settings': typeof AppSettingsRoute
   '/_app/shop': typeof AppShopRoute
+  '/_app/skills': typeof AppSkillsRoute
+  '/_app/course/$slug': typeof AppCourseSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -143,10 +179,14 @@ export interface FileRouteTypes {
     | '/about'
     | '/home'
     | '/liked'
+    | '/my-courses'
+    | '/redeem'
     | '/reels'
     | '/saved'
     | '/settings'
     | '/shop'
+    | '/skills'
+    | '/course/$slug'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -157,10 +197,14 @@ export interface FileRouteTypes {
     | '/about'
     | '/home'
     | '/liked'
+    | '/my-courses'
+    | '/redeem'
     | '/reels'
     | '/saved'
     | '/settings'
     | '/shop'
+    | '/skills'
+    | '/course/$slug'
   id:
     | '__root__'
     | '/'
@@ -172,10 +216,14 @@ export interface FileRouteTypes {
     | '/_app/about'
     | '/_app/home'
     | '/_app/liked'
+    | '/_app/my-courses'
+    | '/_app/redeem'
     | '/_app/reels'
     | '/_app/saved'
     | '/_app/settings'
     | '/_app/shop'
+    | '/_app/skills'
+    | '/_app/course/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -231,6 +279,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_app/skills': {
+      id: '/_app/skills'
+      path: '/skills'
+      fullPath: '/skills'
+      preLoaderRoute: typeof AppSkillsRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/shop': {
       id: '/_app/shop'
       path: '/shop'
@@ -259,6 +314,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppReelsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/redeem': {
+      id: '/_app/redeem'
+      path: '/redeem'
+      fullPath: '/redeem'
+      preLoaderRoute: typeof AppRedeemRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/my-courses': {
+      id: '/_app/my-courses'
+      path: '/my-courses'
+      fullPath: '/my-courses'
+      preLoaderRoute: typeof AppMyCoursesRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/liked': {
       id: '/_app/liked'
       path: '/liked'
@@ -280,6 +349,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAboutRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/course/$slug': {
+      id: '/_app/course/$slug'
+      path: '/course/$slug'
+      fullPath: '/course/$slug'
+      preLoaderRoute: typeof AppCourseSlugRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
@@ -287,20 +363,28 @@ interface AppRouteChildren {
   AppAboutRoute: typeof AppAboutRoute
   AppHomeRoute: typeof AppHomeRoute
   AppLikedRoute: typeof AppLikedRoute
+  AppMyCoursesRoute: typeof AppMyCoursesRoute
+  AppRedeemRoute: typeof AppRedeemRoute
   AppReelsRoute: typeof AppReelsRoute
   AppSavedRoute: typeof AppSavedRoute
   AppSettingsRoute: typeof AppSettingsRoute
   AppShopRoute: typeof AppShopRoute
+  AppSkillsRoute: typeof AppSkillsRoute
+  AppCourseSlugRoute: typeof AppCourseSlugRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
   AppAboutRoute: AppAboutRoute,
   AppHomeRoute: AppHomeRoute,
   AppLikedRoute: AppLikedRoute,
+  AppMyCoursesRoute: AppMyCoursesRoute,
+  AppRedeemRoute: AppRedeemRoute,
   AppReelsRoute: AppReelsRoute,
   AppSavedRoute: AppSavedRoute,
   AppSettingsRoute: AppSettingsRoute,
   AppShopRoute: AppShopRoute,
+  AppSkillsRoute: AppSkillsRoute,
+  AppCourseSlugRoute: AppCourseSlugRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)

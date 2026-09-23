@@ -48,6 +48,7 @@
     "@tanstack/react-start": "^1.168.26",
     "@tanstack/router-plugin": "^1.168.18",
     "@types/canvas-confetti": "^1.9.0",
+    "@vidstack/react": "^1.12.12",
     "appwrite": "^26.2.0",
     "canvas-confetti": "^1.9.4",
     "class-variance-authority": "^0.7.1",
@@ -55,6 +56,7 @@
     "cmdk": "^1.1.1",
     "date-fns": "^4.1.0",
     "embla-carousel-react": "^8.6.0",
+    "hls.js": "^1.5.0",
     "input-otp": "^1.4.2",
     "lucide-react": "^0.575.0",
     "react": "^19.2.0",
@@ -70,6 +72,7 @@
     "tailwindcss": "^4.2.1",
     "tw-animate-css": "^1.3.4",
     "vaul": "^1.1.2",
+    "vidstack": "^1.12.12",
     "vite-tsconfig-paths": "^6.0.2",
     "zod": "^3.24.2"
   },

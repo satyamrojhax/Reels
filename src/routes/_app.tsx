@@ -2,7 +2,7 @@ import { createFileRoute, Outlet, useNavigate, useRouterState } from "@tanstack/
 import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useTheme } from "@/hooks/use-theme";
-import { Sidebar, BottomNav, Footer } from "@/components/nav";
+import { Sidebar, BottomNav, Footer, MobileHeader } from "@/components/nav";
 import { InstallPwa } from "@/components/install-pwa";
 
 export const Route = createFileRoute("/_app")({
@@ -43,6 +43,7 @@ function AppLayout() {
 
   return (
     <div className={`min-h-screen bg-background ${activeCrt ? "crt-filter" : ""}`}>
+      <MobileHeader />
       <Sidebar username={username} />
       <main className={isReels ? "md:pl-[244px]" : "pb-20 md:pb-0 md:pl-[244px]"}>
         <Outlet />

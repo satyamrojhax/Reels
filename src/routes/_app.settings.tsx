@@ -1,4 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router"; 
 import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useTheme, type Theme } from "@/hooks/use-theme";
@@ -28,6 +29,9 @@ import {
   Coins,
   Download,
   BadgeCheck,
+  Gift,
+  Heart,
+  Bookmark
 } from "lucide-react";
 
 export const Route = createFileRoute("/_app/settings")({
@@ -215,6 +219,57 @@ function SettingsPage() {
           </button>
         </section>
       )}
+
+      {/* Bookmarks & Likes */}
+      <section className="mt-4 space-y-3">
+        <Link
+          to="/liked"
+          className="paper-card flex w-full items-center justify-between p-5 text-left transition hover:bg-dew dark:hover:bg-secondary"
+        >
+          <div>
+            <div className="font-display text-lg lowercase text-cocoa dark:text-cream">
+              liked reels
+            </div>
+            <div className="text-sm text-charcoal/70 dark:text-cream/70">
+              view your {likedCount} liked reels.
+            </div>
+          </div>
+          <Heart className="h-5 w-5 text-cocoa dark:text-cream" />
+        </Link>
+
+        <Link
+          to="/saved"
+          className="paper-card flex w-full items-center justify-between p-5 text-left transition hover:bg-dew dark:hover:bg-secondary"
+        >
+          <div>
+            <div className="font-display text-lg lowercase text-cocoa dark:text-cream">
+              saved reels
+            </div>
+            <div className="text-sm text-charcoal/70 dark:text-cream/70">
+              view your {savedCount} saved reels.
+            </div>
+          </div>
+          <Bookmark className="h-5 w-5 text-cocoa dark:text-cream" />
+        </Link>
+      </section>
+
+      {/* Skills & Earnings */}
+      <section className="mt-4">
+        <Link
+          to="/redeem"
+          className="paper-card flex w-full items-center justify-between p-5 text-left transition hover:bg-dew border-magenta-haze/30 bg-magenta-haze/5 dark:hover:bg-secondary dark:border-periwinkle-sky/30 dark:bg-periwinkle-sky/5"
+        >
+          <div>
+            <div className="font-display text-lg lowercase text-magenta-haze dark:text-periwinkle-sky">
+              skills & earnings
+            </div>
+            <div className="text-sm text-charcoal/70 dark:text-cream/70">
+              you have {coins} coins. redeem them for rewards.
+            </div>
+          </div>
+          <Gift className="h-6 w-6 text-magenta-haze dark:text-periwinkle-sky" />
+        </Link>
+      </section>
 
       {/* About */}
       <section className="mt-4">
