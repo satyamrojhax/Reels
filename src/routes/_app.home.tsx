@@ -31,10 +31,6 @@ function HomePage() {
             <Compass className="h-4 w-4" strokeWidth={2.25} />
             learn skills
           </Link>
-          <Link to="/liked" className="btn-pill">
-            <Heart className="h-4 w-4" strokeWidth={2.25} />
-            your likes
-          </Link>
         </div>
       </section>
 
@@ -65,7 +61,7 @@ function HomePage() {
         <p className="font-display text-3xl lowercase md:text-4xl">
           that's all for now — go tap something.
         </p>
-        <p className="mt-2 text-sm opacity-80">reels · a warm little corner of the internet.</p>
+        <p className="mt-2 text-sm opacity-80">Cutiefy · a warm little corner of the internet.</p>
       </footer>
     </div>
   );

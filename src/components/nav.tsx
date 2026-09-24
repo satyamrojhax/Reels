@@ -30,7 +30,7 @@ function BrandMark({ size = 36 }: { size?: number }) {
       className="font-script leading-none text-twilight-navy dark:text-cream-linen"
       style={{ fontSize: size, transform: "translateY(2px)" }}
     >
-      reels
+      Cutiefy
     </span>
   );
 }

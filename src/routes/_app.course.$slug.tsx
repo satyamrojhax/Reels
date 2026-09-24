@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useEnrolledCourses } from "@/hooks/use-enrolled-courses";
 import { CoursePlayer } from "@/components/course-player";
 import { ChevronDown, PlayCircle, FileText, CheckCircle, Trash2 } from "lucide-react";
-import { getCoins, set, KEYS } from "@/lib/storage";
+import { getCoins, set, get, KEYS } from "@/lib/storage";
 
 type Lecture = {
   type: string;
@@ -76,21 +76,33 @@ function CourseDetailsPage() {
     async function fetchCourse() {
       try {
         const initialFolder = search.folder || "Software Development";
-        let res = await fetch(`https://epowerx-labs-private-limited.github.io/TuteDude-Courses-Data/${encodeURIComponent(initialFolder)}/${slug}.json`);
+        const folderMapping: Record<string, string> = {
+          "Design & UI/UX": "Design",
+          "Data Science": "Data Science & Analytics",
+          "Video Editing": "Video Editing & VFX",
+        };
+        const mappedFolder = folderMapping[initialFolder] || initialFolder;
+        
+        let res = await fetch(`https://epowerx-labs-private-limited.github.io/TuteDude-Courses-Data/${encodeURIComponent(mappedFolder)}/${slug}.json`);
         
         if (!res.ok) {
           // If the UI category folder fails, try the known actual backend folders
           const fallbackFolders = [
             "Software Development",
             "Design",
-            "Data Science",
+            "Data Science & Analytics",
             "AI & ML",
             "DSA",
             "Finance",
-            "Management"
+            "Management",
+            "Marketing",
+            "DevOps & Cloud",
+            "Cyber Security",
+            "Video Editing & VFX",
+            "Video Editing"
           ];
           for (const fb of fallbackFolders) {
-            if (fb === initialFolder) continue;
+            if (fb === mappedFolder) continue;
             res = await fetch(`https://epowerx-labs-private-limited.github.io/TuteDude-Courses-Data/${encodeURIComponent(fb)}/${slug}.json`);
             if (res.ok) break;
           }
@@ -103,9 +115,9 @@ function CourseDetailsPage() {
           setCourse(json.data);
           
           // load progress
-          const savedProgress = localStorage.getItem(`progress_${slug}`);
-          if (savedProgress) {
-            setCompletedLectures(JSON.parse(savedProgress));
+          const savedProgress = get<Record<string, boolean>>(`progress_${slug}`, {});
+          if (Object.keys(savedProgress).length > 0) {
+            setCompletedLectures(savedProgress);
           }
         } else {
           setError("Invalid course data");
@@ -179,7 +191,7 @@ function CourseDetailsPage() {
     }
     const updated = { ...completedLectures, [lectureId]: true };
     setCompletedLectures(updated);
-    localStorage.setItem(`progress_${slug}`, JSON.stringify(updated));
+    set(`progress_${slug}`, updated);
   };
 
   if (loading) {
@@ -266,7 +278,7 @@ function CourseDetailsPage() {
                 </button>
                 <button 
                   onClick={() => unenroll(slug)}
-                  className="flex w-fit items-center justify-center gap-2 rounded-full border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm font-medium text-red-600 transition-colors hover:bg-red-500 hover:text-white dark:text-red-400"
+                  className="flex w-full sm:w-fit items-center justify-center gap-2 rounded-full border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm font-medium text-red-600 transition-colors hover:bg-red-500 hover:text-white dark:text-red-400"
                 >
                   <Trash2 className="h-4 w-4" />
                   Unenroll
@@ -306,11 +318,11 @@ function CourseDetailsPage() {
               />
               
               {showAutoplayCountdown && nextLesson && (
-                <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-black/80 backdrop-blur-sm rounded-xl animate-in fade-in">
-                  <h3 className="mb-2 text-xl font-bold text-white">Up Next</h3>
-                  <p className="mb-6 text-2xl text-cream-linen text-center px-4 line-clamp-2">{nextLesson.name}</p>
+                <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-black/80 backdrop-blur-sm rounded-xl animate-in fade-in p-2 sm:p-4">
+                  <h3 className="mb-1 text-sm font-bold text-white sm:text-base md:mb-2 md:text-xl">Up Next</h3>
+                  <p className="mb-2 px-2 text-center text-sm text-cream-linen line-clamp-2 sm:text-base md:mb-6 md:text-2xl">{nextLesson.name}</p>
                   
-                  <div className="relative mb-6 flex h-16 w-16 items-center justify-center">
+                  <div className="relative mb-2 flex h-10 w-10 items-center justify-center sm:h-12 sm:w-12 md:mb-6 md:h-16 md:w-16">
                     <svg className="absolute h-full w-full -rotate-90 transform" viewBox="0 0 36 36">
                       <path
                         className="text-white/20"
@@ -328,13 +340,13 @@ function CourseDetailsPage() {
                         strokeWidth="2"
                       />
                     </svg>
-                    <span className="text-xl font-bold text-white">{autoplayCountdown}</span>
+                    <span className="text-sm font-bold text-white sm:text-lg md:text-xl">{autoplayCountdown}</span>
                   </div>
                   
-                  <div className="flex gap-4">
+                  <div className="flex gap-2 sm:gap-4">
                     <button 
                       onClick={() => setShowAutoplayCountdown(false)}
-                      className="rounded-full bg-white/10 px-6 py-2 font-medium text-white transition-colors hover:bg-white/20"
+                      className="rounded-full bg-white/10 px-3 py-1 text-xs font-medium text-white transition-colors hover:bg-white/20 sm:px-4 sm:py-1.5 sm:text-sm md:px-6 md:py-2 md:text-base"
                     >
                       Cancel
                     </button>
@@ -343,9 +355,9 @@ function CourseDetailsPage() {
                         setActiveVideo(nextLesson!);
                         setShowAutoplayCountdown(false);
                       }}
-                      className="flex items-center gap-2 rounded-full bg-magenta-haze px-6 py-2 font-medium text-white transition-colors hover:bg-magenta-haze/90"
+                      className="flex items-center gap-1 rounded-full bg-magenta-haze px-3 py-1 text-xs font-medium text-white transition-colors hover:bg-magenta-haze/90 sm:gap-2 sm:px-4 sm:py-1.5 sm:text-sm md:px-6 md:py-2 md:text-base"
                     >
-                      Play Now <PlayCircle className="h-4 w-4" />
+                      Play Now <PlayCircle className="h-3.5 w-3.5 sm:h-4 sm:w-4 md:h-5 md:w-5" />
                     </button>
                   </div>
                 </div>

@@ -89,7 +89,7 @@ function RedeemPage() {
           <button
             onClick={() => setIsModalOpen(true)}
             disabled={currentCoins < 1000}
-            className={`rounded-full px-10 py-4 text-lg font-bold text-white shadow-md transition-transform ${
+            className={`rounded-full w-full sm:w-auto px-10 py-4 text-lg font-bold text-white shadow-md transition-transform ${
               currentCoins >= 1000 
                 ? "bg-magenta-haze hover:scale-[1.02] active:scale-95" 
                 : "bg-slate-mist text-twilight-navy/50 cursor-not-allowed dark:bg-secondary dark:text-cream-linen/50"
@@ -128,6 +128,8 @@ function RedeemPage() {
                 </label>
                 <input
                   type="text"
+                  name="name"
+                  id="name"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Enter your full name"
@@ -141,6 +143,8 @@ function RedeemPage() {
                 </label>
                 <input
                   type="number"
+                  name="coinsToRedeem"
+                  id="coinsToRedeem"
                   value={coinsToRedeem}
                   onChange={(e) => setCoinsToRedeem(e.target.value)}
                   placeholder="e.g. 1000"
@@ -159,6 +163,8 @@ function RedeemPage() {
                 </label>
                 <input
                   type="text"
+                  name="upi"
+                  id="upi"
                   value={upi}
                   onChange={(e) => setUpi(e.target.value)}
                   placeholder="e.g. yourname@upi or 9876543210"

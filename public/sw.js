@@ -1,5 +1,5 @@
 /**
- * InstaReels — Advanced Service Worker
+ * Cutiefy — Advanced Service Worker
  * ─────────────────────────────────────────────────────────────────────────────
  * Caching strategies:
  *

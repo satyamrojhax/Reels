@@ -26,8 +26,8 @@ export function InstallPwa() {
   return (
     <div className="fixed bottom-24 left-1/2 z-50 w-[90%] max-w-sm -translate-x-1/2 md:bottom-6 md:left-auto md:right-6 md:translate-x-0">
       <div className="flex items-center gap-4 rounded-xl border border-twilight-navy/20 bg-cloud-white p-4 shadow-lg dark:border-periwinkle-sky/20 dark:bg-dusk-indigo">
-        <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-periwinkle-sky/30 text-twilight-navy dark:bg-secondary dark:text-cream-linen">
-          <Download className="h-5 w-5" />
+        <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full overflow-hidden border border-twilight-navy/10 bg-cloud-white dark:border-periwinkle-sky/10 dark:bg-dusk-indigo">
+          <img src="/PWA_ICON.png" alt="App Logo" className="h-full w-full object-cover" />
         </div>
         <div className="flex-1">
           <h3 className="text-sm font-semibold text-twilight-navy dark:text-cream-linen">
