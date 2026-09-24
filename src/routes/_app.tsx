@@ -43,7 +43,7 @@ function AppLayout() {
 
   return (
     <div className={`min-h-screen bg-background ${activeCrt ? "crt-filter" : ""}`}>
-      <MobileHeader />
+      {!isReels && <MobileHeader />}
       <Sidebar username={username} />
       <main className={isReels ? "md:pl-[244px]" : "pb-20 md:pb-0 md:pl-[244px]"}>
         <Outlet />
