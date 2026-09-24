@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Home, Film, Heart, Bookmark, Settings, ShoppingBag, BadgeCheck, Compass, PlaySquare, Menu, X } from "lucide-react";
+import { Home, Film, Heart, Bookmark, Settings, ShoppingBag, BadgeCheck, Compass, PlaySquare, Menu, X, Mic } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { hasUnlocked } from "@/lib/storage";
 import { useState } from "react";
@@ -13,11 +13,22 @@ const bottomItems: { to: any; label: string; icon: LucideIcon }[] = [
   { to: "/settings", label: "settings", icon: Settings },
 ];
 
+const sidebarItems: { to: any; label: string; icon: LucideIcon }[] = [
+  { to: "/home", label: "home", icon: Home },
+  { to: "/reels", label: "reels", icon: Film },
+  { to: "/shop", label: "shop", icon: ShoppingBag },
+  { to: "/skills", label: "skills", icon: Compass },
+  { to: "/english-course", label: "speaking", icon: Mic },
+  { to: "/my-courses", label: "my courses", icon: PlaySquare },
+  { to: "/settings", label: "settings", icon: Settings },
+];
+
 const allItems = [
   { to: "/home", label: "home", icon: Home },
   { to: "/reels", label: "reels", icon: Film },
   { to: "/shop", label: "shop", icon: ShoppingBag },
   { to: "/skills", label: "skills", icon: Compass },
+  { to: "/english-course", label: "speaking", icon: Mic },
   { to: "/my-courses", label: "my courses", icon: PlaySquare },
   { to: "/liked", label: "liked", icon: Heart },
   { to: "/saved", label: "saved", icon: Bookmark },
@@ -45,7 +56,7 @@ export function Sidebar({ username }: { username: string | null }) {
         <BrandMark size={40} />
       </Link>
       <nav className="flex-1 space-y-1">
-        {bottomItems.map((it) => {
+        {sidebarItems.map((it) => {
           const active = pathname === it.to;
           const Icon = it.icon;
           return (

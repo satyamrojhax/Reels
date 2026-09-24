@@ -2,15 +2,24 @@ import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { useEnrolledCourses } from "@/hooks/use-enrolled-courses";
 import { CoursePlayer } from "@/components/course-player";
-import { ChevronDown, PlayCircle, FileText, CheckCircle, Trash2 } from "lucide-react";
+import { ChevronDown, PlayCircle, FileText, CheckCircle, Trash2, Download } from "lucide-react";
 import { getCoins, set, get, KEYS } from "@/lib/storage";
 
-type Lecture = {
+type Resource = {
   type: string;
+  title: string;
+  url: string;
+  download: boolean;
+};
+
+type Lecture = {
+  type: "lecture";
   name: string;
   lectureId: string;
   lectureLength: string;
   videoUrl: string;
+  resources: Resource[];
+  info: string;
 };
 
 type Section = {
@@ -19,29 +28,22 @@ type Section = {
   lectures: Lecture[];
 };
 
-type Assignment = {
-  type: "assignment";
-  name: string;
-  assignmentId: string;
-  assignmentLink: string;
-};
-
-type CourseContent = Section | Assignment;
+type CourseContent = Section;
 
 type CourseDetails = {
   _id: string;
   courseName: string;
   slug: string;
   content: CourseContent[];
+  courseImage: string;
 };
 
-export const Route = createFileRoute("/_app/course/$slug")({
-  component: CourseDetailsPage,
+export const Route = createFileRoute("/_app/english-course/$courseId")({
+  component: EnglishCourseDetailsPage,
 });
 
-function CourseDetailsPage() {
-  const { slug } = Route.useParams();
-  const search: { folder?: string } = Route.useSearch();
+function EnglishCourseDetailsPage() {
+  const { courseId } = Route.useParams();
   const { isEnrolled, enroll, unenroll } = useEnrolledCourses();
   
   const [course, setCourse] = useState<CourseDetails | null>(null);
@@ -49,14 +51,13 @@ function CourseDetailsPage() {
   const [error, setError] = useState("");
   const [activeVideo, setActiveVideo] = useState<Lecture | null>(null);
   const [completedLectures, setCompletedLectures] = useState<Record<string, boolean>>({});
-  const [activeTab, setActiveTab] = useState<"curriculum" | "assignments">("curriculum");
   const [openSections, setOpenSections] = useState<Record<number, boolean>>({ 0: true });
   const [isCurrentSectionOpen, setIsCurrentSectionOpen] = useState(true);
 
   const [showAutoplayCountdown, setShowAutoplayCountdown] = useState(false);
   const [autoplayCountdown, setAutoplayCountdown] = useState(5);
 
-  const enrolled = isEnrolled(slug);
+  const enrolled = isEnrolled(`english_${courseId}`);
 
   useEffect(() => {
     if (!showAutoplayCountdown) return;
@@ -67,7 +68,7 @@ function CourseDetailsPage() {
     }
     const timer = setTimeout(() => setAutoplayCountdown(c => c - 1), 1000);
     return () => clearTimeout(timer);
-  }, [showAutoplayCountdown, autoplayCountdown]); // nextLesson intentionally omitted from deps to avoid bugs if it changes
+  }, [showAutoplayCountdown, autoplayCountdown]);
 
   useEffect(() => {
     setShowAutoplayCountdown(false);
@@ -76,52 +77,44 @@ function CourseDetailsPage() {
   useEffect(() => {
     async function fetchCourse() {
       try {
-        const initialFolder = search.folder || "Software Development";
-        const folderMapping: Record<string, string> = {
-          "Design & UI/UX": "Design",
-          "Data Science": "Data Science & Analytics",
-          "Video Editing": "Video Editing & VFX",
-        };
-        const mappedFolder = folderMapping[initialFolder] || initialFolder;
-        
-        let res = await fetch(`https://epowerx-labs-private-limited.github.io/TuteDude-Courses-Data/${encodeURIComponent(mappedFolder)}/${slug}.json`);
-        
-        if (!res.ok) {
-          // If the UI category folder fails, try the known actual backend folders
-          const fallbackFolders = [
-            "Software Development",
-            "Design",
-            "Data Science & Analytics",
-            "AI & ML",
-            "DSA",
-            "Finance",
-            "Management",
-            "Marketing",
-            "DevOps & Cloud",
-            "Cyber Security",
-            "Video Editing & VFX",
-            "Video Editing"
-          ];
-          for (const fb of fallbackFolders) {
-            if (fb === mappedFolder) continue;
-            res = await fetch(`https://epowerx-labs-private-limited.github.io/TuteDude-Courses-Data/${encodeURIComponent(fb)}/${slug}.json`);
-            if (res.ok) break;
-          }
-        }
-
-        if (!res.ok) throw new Error("Course not found");
-        const json = await res.json();
-        
-        if (json.success && json.data) {
-          setCourse(json.data);
+        const isBonus = courseId === "bonus";
+        const url = isBonus 
+          ? "https://epowerx-labs-private-limited.github.io/english-speaking/bonus/bonus_videos.json"
+          : "https://epowerx-labs-private-limited.github.io/english-speaking/courses/courses_data.json";
           
-          // load progress
-          const savedProgress = get<Record<string, boolean>>(`progress_${slug}`, {});
-          if (Object.keys(savedProgress).length > 0) {
-            setCompletedLectures(savedProgress);
-          }
-        } else {
-          setError("Invalid course data");
+        const res = await fetch(url);
+        if (!res.ok) throw new Error("Course not found");
+        const rawData = await res.json();
+        
+        // Transform data
+        const transformedContent: Section[] = rawData.map((module: any) => ({
+          type: "section",
+          name: module.name,
+          lectures: module.lessons.map((lesson: any) => ({
+            type: "lecture",
+            name: lesson.title,
+            lectureId: lesson.id,
+            lectureLength: "Video", // No length provided in API
+            videoUrl: lesson.video_url,
+            resources: lesson.resources || [],
+            info: lesson.info || ""
+          }))
+        }));
+
+        const transformedCourse: CourseDetails = {
+          _id: `english_${courseId}`,
+          slug: `english_${courseId}`,
+          courseName: isBonus ? "Bonus Videos" : "Speak English with Aleena",
+          courseImage: isBonus ? "https://rolexcoderz.com/pics/bonus.webp" : "https://rolexcoderz.com/pics/course.webp",
+          content: transformedContent
+        };
+
+        setCourse(transformedCourse);
+        
+        // Load progress
+        const savedProgress = get<Record<string, boolean>>(`progress_english_${courseId}`, {});
+        if (Object.keys(savedProgress).length > 0) {
+          setCompletedLectures(savedProgress);
         }
       } catch (err: any) {
         setError(err.message || "Failed to load course");
@@ -130,24 +123,12 @@ function CourseDetailsPage() {
       }
     }
     fetchCourse();
-  }, [slug, search.folder]);
-
-  // We can fetch the course image from courses.json since it's not in the individual course json
-  const [courseImage, setCourseImage] = useState<string>("");
-  useEffect(() => {
-    fetch("https://epowerx-labs-private-limited.github.io/TuteDude-Courses-Data/courses.json")
-      .then(res => res.json())
-      .then(json => {
-        const c = json.data?.courses?.find((c: any) => c.slug === slug);
-        if (c?.courseimage) setCourseImage(c.courseimage);
-      })
-      .catch(console.error);
-  }, [slug]);
+  }, [courseId]);
 
   const handleResume = () => {
     if (!course) return;
     let targetLesson: Lecture | null = null;
-    const sections = course.content.filter(c => c.type === "section") as Section[];
+    const sections = course.content;
     
     // Find first uncompleted lesson
     for (const sec of sections) {
@@ -174,8 +155,9 @@ function CourseDetailsPage() {
     if (course) {
       enroll({
         slug: course.slug,
-        folder: search.folder || "Software Development",
+        folder: "Speaking",
         title: course.courseName,
+        courseimage: course.courseImage,
         enrolledAt: new Date().toISOString()
       });
     }
@@ -192,7 +174,7 @@ function CourseDetailsPage() {
     }
     const updated = { ...completedLectures, [lectureId]: true };
     setCompletedLectures(updated);
-    set(`progress_${slug}`, updated);
+    set(`progress_english_${courseId}`, updated);
   };
 
   if (loading) {
@@ -208,13 +190,12 @@ function CourseDetailsPage() {
       <div className="flex min-h-screen flex-col items-center justify-center p-4">
         <h2 className="mb-4 text-2xl font-bold text-red-500">Error</h2>
         <p className="text-twilight-navy dark:text-cream-linen">{error || "Course not found"}</p>
-        <Link to="/skills" className="mt-6 text-magenta-haze underline">Back to Courses</Link>
+        <Link to="/english-course" className="mt-6 text-magenta-haze underline">Back to Courses</Link>
       </div>
     );
   }
 
-  const sections = course.content.filter(c => c.type === "section") as Section[];
-  const assignments = course.content.filter(c => c.type === "assignment") as Assignment[];
+  const sections = course.content;
 
   // Find current section and next lesson
   let currentSection: Section | null = null;
@@ -249,14 +230,8 @@ function CourseDetailsPage() {
         {/* Top Header / Hero Section (Hidden when playing a video) */}
         {!activeVideo && (
         <div className="flex flex-col gap-6 md:flex-row md:items-center rounded-3xl bg-cloud-white p-6 shadow-sm border border-twilight-navy/10 dark:bg-dusk-indigo dark:border-periwinkle-sky/10 mb-8 text-center md:text-left">
-          <div className="mx-auto md:mx-0 h-32 w-32 shrink-0 overflow-hidden rounded-2xl bg-slate-mist/20 shadow-sm border border-twilight-navy/5 dark:border-periwinkle-sky/5">
-            {courseImage ? (
-              <img src={courseImage} alt={course.courseName} className="h-full w-full object-cover" />
-            ) : (
-              <div className="flex h-full w-full items-center justify-center text-4xl font-bold text-twilight-navy dark:text-cream-linen">
-                {course.courseName.charAt(0)}
-              </div>
-            )}
+          <div className="mx-auto md:mx-0 aspect-[16/9] w-full max-w-[240px] shrink-0 overflow-hidden rounded-2xl bg-slate-mist/20 shadow-sm border border-twilight-navy/5 dark:border-periwinkle-sky/5">
+            <img src={course.courseImage} alt={course.courseName} className="h-full w-full object-cover" />
           </div>
           <div className="flex-1 flex flex-col items-center md:items-start justify-center">
             <h1 className="mb-4 text-3xl font-bold text-twilight-navy md:text-4xl dark:text-cream-linen">
@@ -278,7 +253,7 @@ function CourseDetailsPage() {
                   Resume Learning
                 </button>
                 <button 
-                  onClick={() => unenroll(slug)}
+                  onClick={() => unenroll(course.slug)}
                   className="flex w-full sm:w-fit items-center justify-center gap-2 rounded-full border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm font-medium text-red-600 transition-colors hover:bg-red-500 hover:text-white dark:text-red-400"
                 >
                   <Trash2 className="h-4 w-4" />
@@ -366,13 +341,13 @@ function CourseDetailsPage() {
             </div>
             
             <div className="mt-6 rounded-2xl border border-twilight-navy/10 bg-cloud-white p-6 shadow-sm dark:border-periwinkle-sky/10 dark:bg-dusk-indigo">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
                 <div className="flex-1">
                   <h2 className="text-xl font-bold text-twilight-navy dark:text-cream-linen">
                     {activeVideo.name}
                   </h2>
-                  <p className="mt-1 text-sm text-twilight-navy/80 dark:text-cream-linen/80">
-                    Length: {activeVideo.lectureLength}
+                  <p className="mt-2 text-sm text-twilight-navy/80 dark:text-cream-linen/80 line-clamp-3">
+                    {activeVideo.info}
                   </p>
                 </div>
                 
@@ -392,9 +367,32 @@ function CourseDetailsPage() {
                 </div>
               </div>
 
+              {/* Resources for this video */}
+              {activeVideo.resources && activeVideo.resources.length > 0 && (
+                <div className="mb-8 pt-4 border-t border-twilight-navy/10 dark:border-periwinkle-sky/10">
+                  <h3 className="mb-3 text-sm font-bold uppercase tracking-wider text-twilight-navy/60 dark:text-cream-linen/60">
+                    PDF Notes & Resources
+                  </h3>
+                  <div className="flex flex-wrap gap-3">
+                    {activeVideo.resources.map((res, idx) => (
+                      <a
+                        key={idx}
+                        href={res.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="flex items-center gap-2 rounded-xl border border-twilight-navy/10 bg-cloud-white px-4 py-2 text-sm font-semibold text-twilight-navy shadow-sm transition-colors hover:bg-slate-mist/20 dark:border-periwinkle-sky/10 dark:bg-dusk-indigo dark:text-cream-linen dark:hover:bg-secondary"
+                      >
+                        {res.download ? <Download className="h-4 w-4 text-red-500" /> : <FileText className="h-4 w-4 text-red-500" />}
+                        {res.title}
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {/* Current Section Playlist */}
               {currentSection && (
-                <div className="mt-8 border-t border-twilight-navy/10 pt-6 dark:border-periwinkle-sky/10">
+                <div className="border-t border-twilight-navy/10 pt-6 dark:border-periwinkle-sky/10">
                   <button 
                     onClick={() => setIsCurrentSectionOpen((prev: boolean) => !prev)}
                     className="flex w-full items-center justify-between mb-4"
@@ -404,7 +402,7 @@ function CourseDetailsPage() {
                     </h3>
                     <ChevronDown className={`h-5 w-5 text-twilight-navy transition-transform dark:text-cream-linen ${isCurrentSectionOpen ? "rotate-180" : ""}`} />
                   </button>
-                  
+
                   {isCurrentSectionOpen && (
                     <div className="flex flex-col gap-2">
                       {currentSection.lectures.map((lecture) => {
@@ -427,9 +425,6 @@ function CourseDetailsPage() {
                               </span>
                             </div>
                             <div className="flex shrink-0 items-center gap-3 pl-4">
-                              <span className="text-sm text-twilight-navy/60 dark:text-cream-linen/60">
-                                {lecture.lectureLength}
-                              </span>
                               {isCompleted && <CheckCircle className="h-4 w-4 text-green-500" />}
                             </div>
                           </button>
@@ -505,9 +500,6 @@ function CourseDetailsPage() {
                             </span>
                           </div>
                           <div className="flex items-center gap-3">
-                            <span className="text-sm text-twilight-navy/60 dark:text-cream-linen/60">
-                              {lecture.lectureLength}
-                            </span>
                             {isCompleted && <CheckCircle className="h-4 w-4 text-green-500" />}
                           </div>
                         </button>
@@ -521,43 +513,6 @@ function CourseDetailsPage() {
         </div>
         )}
 
-        {/* Assignments Section (hidden when video is playing) */}
-        {(!enrolled || !activeVideo) && assignments.length > 0 && (
-          <div className="mb-10">
-            <h2 className="mb-6 text-2xl font-bold text-twilight-navy dark:text-cream-linen">
-              Course Assignments & Projects
-            </h2>
-            <div className="grid gap-4 sm:grid-cols-2">
-              {assignments.map((assignment) => (
-                <a
-                  key={assignment.assignmentId}
-                  href={enrolled ? assignment.assignmentLink : "#"}
-                  onClick={(e) => {
-                    if (!enrolled) {
-                      e.preventDefault();
-                      // Do nothing, enforce using the main Enroll Now button
-                    }
-                  }}
-                  target={enrolled ? "_blank" : undefined}
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-4 rounded-xl border border-twilight-navy/10 bg-cloud-white p-5 transition-all hover:-translate-y-1 hover:shadow-md dark:border-periwinkle-sky/10 dark:bg-dusk-indigo"
-                >
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-magenta-haze/10">
-                    <FileText className="h-6 w-6 text-magenta-haze dark:text-periwinkle-sky" />
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-twilight-navy dark:text-cream-linen">
-                      {assignment.name}
-                    </h4>
-                    <span className="text-sm font-medium text-magenta-haze underline dark:text-periwinkle-sky">
-                      {enrolled ? "Open Document" : "Enroll to view"}
-                    </span>
-                  </div>
-                </a>
-              ))}
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );

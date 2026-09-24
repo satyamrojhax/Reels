@@ -53,12 +53,23 @@ export function CoursePlayer({ videoUrl, posterUrl, title, onEnded }: CoursePlay
     };
   }, []);
 
+  const mediaSrc = (() => {
+    if (!videoUrl) return "";
+    if (videoUrl.includes(".m3u8") || videoUrl.includes(".php")) {
+      return { src: videoUrl, type: "application/x-mpegurl" };
+    }
+    if (videoUrl.includes(".mp4")) {
+      return { src: videoUrl, type: "video/mp4" };
+    }
+    return videoUrl;
+  })();
+
   return (
     <div className="aspect-video w-full overflow-hidden rounded-xl bg-black shadow-lg">
       <MediaPlayer
         ref={playerRef}
         title={title}
-        src={videoUrl}
+        src={mediaSrc as any}
         crossOrigin
         playsInline
         className="h-full w-full"

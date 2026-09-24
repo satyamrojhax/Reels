@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/use-auth";
-import { Play, Compass, Heart, Settings, Sparkles } from "lucide-react";
+import { Play, Compass, Heart, Settings, Sparkles, Mic } from "lucide-react";
 
 export const Route = createFileRoute("/_app/home")({
   component: HomePage,
@@ -30,6 +30,10 @@ function HomePage() {
           <Link to="/skills" className="btn-pill">
             <Compass className="h-4 w-4" strokeWidth={2.25} />
             learn skills
+          </Link>
+          <Link to="/english-course" className="btn-pill">
+            <Mic className="h-4 w-4" strokeWidth={2.25} />
+            speaking
           </Link>
         </div>
       </section>
