@@ -3,7 +3,7 @@ import { videoCache } from "./video-cache";
 
 export type Reel = {
   id: string;
-  source: "v1" | "v2" | "v4" | "local" | "insta_reels";
+  source: "v1" | "v2" | "v4" | "local" | "insta_";
   videoUrl: string;
   thumbnail?: string;
   title?: string;
@@ -27,9 +27,9 @@ type XvideoItem = {
 };
 
 const XVIDEO_BASES = [
-  { key: "v1" as const, url: "https://xvideos-backend-reels.vercel.app/v1/xvideos", maxPage: 67 },
-  { key: "v2" as const, url: "https://xvideos-backend-reels.vercel.app/v2/xvideos", maxPage: 67 },
-  { key: "v4" as const, url: "https://xvideos-backend-reels.vercel.app/v4/xvideos", maxPage: 62 },
+  { key: "v1" as const, url: "https://xvideos.lfrdcatechnologies.cc.cd/v1/xvideos", maxPage: 67 },
+  { key: "v2" as const, url: "https://xvideos.lfrdcatechnologies.cc.cd/v2/xvideos", maxPage: 67 },
+  { key: "v4" as const, url: "https://xvideos.lfrdcatechnologies.cc.cd/v4/xvideos", maxPage: 62 },
 ];
 
 function shuffle<T>(arr: T[]): T[] {
@@ -81,7 +81,7 @@ function startDatabaseLoad(): Promise<void> {
         const recommendedDbRaw = await recRes.json();
         recommendedDb = (recommendedDbRaw as any[]).map((v: any) => ({
           id: `recommended-${v.id}`,
-          source: "insta_reels" as const,
+          source: "insta_" as const,
           videoUrl: v.video_url,
           thumbnail: v.image,
           title: v.title,
@@ -119,7 +119,7 @@ async function fetchWithRetry(url: string, attempts = 2): Promise<Response | nul
       const res = await fetch(url, { headers });
       if (res.ok) return res;
       if (res.status >= 400 && res.status < 500 && res.status !== 429) return null;
-    } catch {}
+    } catch { }
     if (i < attempts - 1) {
       await new Promise((r) => setTimeout(r, 300 + Math.random() * 200));
     }
@@ -153,7 +153,7 @@ async function fetchXvideos(base: (typeof XVIDEO_BASES)[number], page: number): 
     }));
 
     // Cache for 60 min — fire-and-forget
-    videoCache.set(cacheKey, reels).catch(() => {});
+    videoCache.set(cacheKey, reels).catch(() => { });
     return reels;
   } catch {
     return [];
@@ -278,7 +278,7 @@ export async function fetchReelsPage(
 
   // Cache the assembled page
   if (!isRandom) {
-    videoCache.set(feedCacheKey, result).catch(() => {});
+    videoCache.set(feedCacheKey, result).catch(() => { });
   }
 
   return result;
@@ -289,7 +289,7 @@ export async function fetchReelsPage(
  * Call this to warm the next page before the user scrolls to it.
  */
 export function prefetchReelsPage(page: number, filter: FeedFilter = "all"): void {
-  fetchReelsPage(page, filter).catch(() => {});
+  fetchReelsPage(page, filter).catch(() => { });
 }
 
 /**
