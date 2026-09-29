@@ -151,7 +151,7 @@ function ShopPage() {
   };
 
   return (
-    <div className="mx-auto max-w-[1200px] px-6 py-10 pb-24 md:pl-[268px]">
+    <div className="mx-auto max-w-[1200px] px-6 py-10 pb-24">
       <div className="mb-8 flex flex-col items-start gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p className="font-display text-marker text-xl lowercase italic">treat yourself —</p>

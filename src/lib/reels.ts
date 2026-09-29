@@ -1,9 +1,9 @@
-import { getRandomMode, getRecommendedOffset, setRecommendedOffset } from "./storage";
+import { getRandomMode } from "./storage";
 import { videoCache } from "./video-cache";
 
 export type Reel = {
   id: string;
-  source: "v1" | "v2" | "v4" | "local" | "insta_";
+  source: "v1" | "v2" | "v4" | "local" | "insta_" | "satyamrojha";
   videoUrl: string;
   thumbnail?: string;
   title?: string;
@@ -11,7 +11,9 @@ export type Reel = {
   duration?: string;
   views?: number;
   likes?: number;
+  dislikes?: number;
   timeAgo?: string;
+  username?: string;
 };
 
 type XvideoItem = {
@@ -50,7 +52,6 @@ function hashCode(s: string): string {
 // ─── Local DB loading (eagerly initiated at module import) ────────────────────
 
 let localDb: Reel[] = [];
-let recommendedDb: Reel[] = [];
 /** Single shared promise — multiple callers await the same load. */
 let dbLoadPromise: Promise<void> | null = null;
 
@@ -58,10 +59,7 @@ function startDatabaseLoad(): Promise<void> {
   if (dbLoadPromise) return dbLoadPromise;
   dbLoadPromise = (async () => {
     try {
-      const [localRes, recRes] = await Promise.all([
-        fetch("/assets/v1-reels-db.json"),
-        fetch("/assets/recommended_data.json"),
-      ]);
+      const localRes = await fetch("/assets/v1-reels-db.json");
 
       if (localRes.ok) {
         const localDbRaw = await localRes.json();
@@ -75,17 +73,6 @@ function startDatabaseLoad(): Promise<void> {
             title: "Watch Reels 18+",
           })),
         );
-      }
-
-      if (recRes.ok) {
-        const recommendedDbRaw = await recRes.json();
-        recommendedDb = (recommendedDbRaw as any[]).map((v: any) => ({
-          id: `recommended-${v.id}`,
-          source: "insta_" as const,
-          videoUrl: v.video_url,
-          thumbnail: v.image,
-          title: v.title,
-        }));
       }
     } catch (error) {
       console.error("Failed to load databases:", error);
@@ -160,9 +147,167 @@ async function fetchXvideos(base: (typeof XVIDEO_BASES)[number], page: number): 
   }
 }
 
+async function fetchLatestReels(page: number): Promise<Reel[]> {
+  const apiPage = page - 1;
+  const cacheKey = `satyamrojha::latest::p${apiPage}`;
+
+  const cached = await videoCache.get<Reel[]>(cacheKey);
+  if (cached) return cached;
+
+  const res = await fetchWithRetry(`https://reelsbackend.satyamrojha.cc.cd/api/latest-reels?page=${apiPage}`);
+  if (!res) return [];
+  try {
+    const rawJson = await res.json();
+    const arr = Array.isArray(rawJson) ? rawJson : (rawJson.data || []);
+    const reels: Reel[] = arr.map((v: any) => ({
+      id: `latest-${v.id}`,
+      source: "satyamrojha",
+      videoUrl: v.videoUrl,
+      thumbnail: v.thumbnail,
+      title: v.title,
+      description: v.description,
+      views: v.views,
+      likes: v.likes,
+      dislikes: v.dislikes,
+      username: v.username,
+    }));
+    videoCache.set(cacheKey, reels).catch(() => {});
+    return reels;
+  } catch {
+    return [];
+  }
+}
+
+async function fetchCategoryReels(category: string): Promise<Reel[]> {
+  const res = await fetchWithRetry(`https://reelsbackend.satyamrojha.cc.cd/api/categories/${encodeURIComponent(category)}`);
+  if (!res) return [];
+  try {
+    const rawJson = await res.json();
+    const arr = Array.isArray(rawJson) ? rawJson : (rawJson.data || []);
+    const reels: Reel[] = arr.map((v: any) => ({
+      id: `category-${v.id}-${Math.random().toString(36).slice(2)}`,
+      source: "satyamrojha",
+      videoUrl: v.videoUrl,
+      thumbnail: v.thumbnail,
+      title: v.title,
+      description: v.description,
+      views: v.views,
+      likes: v.likes,
+      dislikes: v.dislikes,
+      username: v.username,
+    }));
+    return reels;
+  } catch {
+    return [];
+  }
+}
+
+export const CATEGORIES = [
+  "Explore",
+  "18+",
+  "Desi",
+  "Homemade",
+  "Couple",
+  "College(18+)",
+  "Gay",
+  "Lesbian",
+  "Shemale",
+  "Asian",
+  "JAV",
+  "Japanese(JAV)",
+  "American",
+  "Latina",
+  "Ebony",
+  "Interracial",
+  "Amateur",
+  "Al",
+  "MILF",
+  "Anal",
+  "Mature",
+  "Big-Ass",
+  "Big-Tits",
+  "Curvy",
+  "Petite",
+  "Girlfriend",
+  "Wife",
+  "Threesome",
+  "Group",
+  "Swingers",
+  "Cuckold",
+  "Blowjob",
+  "Oral",
+  "Deepthroat",
+  "Creampie",
+  "Facial",
+  "Cowgirl",
+  "Reverse-Cowgirl",
+  "Cam",
+  "Self-Shot",
+  "Mobile-Recorded",
+  "Hidden-Cam",
+  "Spy-Cam",
+  "Webcam",
+  "Live-Cam",
+  "Flash",
+  "Hentai",
+  "Cosplay",
+  "Roleplay",
+  "Uniforms",
+  "Massage",
+  "Office",
+  "Hotel",
+  "Public",
+  "Outdoor",
+  "Car",
+  "Gym",
+  "Shower",
+  "BDSM",
+  "Bondage",
+  "Domination",
+  "Submission",
+  "Foot-Fetish",
+  "Stockings",
+  "Latex",
+  "Leather",
+  "Pantyhose",
+  "Fashion",
+  "3D",
+  "Women",
+  "Men",
+  "Solo-Female",
+  "Solo-Male",
+  "Masturbation",
+  "Toys",
+  "LGBT",
+  "Bisexual",
+  "Trans",
+  "Transgender",
+  "Female-Domination",
+  "Romantic",
+  "Passionate",
+  "Slow",
+  "Rough",
+  "Vintage",
+  "Retro",
+  "Classic",
+  "Hardcore",
+  "Softcore",
+  "Bhabhi",
+  "Aunty",
+  "Indian-Wife",
+  "Hindi",
+  "Telugu",
+  "Tamil",
+  "Malayalam",
+  "Punjabi",
+  "Bengali",
+  "Desi-Village",
+  "Indian-Webcam"
+];
+
 let localDbOffset = 0;
 
-export type FeedFilter = "all" | "local" | "trending" | "recommended";
+export type FeedFilter = "all" | "local" | "trending" | "latest" | `category:${string}`;
 
 export async function fetchReelsPage(
   page: number,
@@ -183,21 +328,6 @@ export async function fetchReelsPage(
   let selectedReels: Reel[] = [];
 
   switch (filter) {
-    case "recommended": {
-      if (isRandom) {
-        selectedReels.push(...shuffle(recommendedDb).slice(0, 15));
-      } else {
-        let offset = getRecommendedOffset();
-        let slice = recommendedDb.slice(offset, offset + 15);
-        if (slice.length < 15) {
-          slice = [...slice, ...recommendedDb.slice(0, 15 - slice.length)];
-        }
-        setRecommendedOffset((offset + 15) % recommendedDb.length);
-        selectedReels.push(...slice);
-      }
-      break;
-    }
-
     case "local": {
       if (isRandom) {
         selectedReels.push(...shuffle(localDb).slice(0, 30));
@@ -231,29 +361,44 @@ export async function fetchReelsPage(
       break;
     }
 
+    case "latest": {
+      const res = await fetchLatestReels(page);
+      selectedReels.push(...res);
+      break;
+    }
+
     case "all":
     default: {
-      if (isRandom) {
-        selectedReels.push(...shuffle(localDb).slice(0, 50));
-        const base = XVIDEO_BASES[Math.floor(Math.random() * XVIDEO_BASES.length)];
-        const randomPage = Math.floor(Math.random() * base.maxPage) + 1;
-        const res = await fetchXvideos(base, randomPage);
+      if (filter.startsWith("category:")) {
+        const categoryName = filter.split(":")[1] || "Explore";
+        const res = await fetchCategoryReels(categoryName);
         selectedReels.push(...res);
-      } else {
-        let slice = localDb.slice(localDbOffset, localDbOffset + 50);
-        if (slice.length < 50) {
-          slice = [...slice, ...localDb.slice(0, 50 - slice.length)];
-        }
-        localDbOffset = (localDbOffset + 50) % localDb.length;
-        selectedReels.push(...slice);
+        break;
+      }
 
-        const offset = page - 1;
-        const sourceIndex = offset % 3;
-        const apiPage = Math.floor(offset / 3) + 1;
-        const base = XVIDEO_BASES[sourceIndex];
-        const safePage = ((apiPage - 1) % base.maxPage) + 1;
-        const res = await fetchXvideos(base, safePage);
-        selectedReels.push(...res);
+      if (filter === "all") {
+        if (isRandom) {
+          selectedReels.push(...shuffle(localDb).slice(0, 50));
+          const base = XVIDEO_BASES[Math.floor(Math.random() * XVIDEO_BASES.length)];
+          const randomPage = Math.floor(Math.random() * base.maxPage) + 1;
+          const res = await fetchXvideos(base, randomPage);
+          selectedReels.push(...res);
+        } else {
+          let slice = localDb.slice(localDbOffset, localDbOffset + 50);
+          if (slice.length < 50) {
+            slice = [...slice, ...localDb.slice(0, 50 - slice.length)];
+          }
+          localDbOffset = (localDbOffset + 50) % localDb.length;
+          selectedReels.push(...slice);
+
+          const offset = page - 1;
+          const sourceIndex = offset % 3;
+          const apiPage = Math.floor(offset / 3) + 1;
+          const base = XVIDEO_BASES[sourceIndex];
+          const safePage = ((apiPage - 1) % base.maxPage) + 1;
+          const res = await fetchXvideos(base, safePage);
+          selectedReels.push(...res);
+        }
       }
       break;
     }
@@ -297,7 +442,7 @@ export function prefetchReelsPage(page: number, filter: FeedFilter = "all"): voi
  * Ideal to call once when the app boots so tab switches feel instant.
  */
 export function warmAllFilters(): void {
-  const filters: FeedFilter[] = ["all", "recommended", "local", "trending"];
+  const filters: FeedFilter[] = ["all", "local", "trending"];
   for (const f of filters) {
     prefetchReelsPage(1, f);
     prefetchReelsPage(2, f);

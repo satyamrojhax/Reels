@@ -24,6 +24,7 @@ import { Route as AppRedeemRouteImport } from './routes/_app.redeem'
 import { Route as AppMyCoursesRouteImport } from './routes/_app.my-courses'
 import { Route as AppLikedRouteImport } from './routes/_app.liked'
 import { Route as AppHomeRouteImport } from './routes/_app.home'
+import { Route as AppCategoryRouteImport } from './routes/_app.category'
 import { Route as AppAboutRouteImport } from './routes/_app.about'
 import { Route as AppEnglishCourseIndexRouteImport } from './routes/_app.english-course.index'
 import { Route as AppEnglishCourseCourseIdRouteImport } from './routes/_app.english-course.$courseId'
@@ -103,6 +104,11 @@ const AppHomeRoute = AppHomeRouteImport.update({
   path: '/home',
   getParentRoute: () => AppRoute,
 } as any)
+const AppCategoryRoute = AppCategoryRouteImport.update({
+  id: '/category',
+  path: '/category',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppAboutRoute = AppAboutRouteImport.update({
   id: '/about',
   path: '/about',
@@ -132,6 +138,7 @@ export interface FileRoutesByFullPath {
   '/pin': typeof PinRoute
   '/pin-setup': typeof PinSetupRoute
   '/about': typeof AppAboutRoute
+  '/category': typeof AppCategoryRoute
   '/home': typeof AppHomeRoute
   '/liked': typeof AppLikedRoute
   '/my-courses': typeof AppMyCoursesRoute
@@ -152,6 +159,7 @@ export interface FileRoutesByTo {
   '/pin': typeof PinRoute
   '/pin-setup': typeof PinSetupRoute
   '/about': typeof AppAboutRoute
+  '/category': typeof AppCategoryRoute
   '/home': typeof AppHomeRoute
   '/liked': typeof AppLikedRoute
   '/my-courses': typeof AppMyCoursesRoute
@@ -174,6 +182,7 @@ export interface FileRoutesById {
   '/pin': typeof PinRoute
   '/pin-setup': typeof PinSetupRoute
   '/_app/about': typeof AppAboutRoute
+  '/_app/category': typeof AppCategoryRoute
   '/_app/home': typeof AppHomeRoute
   '/_app/liked': typeof AppLikedRoute
   '/_app/my-courses': typeof AppMyCoursesRoute
@@ -196,6 +205,7 @@ export interface FileRouteTypes {
     | '/pin'
     | '/pin-setup'
     | '/about'
+    | '/category'
     | '/home'
     | '/liked'
     | '/my-courses'
@@ -216,6 +226,7 @@ export interface FileRouteTypes {
     | '/pin'
     | '/pin-setup'
     | '/about'
+    | '/category'
     | '/home'
     | '/liked'
     | '/my-courses'
@@ -237,6 +248,7 @@ export interface FileRouteTypes {
     | '/pin'
     | '/pin-setup'
     | '/_app/about'
+    | '/_app/category'
     | '/_app/home'
     | '/_app/liked'
     | '/_app/my-courses'
@@ -367,6 +379,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppHomeRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/category': {
+      id: '/_app/category'
+      path: '/category'
+      fullPath: '/category'
+      preLoaderRoute: typeof AppCategoryRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/about': {
       id: '/_app/about'
       path: '/about'
@@ -400,6 +419,7 @@ declare module '@tanstack/react-router' {
 
 interface AppRouteChildren {
   AppAboutRoute: typeof AppAboutRoute
+  AppCategoryRoute: typeof AppCategoryRoute
   AppHomeRoute: typeof AppHomeRoute
   AppLikedRoute: typeof AppLikedRoute
   AppMyCoursesRoute: typeof AppMyCoursesRoute
@@ -416,6 +436,7 @@ interface AppRouteChildren {
 
 const AppRouteChildren: AppRouteChildren = {
   AppAboutRoute: AppAboutRoute,
+  AppCategoryRoute: AppCategoryRoute,
   AppHomeRoute: AppHomeRoute,
   AppLikedRoute: AppLikedRoute,
   AppMyCoursesRoute: AppMyCoursesRoute,

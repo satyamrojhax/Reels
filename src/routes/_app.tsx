@@ -14,7 +14,7 @@ function AppLayout() {
   const navigate = useNavigate();
   const { ready, ageOk, username, pinOk } = useAuth();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const isReels = pathname === "/reels";
+  const isReels = pathname === "/reels" || pathname === "/category";
 
   const [activeCrt, setActiveCrt] = useState(false);
   useEffect(() => {
@@ -42,13 +42,15 @@ function AppLayout() {
   }
 
   return (
-    <div className={`min-h-screen bg-background ${activeCrt ? "crt-filter" : ""}`}>
-      {!isReels && <MobileHeader />}
+    <div className={`flex min-h-screen w-full bg-background ${activeCrt ? "crt-filter" : ""}`}>
       <Sidebar username={username} />
-      <main className={isReels ? "md:pl-[244px]" : "pb-20 md:pb-0 md:pl-[244px]"}>
-        <Outlet />
-      </main>
-      {!isReels && <BottomNav />}
+      <div className="flex-1 min-w-0 flex flex-col relative h-screen overflow-y-auto">
+        {!isReels && <MobileHeader />}
+        <main className={`flex-1 relative ${isReels ? "" : "pt-14 pb-20 md:pb-0"}`}>
+          <Outlet />
+        </main>
+        {!isReels && <BottomNav />}
+      </div>
       <InstallPwa />
     </div>
   );

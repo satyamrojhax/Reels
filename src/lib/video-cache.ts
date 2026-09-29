@@ -202,7 +202,7 @@ export const videoCache = new VideoCache();
  * Called once from the router root.
  */
 export async function warmCacheOnStartup(): Promise<void> {
-  const filters = ["all", "recommended", "local", "trending"];
+  const filters = ["all", "local", "trending"];
   const keys = filters.flatMap((f) => [1, 2, 3].map((p) => `${f}::page${p}`));
   await videoCache.warmup(keys);
 }

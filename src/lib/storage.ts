@@ -21,7 +21,6 @@ export const KEYS = {
   lastReelIdx: "ig.last_reel_idx",
   unlocks: "ig.unlocks",
   randomMode: "ig.random_mode",
-  recOffset: "ig.rec_offset",
 } as const;
 
 export const isBrowser = () => typeof window !== "undefined";
@@ -143,12 +142,4 @@ export function getRandomMode(): boolean {
 
 export function setRandomMode(value: boolean): void {
   set(KEYS.randomMode, value);
-}
-
-export function getRecommendedOffset(): number {
-  return get<number>(KEYS.recOffset, 0);
-}
-
-export function setRecommendedOffset(value: number): void {
-  set(KEYS.recOffset, value);
 }

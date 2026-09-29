@@ -14,8 +14,9 @@ function HomePage() {
       {/* Hero */}
       <section className="relative">
         <p className="font-display text-marker text-xl lowercase italic">welcome back,</p>
-        <h1 className="mt-2 font-display text-[64px] leading-[1.02] lowercase text-cocoa md:text-[104px] dark:text-cream">
-          hey @{username},<br />
+        <h1 className="mt-2 font-display text-[48px] leading-[1.02] lowercase text-cocoa md:text-[80px] dark:text-cream break-words">
+          hey{" "}
+          <span className="break-all">@{username}</span>,<br />
           start <span className="marker-underline">exploring.</span>
         </h1>
         <p className="mt-6 max-w-xl text-[18px] leading-relaxed text-charcoal/80 dark:text-cream/70">

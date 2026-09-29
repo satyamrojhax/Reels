@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Home, Film, Heart, Bookmark, Settings, ShoppingBag, BadgeCheck, Compass, PlaySquare, Menu, X, Mic } from "lucide-react";
+import { Home, Film, Heart, Bookmark, Settings, ShoppingBag, BadgeCheck, Compass, PlaySquare, Menu, X, Mic, Instagram } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { hasUnlocked } from "@/lib/storage";
 import { useState } from "react";
@@ -9,12 +9,13 @@ const bottomItems: { to: any; label: string; icon: LucideIcon }[] = [
   { to: "/reels", label: "reels", icon: Film },
   { to: "/shop", label: "shop", icon: ShoppingBag },
   { to: "/skills", label: "skills", icon: Compass },
-  { to: "/my-courses", label: "my courses", icon: PlaySquare },
+  { to: "/my-courses", label: "courses", icon: PlaySquare },
   { to: "/settings", label: "settings", icon: Settings },
 ];
 
 const sidebarItems: { to: any; label: string; icon: LucideIcon }[] = [
   { to: "/home", label: "home", icon: Home },
+  { to: "/category", label: "for you", icon: PlaySquare },
   { to: "/reels", label: "reels", icon: Film },
   { to: "/shop", label: "shop", icon: ShoppingBag },
   { to: "/skills", label: "skills", icon: Compass },
@@ -25,6 +26,7 @@ const sidebarItems: { to: any; label: string; icon: LucideIcon }[] = [
 
 const allItems = [
   { to: "/home", label: "home", icon: Home },
+  { to: "/category", label: "for you", icon: PlaySquare },
   { to: "/reels", label: "reels", icon: Film },
   { to: "/shop", label: "shop", icon: ShoppingBag },
   { to: "/skills", label: "skills", icon: Compass },
@@ -51,11 +53,16 @@ export function Sidebar({ username }: { username: string | null }) {
   const isVerified = hasUnlocked("badge_verified");
   const isVip = hasUnlocked("badge_vip");
   return (
-    <aside className="fixed left-0 top-0 z-30 hidden h-screen w-[244px] flex-col border-r border-twilight-navy bg-cloud-white px-6 py-8 md:flex dark:bg-dusk-indigo dark:border-periwinkle-sky/40">
-      <Link to="/home" className="mb-10 block">
-        <BrandMark size={40} />
+    <aside className="group/sidebar sticky top-0 z-30 hidden h-screen shrink-0 w-[72px] hover:w-[244px] transition-all duration-300 flex-col border-r border-twilight-navy bg-cloud-white px-3 hover:px-6 py-8 md:flex dark:bg-dusk-indigo dark:border-periwinkle-sky/40 overflow-hidden">
+      <Link to="/home" className="mb-10 flex items-center shrink-0 w-full overflow-hidden whitespace-nowrap pl-1 h-10 group-hover/sidebar:pl-0 transition-all">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center transition-all duration-300 group-hover/sidebar:hidden">
+          <Instagram className="h-7 w-7 text-twilight-navy dark:text-cream-linen" strokeWidth={1.75} />
+        </div>
+        <div className="hidden h-full items-center opacity-0 transition-opacity duration-300 group-hover/sidebar:flex group-hover/sidebar:opacity-100">
+          <BrandMark size={34} />
+        </div>
       </Link>
-      <nav className="flex-1 space-y-1">
+      <nav className="flex-1 space-y-2 w-full">
         {sidebarItems.map((it) => {
           const active = pathname === it.to;
           const Icon = it.icon;
@@ -63,25 +70,27 @@ export function Sidebar({ username }: { username: string | null }) {
             <Link
               key={it.to}
               to={it.to}
-              className={`group flex items-center gap-3 rounded-md px-3 py-2.5 text-[15px] transition ${
+              className={`group relative flex items-center gap-4 rounded-md px-3 py-2.5 text-[15px] transition ${
                 active
                   ? "bg-periwinkle-sky text-twilight-navy dark:bg-secondary dark:text-cream-linen"
                   : "text-twilight-navy hover:bg-periwinkle-sky/30 dark:text-cream-linen/80 dark:hover:bg-secondary/60"
               }`}
             >
-              <Icon className="h-[18px] w-[18px]" strokeWidth={active ? 2.25 : 1.75} />
-              <span className={active ? "font-medium" : ""}>{it.label}</span>
-              {active && <span className="ml-auto h-1.5 w-1.5 rounded-full bg-cobalt-pop" />}
+              <Icon className="h-[22px] w-[22px] shrink-0" strokeWidth={active ? 2.25 : 1.75} />
+              <span className={`whitespace-nowrap transition-opacity duration-300 opacity-0 group-hover/sidebar:opacity-100 ${active ? "font-medium" : ""}`}>
+                {it.label}
+              </span>
+              {active && <span className="absolute right-2 top-1/2 -translate-y-1/2 h-1.5 w-1.5 rounded-full bg-cobalt-pop opacity-0 group-hover/sidebar:opacity-100 transition-opacity" />}
             </Link>
           );
         })}
       </nav>
       {username && (
-        <div className="mt-6 flex items-center gap-3 rounded-md border border-slate-mist bg-cream-linen px-3 py-2.5 dark:border-periwinkle-sky/40 dark:bg-secondary">
-          <div className="flex h-9 w-9 items-center justify-center rounded-full border border-twilight-navy bg-cloud-white text-sm font-semibold text-twilight-navy dark:border-cream-linen dark:bg-transparent dark:text-cream-linen">
+        <div className="mt-6 flex items-center gap-3 rounded-md border border-slate-mist bg-cream-linen p-2 dark:border-periwinkle-sky/40 dark:bg-secondary whitespace-nowrap overflow-hidden transition-all duration-300 w-[44px] group-hover/sidebar:w-full">
+          <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-twilight-navy bg-cloud-white text-sm font-semibold text-twilight-navy dark:border-cream-linen dark:bg-transparent dark:text-cream-linen">
             {username[0]?.toUpperCase()}
           </div>
-          <div className="min-w-0">
+          <div className="min-w-0 opacity-0 group-hover/sidebar:opacity-100 transition-opacity duration-300">
             <div className="flex items-center gap-1 truncate text-sm font-medium text-twilight-navy dark:text-cream-linen">
               <span className={isVip ? "vip-text" : ""}>@{username}</span>
               {isVip && <span title="VIP">👑</span>}
@@ -146,7 +155,7 @@ export function MobileHeader() {
   
   return (
     <>
-      <header className="sticky top-0 z-40 flex h-14 items-center justify-between border-b border-twilight-navy/10 bg-background/80 px-4 backdrop-blur-md md:hidden dark:border-periwinkle-sky/10">
+      <header className="fixed top-0 left-0 right-0 z-40 flex h-14 items-center justify-between border-b border-twilight-navy/10 bg-background/80 px-4 backdrop-blur-md md:hidden dark:border-periwinkle-sky/10">
         <Link to="/home" className="flex items-center gap-2">
           <BrandMark size={24} />
         </Link>

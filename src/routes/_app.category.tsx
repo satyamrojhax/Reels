@@ -1,49 +1,36 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useInfiniteQuery, useQueryClient, type InfiniteData, useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQueryClient, type InfiniteData } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { fetchReelsPage, warmAllFilters, CATEGORIES, type Reel, type FeedFilter } from "@/lib/reels";
+import { fetchReelsPage, CATEGORIES, type Reel, type FeedFilter } from "@/lib/reels";
 import { ReelPlayer } from "@/components/reel-player";
 import { KEYS, get, set, getCoins, getAutoScroll, getLiked, getSaved } from "@/lib/storage";
-import { warmCacheOnStartup } from "@/lib/video-cache";
 import { useVideoPrewarmer } from "@/hooks/use-video-prewarmer";
-import { AlertTriangle, RefreshCw, RotateCcw, X, Coins, ChevronUp, ChevronDown } from "lucide-react";
+import { AlertTriangle, RefreshCw, Coins, ChevronUp, ChevronDown } from "lucide-react";
 
-type ReelsSearch = { start?: string; tabs?: FeedFilter };
+type CategorySearch = { c?: string; start?: string };
 
-/** How many pages we keep in memory before evicting old ones from the front. */
 const MAX_PAGES = 6;
 
-export const Route = createFileRoute("/_app/reels")({
-  validateSearch: (s: Record<string, unknown>): ReelsSearch => ({
+export const Route = createFileRoute("/_app/category")({
+  validateSearch: (s: Record<string, unknown>): CategorySearch => ({
+    c: typeof s.c === "string" ? s.c : undefined,
     start: typeof s.start === "string" ? s.start : undefined,
-    tabs: typeof s.tabs === "string" ? (s.tabs as FeedFilter) : undefined,
   }),
-  component: ReelsPage,
+  component: CategoryPage,
 });
 
 type PageData = { items: Reel[]; nextPage: number };
 type FeedData = InfiniteData<PageData, number>;
 
-// Warm cache + all filter tabs once — called outside component so it's truly
-// run once per page load, not on every re-render.
-let warmupStarted = false;
-function ensureWarmedUp() {
-  if (warmupStarted) return;
-  warmupStarted = true;
-  warmCacheOnStartup().catch(() => {});
-  // Warm pages 1–2 of all four tabs in the background
-  warmAllFilters();
-}
-ensureWarmedUp();
-
-function ReelsPage() {
+function CategoryPage() {
   const search = Route.useSearch();
-  const { start, tabs } = search;
+  const { start, c } = search;
   const navigate = Route.useNavigate();
   const queryClient = useQueryClient();
   const [coins, setCoins] = useState(0);
 
-  const filter = tabs || "all";
+  const categoryParam = c || "Explore";
+  const filter: FeedFilter = `category:${categoryParam}`;
 
   useEffect(() => {
     setCoins(getCoins());
@@ -67,9 +54,9 @@ function ReelsPage() {
     queryFn: ({ pageParam }) => fetchReelsPage(pageParam, filter),
     initialPageParam: 1,
     getNextPageParam: (last) => last.nextPage,
-    // 30 min stale-time: tab switches hit the cache, not the network
-    staleTime: filter === "latest" ? 0 : 30 * 60_000,
+    staleTime: categoryParam === "Explore" ? 0 : 30 * 60_000,
     gcTime: 60 * 60_000,
+    refetchOnMount: categoryParam === "Explore" ? "always" : true,
     retry: 3,
     retryDelay: (i) => Math.min(1000 * 2 ** i, 8000),
   });
@@ -100,8 +87,6 @@ function ReelsPage() {
   const slideRefs = useRef<Array<HTMLElement | null>>([]);
   const [activeIdx, setActiveIdx] = useState(0);
   const [muted, setMuted] = useState(true);
-  const [resumeTarget, setResumeTarget] = useState<{ id: string; idx: number } | null>(null);
-  const restoredRef = useRef<string | null>(null);
   const prevReelsLenRef = useRef(0);
 
   useEffect(() => {
@@ -124,41 +109,6 @@ function ReelsPage() {
     }
   }, []);
 
-  // Deep-link: jump to ?start=<id>
-  useEffect(() => {
-    if (!start || reels.length === 0) return;
-    const key = `start:${start}`;
-    if (restoredRef.current === key) return;
-    const i = reels.findIndex((r) => r.id === start);
-    if (i >= 0) {
-      restoredRef.current = key;
-      requestAnimationFrame(() => scrollToIdx(i, "auto"));
-    } else if (hasNextPage && !isFetchingNextPage) {
-      fetchNextPage();
-    }
-  }, [start, reels, hasNextPage, isFetchingNextPage, fetchNextPage, scrollToIdx]);
-
-  // Resume banner
-  useEffect(() => {
-    if (start || resumeTarget !== null || restoredRef.current === "no-resume") return;
-    if (reels.length === 0) return;
-    const savedId = get<string | null>(KEYS.lastReelId, null);
-    if (!savedId) {
-      restoredRef.current = "no-resume";
-      return;
-    }
-    const i = reels.findIndex((r) => r.id === savedId);
-    if (i > 0) {
-      restoredRef.current = "no-resume";
-      setResumeTarget({ id: savedId, idx: i });
-    } else if (i < 0 && hasNextPage && !isFetchingNextPage) {
-      fetchNextPage();
-    } else if (i === 0) {
-      restoredRef.current = "no-resume";
-    }
-  }, [start, reels, resumeTarget, hasNextPage, isFetchingNextPage, fetchNextPage]);
-
-  // Observe active slide + persist
   useEffect(() => {
     const root = containerRef.current;
     if (!root) return;
@@ -168,11 +118,6 @@ function ReelsPage() {
           if (e.isIntersecting && e.intersectionRatio >= 0.7) {
             const idx = Number((e.target as HTMLElement).dataset.idx);
             setActiveIdx(idx);
-            const r = reels[idx];
-            if (r) {
-              set(KEYS.lastReelId, r.id);
-              set(KEYS.lastReelIdx, idx);
-            }
           }
         });
       },
@@ -182,13 +127,11 @@ function ReelsPage() {
     return () => obs.disconnect();
   }, [reels]);
 
-  // Aggressive prefetch — start loading the next page when 15 reels remain
   useEffect(() => {
     if (!hasNextPage || isFetchingNextPage) return;
     if (reels.length - activeIdx <= 15) fetchNextPage();
   }, [activeIdx, reels.length, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  // Safe cache eviction: cap in-memory pages
   useEffect(() => {
     const cache = data;
     if (!cache) return;
@@ -214,19 +157,12 @@ function ReelsPage() {
     setActiveIdx((i) => Math.max(0, i - droppedItems));
   }, [data, activeIdx, queryClient, filter]);
 
-  // Pre-warm CDN connections for upcoming reels
   useVideoPrewarmer(reels, activeIdx);
 
-  // Track reel-length changes to resize refs array
   useEffect(() => {
     prevReelsLenRef.current = reels.length;
     slideRefs.current.length = reels.length;
   }, [reels.length]);
-
-  const goNext = useCallback(() => {
-    scrollToIdx(activeIdx + 1, "smooth");
-  }, [activeIdx, scrollToIdx]);
-  void goNext; // exported for future use
 
   const bumpWatched = useCallback(() => {
     const n = get<number>(KEYS.watched, 0);
@@ -246,16 +182,6 @@ function ReelsPage() {
     }
   }, [activeIdx, reels.length, scrollToIdx, bumpWatched]);
 
-  const jumpToResume = () => {
-    if (!resumeTarget) return;
-    const i = reels.findIndex((r) => r.id === resumeTarget.id);
-    if (i >= 0) scrollToIdx(i, "smooth");
-    setResumeTarget(null);
-    navigate({ to: "/reels", search: { start: resumeTarget.id }, replace: true });
-  };
-
-  // ─── Error & Loading States ────────────────────────────────────────────────
-
   if (isError && reels.length === 0) {
     return (
       <div className="flex h-[100dvh] w-full items-center justify-center bg-background text-foreground px-6">
@@ -264,10 +190,6 @@ function ReelsPage() {
             <AlertTriangle className="h-6 w-6 text-cream-linen" />
           </div>
           <h2 className="text-lg font-semibold text-cream-linen">Can't load reels</h2>
-          <p className="mt-2 text-sm text-cream-linen/70">
-            {(error as Error)?.message ??
-              "Something went wrong. Please check your connection and try again."}
-          </p>
           <button
             onClick={() => refetch()}
             disabled={isRefetching}
@@ -293,30 +215,39 @@ function ReelsPage() {
     );
   }
 
-  // ─── Main Feed ─────────────────────────────────────────────────────────────
-
   return (
     <div className="relative h-[100dvh] w-full bg-background overflow-hidden">
-      {/* Category Pills */}
-      <div className="absolute left-0 right-0 top-14 z-30 flex w-full justify-center px-4 md:top-6 pointer-events-none">
-        <div className="no-scrollbar flex items-center justify-center gap-2 overflow-x-auto sm:gap-3 pointer-events-auto">
-          {(["all", "latest", "local", "trending"] as string[]).map((f) => (
-            <button
-              key={f}
-              onClick={() => navigate({ search: (prev) => ({ ...prev, tabs: f as FeedFilter }), replace: true })}
-              className={`shrink-0 rounded-full px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider transition sm:px-4 sm:text-xs ${
-                filter === f
-                  ? "bg-foreground text-background"
-                  : "bg-background/80 text-foreground border border-border/60 backdrop-blur hover:bg-muted"
-              }`}
-            >
-              {f}
-            </button>
-          ))}
+      {/* Categories Dropdown — top right on desktop, top center on mobile */}
+      <div className="absolute left-0 right-0 top-4 z-30 flex justify-center px-4 md:top-6 md:justify-end md:pr-8 pointer-events-none">
+        <div className="relative flex items-center justify-center pointer-events-auto">
+          <select
+            value={categoryParam}
+            onChange={(e) => {
+              const val = e.target.value;
+              if (val) {
+                if (val === "Explore") {
+                  queryClient.invalidateQueries({ queryKey: ["reels-feed", "Explore"] });
+                }
+                navigate({ search: (prev) => ({ ...prev, c: val }), replace: true });
+              }
+            }}
+            className="appearance-none bg-background text-foreground border border-border px-4 pr-8 py-2 text-xs md:text-sm font-bold uppercase tracking-wider outline-none cursor-pointer rounded-full shadow-md truncate focus:ring-2 focus:ring-cobalt-pop max-w-[60vw] md:max-w-[220px] transition-all"
+          >
+            {CATEGORIES.map((cName) => (
+              <option key={cName} value={cName} className="bg-popover text-popover-foreground">
+                {cName === "Explore" ? "For You" : cName}
+              </option>
+            ))}
+          </select>
+          <div className="pointer-events-none absolute right-3 flex items-center justify-center text-foreground/70">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+              <path d="m6 9 6 6 6-6"/>
+            </svg>
+          </div>
         </div>
       </div>
 
-      {/* Coins display */}
+      {/* Coins display - top left, doesn't overlap dropdown */}
       <div className="absolute top-4 left-4 z-30 flex items-center gap-2 rounded-full bg-background/80 border border-border/50 px-3 py-1.5 backdrop-blur md:top-6 md:left-6">
         <Coins className="h-5 w-5 text-yellow-500" />
         <span className="text-sm font-semibold text-foreground">{coins}</span>
@@ -345,36 +276,7 @@ function ReelsPage() {
         className="no-scrollbar h-full w-full snap-y snap-mandatory overflow-y-scroll"
       >
 
-
-
-      {/* Resume watching banner */}
-      {resumeTarget && (
-        <div className="pointer-events-none fixed left-1/2 top-4 z-30 w-[min(92vw,420px)] -translate-x-1/2 md:top-6">
-          <div className="pointer-events-auto flex items-center gap-3 rounded-full border border-twilight-navy bg-cloud-white px-4 py-2 shadow-[0_2px_18px_rgba(10,10,58,0.25)]">
-            <RotateCcw className="h-4 w-4 text-cobalt-pop" />
-            <div className="min-w-0 flex-1 text-sm text-twilight-navy">
-              <span className="font-medium">resume watching</span>
-              <span className="ml-1 text-slate-mist">— pick up where you left off</span>
-            </div>
-            <button
-              onClick={jumpToResume}
-              className="rounded-full border border-twilight-navy bg-transparent px-3 py-1 text-xs font-medium uppercase tracking-wider text-twilight-navy transition hover:bg-periwinkle-sky"
-            >
-              jump back
-            </button>
-            <button
-              onClick={() => setResumeTarget(null)}
-              aria-label="Dismiss"
-              className="text-slate-mist hover:text-twilight-navy"
-            >
-              <X className="h-4 w-4" />
-            </button>
-          </div>
-        </div>
-      )}
-
       {reels.map((r, i) => {
-        // Render the player for reels within distance 3; beyond that show thumbnail placeholder
         const near = Math.abs(i - activeIdx) <= 3;
         const composite = `reel::${r.source}::${r.id}::${i}`;
         return (
@@ -421,20 +323,6 @@ function ReelsPage() {
             <div className="h-2.5 w-2.5 animate-bounce rounded-full bg-periwinkle-sky" style={{ animationDelay: "150ms" }} />
             <div className="h-2.5 w-2.5 animate-bounce rounded-full bg-periwinkle-sky" style={{ animationDelay: "300ms" }} />
           </div>
-        </div>
-      )}
-      {isError && reels.length > 0 && (
-        <div className="flex h-24 flex-col items-center justify-center gap-2 bg-background px-6 text-sm text-muted-foreground">
-          <div className="flex items-center gap-2">
-            <AlertTriangle className="h-4 w-4 text-cream-linen" />
-            <span>Couldn't load more reels.</span>
-          </div>
-          <button
-            onClick={() => fetchNextPage()}
-            className="inline-flex items-center gap-1 rounded-full border border-periwinkle-sky/60 px-3 py-1 text-cream-linen hover:bg-periwinkle-sky/20"
-          >
-            <RefreshCw className="h-3 w-3" /> Retry
-          </button>
         </div>
       )}
       </div>
