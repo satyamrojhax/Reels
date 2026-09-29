@@ -14,7 +14,7 @@ function AppLayout() {
   const navigate = useNavigate();
   const { ready, ageOk, username, pinOk } = useAuth();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const isReels = pathname === "/reels" || pathname === "/category";
+  const isReels = pathname === "/reels" || pathname === "/category" || pathname.startsWith("/creator");
 
   const [activeCrt, setActiveCrt] = useState(false);
   useEffect(() => {

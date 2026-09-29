@@ -437,14 +437,43 @@ export function prefetchReelsPage(page: number, filter: FeedFilter = "all"): voi
   fetchReelsPage(page, filter).catch(() => { });
 }
 
-/**
- * Warm all filter tabs' first pages in the background.
- * Ideal to call once when the app boots so tab switches feel instant.
- */
 export function warmAllFilters(): void {
-  const filters: FeedFilter[] = ["all", "local", "trending"];
-  for (const f of filters) {
-    prefetchReelsPage(1, f);
-    prefetchReelsPage(2, f);
+  // Only prefetch the local feed to avoid unnecessary API calls
+  prefetchReelsPage(1, "local");
+}
+
+export async function fetchCreatorReelsPage(
+  username: string,
+  type: "latest" | "popular",
+  page: number
+): Promise<{ items: Reel[]; nextPage: number | undefined }> {
+  const res = await fetchWithRetry(`https://reelsbackend.satyamrojha.cc.cd/api/creator?creator=${encodeURIComponent(username)}&type=${type}&page=${page}`);
+  
+  if (!res) {
+    throw new Error("Failed to load creator reels");
+  }
+
+  try {
+    const rawJson = await res.json();
+    const arr = Array.isArray(rawJson) ? rawJson : (rawJson.data || []);
+    const reels: Reel[] = arr.map((v: any) => ({
+      id: `creator-${v.id}-${Math.random().toString(36).slice(2)}`,
+      source: "satyamrojha",
+      videoUrl: v.videoUrl,
+      thumbnail: v.thumbnail,
+      title: v.title,
+      description: v.description,
+      views: v.views,
+      likes: v.likes,
+      dislikes: v.dislikes,
+      username: v.username,
+    }));
+
+    return {
+      items: reels,
+      nextPage: rawJson.hasNextPage ? (rawJson.nextPage ?? page + 1) : undefined,
+    };
+  } catch {
+    throw new Error("Error parsing creator reels");
   }
 }

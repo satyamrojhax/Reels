@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Home, Film, Heart, Bookmark, Settings, ShoppingBag, BadgeCheck, Compass, PlaySquare, Menu, X, Mic, Instagram } from "lucide-react";
+import { Home, Film, Heart, Bookmark, Settings, ShoppingBag, BadgeCheck, Compass, PlaySquare, Menu, X, Mic, Instagram, WandSparkles } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { hasUnlocked } from "@/lib/storage";
 import { useState } from "react";
@@ -15,7 +15,7 @@ const bottomItems: { to: any; label: string; icon: LucideIcon }[] = [
 
 const sidebarItems: { to: any; label: string; icon: LucideIcon }[] = [
   { to: "/home", label: "home", icon: Home },
-  { to: "/category", label: "for you", icon: PlaySquare },
+  { to: "/category", label: "for you", icon: WandSparkles },
   { to: "/reels", label: "reels", icon: Film },
   { to: "/shop", label: "shop", icon: ShoppingBag },
   { to: "/skills", label: "skills", icon: Compass },
@@ -26,7 +26,7 @@ const sidebarItems: { to: any; label: string; icon: LucideIcon }[] = [
 
 const allItems = [
   { to: "/home", label: "home", icon: Home },
-  { to: "/category", label: "for you", icon: PlaySquare },
+  { to: "/category", label: "for you", icon: WandSparkles },
   { to: "/reels", label: "reels", icon: Film },
   { to: "/shop", label: "shop", icon: ShoppingBag },
   { to: "/skills", label: "skills", icon: Compass },

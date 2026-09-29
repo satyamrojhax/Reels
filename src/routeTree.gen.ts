@@ -28,6 +28,7 @@ import { Route as AppCategoryRouteImport } from './routes/_app.category'
 import { Route as AppAboutRouteImport } from './routes/_app.about'
 import { Route as AppEnglishCourseIndexRouteImport } from './routes/_app.english-course.index'
 import { Route as AppEnglishCourseCourseIdRouteImport } from './routes/_app.english-course.$courseId'
+import { Route as AppCreatorUsernameRouteImport } from './routes/_app.creator.$username'
 import { Route as AppCourseSlugRouteImport } from './routes/_app.course.$slug'
 
 const PinSetupRoute = PinSetupRouteImport.update({
@@ -125,6 +126,11 @@ const AppEnglishCourseCourseIdRoute =
     path: '/english-course/$courseId',
     getParentRoute: () => AppRoute,
   } as any)
+const AppCreatorUsernameRoute = AppCreatorUsernameRouteImport.update({
+  id: '/creator/$username',
+  path: '/creator/$username',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppCourseSlugRoute = AppCourseSlugRouteImport.update({
   id: '/course/$slug',
   path: '/course/$slug',
@@ -149,6 +155,7 @@ export interface FileRoutesByFullPath {
   '/shop': typeof AppShopRoute
   '/skills': typeof AppSkillsRoute
   '/course/$slug': typeof AppCourseSlugRoute
+  '/creator/$username': typeof AppCreatorUsernameRoute
   '/english-course/$courseId': typeof AppEnglishCourseCourseIdRoute
   '/english-course/': typeof AppEnglishCourseIndexRoute
 }
@@ -170,6 +177,7 @@ export interface FileRoutesByTo {
   '/shop': typeof AppShopRoute
   '/skills': typeof AppSkillsRoute
   '/course/$slug': typeof AppCourseSlugRoute
+  '/creator/$username': typeof AppCreatorUsernameRoute
   '/english-course/$courseId': typeof AppEnglishCourseCourseIdRoute
   '/english-course': typeof AppEnglishCourseIndexRoute
 }
@@ -193,6 +201,7 @@ export interface FileRoutesById {
   '/_app/shop': typeof AppShopRoute
   '/_app/skills': typeof AppSkillsRoute
   '/_app/course/$slug': typeof AppCourseSlugRoute
+  '/_app/creator/$username': typeof AppCreatorUsernameRoute
   '/_app/english-course/$courseId': typeof AppEnglishCourseCourseIdRoute
   '/_app/english-course/': typeof AppEnglishCourseIndexRoute
 }
@@ -216,6 +225,7 @@ export interface FileRouteTypes {
     | '/shop'
     | '/skills'
     | '/course/$slug'
+    | '/creator/$username'
     | '/english-course/$courseId'
     | '/english-course/'
   fileRoutesByTo: FileRoutesByTo
@@ -237,6 +247,7 @@ export interface FileRouteTypes {
     | '/shop'
     | '/skills'
     | '/course/$slug'
+    | '/creator/$username'
     | '/english-course/$courseId'
     | '/english-course'
   id:
@@ -259,6 +270,7 @@ export interface FileRouteTypes {
     | '/_app/shop'
     | '/_app/skills'
     | '/_app/course/$slug'
+    | '/_app/creator/$username'
     | '/_app/english-course/$courseId'
     | '/_app/english-course/'
   fileRoutesById: FileRoutesById
@@ -407,6 +419,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppEnglishCourseCourseIdRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/creator/$username': {
+      id: '/_app/creator/$username'
+      path: '/creator/$username'
+      fullPath: '/creator/$username'
+      preLoaderRoute: typeof AppCreatorUsernameRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/course/$slug': {
       id: '/_app/course/$slug'
       path: '/course/$slug'
@@ -430,6 +449,7 @@ interface AppRouteChildren {
   AppShopRoute: typeof AppShopRoute
   AppSkillsRoute: typeof AppSkillsRoute
   AppCourseSlugRoute: typeof AppCourseSlugRoute
+  AppCreatorUsernameRoute: typeof AppCreatorUsernameRoute
   AppEnglishCourseCourseIdRoute: typeof AppEnglishCourseCourseIdRoute
   AppEnglishCourseIndexRoute: typeof AppEnglishCourseIndexRoute
 }
@@ -447,6 +467,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppShopRoute: AppShopRoute,
   AppSkillsRoute: AppSkillsRoute,
   AppCourseSlugRoute: AppCourseSlugRoute,
+  AppCreatorUsernameRoute: AppCreatorUsernameRoute,
   AppEnglishCourseCourseIdRoute: AppEnglishCourseCourseIdRoute,
   AppEnglishCourseIndexRoute: AppEnglishCourseIndexRoute,
 }

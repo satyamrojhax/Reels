@@ -40,24 +40,42 @@ function getHostname(url: string): string | null {
   }
 }
 
+function preloadImage(url: string) {
+  const key = `img::${url}`;
+  if (injected.has(key)) return;
+  injected.add(key);
+  const img = new Image();
+  img.src = url;
+}
+
 export function useVideoPrewarmer(reels: Reel[], activeIdx: number) {
   useEffect(() => {
     if (reels.length === 0) return;
 
-    // Distance 1 — preconnect + preload the actual video file
+    // Cache thumbnails for the next 5 reels
+    for (let i = 1; i <= 5; i++) {
+      const r = reels[activeIdx + i];
+      if (r?.thumbnail) preloadImage(r.thumbnail);
+    }
+
+    // Distance 1 — preconnect + preload the actual video file aggressively
     const next1 = reels[activeIdx + 1];
     if (next1?.videoUrl) {
       const host = getHostname(next1.videoUrl);
       if (host) injectHint("preconnect", `${new URL(next1.videoUrl).origin}`, undefined, true);
+      
+      // Inject fetch prefetch to aggressively download video bytes into HTTP cache
+      injectHint("prefetch", next1.videoUrl, "video");
     }
 
-    // Distance 2–3 — at minimum open TCP connections to CDN hosts
+    // Distance 2–3 — preconnect and prefetch
     for (const offset of [2, 3]) {
       const reel = reels[activeIdx + offset];
       if (!reel?.videoUrl) continue;
       try {
         const origin = new URL(reel.videoUrl).origin;
         injectHint("preconnect", origin, undefined, true);
+        injectHint("prefetch", reel.videoUrl, "video");
       } catch {}
     }
   }, [reels, activeIdx]);

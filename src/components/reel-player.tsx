@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, memo, useCallback } from "react";
 import type { Reel } from "@/lib/reels";
+import { Link } from "@tanstack/react-router";
 import {
   Heart,
   Share2,
@@ -339,14 +340,28 @@ export const ReelPlayer = memo(function ReelPlayer({
             <div className="overflow-y-auto">
               {/* Video details */}
               <div className="px-4 pt-2 pb-3 border-b border-border">
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="ig-gradient-bg flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white">
-                    {(reel.username || reel.source)[0]?.toUpperCase()}
+                {reel.source === "satyamrojha" ? (
+                  <Link 
+                    to={`/creator/${encodeURIComponent(reel.username || reel.source)}` as any}
+                    className="flex items-center gap-3 mb-2 w-fit cursor-pointer hover:opacity-80 transition-opacity"
+                  >
+                    <div className="ig-gradient-bg flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white">
+                      {(reel.username || reel.source)[0]?.toUpperCase()}
+                    </div>
+                    <span className="text-sm font-semibold text-card-foreground truncate">
+                      {reel.username || `${reel.source}_reels`}
+                    </span>
+                  </Link>
+                ) : (
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="ig-gradient-bg flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white">
+                      {(reel.username || reel.source)[0]?.toUpperCase()}
+                    </div>
+                    <span className="text-sm font-semibold text-card-foreground truncate">
+                      {reel.username || `${reel.source}_reels`}
+                    </span>
                   </div>
-                  <span className="text-sm font-semibold text-card-foreground truncate">
-                    {reel.username || `${reel.source}_reels`}
-                  </span>
-                </div>
+                )}
                 {reel.title && <p className="text-sm text-card-foreground font-medium leading-snug">{reel.title}</p>}
                 {reel.description && <p className="text-xs text-muted-foreground mt-1 leading-relaxed line-clamp-3">{reel.description}</p>}
                 <div className="mt-1.5 flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-muted-foreground">
@@ -392,14 +407,28 @@ export const ReelPlayer = memo(function ReelPlayer({
           <div className="w-72 rounded-2xl bg-popover border border-border shadow-2xl overflow-hidden">
             {/* Video details */}
             <div className="px-4 py-4 border-b border-border">
-              <div className="flex items-center gap-3 mb-2">
-                <div className="ig-gradient-bg flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white">
-                  {(reel.username || reel.source)[0]?.toUpperCase()}
+              {reel.source === "satyamrojha" ? (
+                <Link 
+                  to={`/creator/${encodeURIComponent(reel.username || reel.source)}` as any}
+                  className="flex items-center gap-3 mb-2 w-fit cursor-pointer hover:opacity-80 transition-opacity"
+                >
+                  <div className="ig-gradient-bg flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white">
+                    {(reel.username || reel.source)[0]?.toUpperCase()}
+                  </div>
+                  <span className="text-sm font-semibold text-foreground truncate">
+                    {reel.username || `${reel.source}_reels`}
+                  </span>
+                </Link>
+              ) : (
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="ig-gradient-bg flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white">
+                    {(reel.username || reel.source)[0]?.toUpperCase()}
+                  </div>
+                  <span className="text-sm font-semibold text-foreground truncate">
+                    {reel.username || `${reel.source}_reels`}
+                  </span>
                 </div>
-                <span className="text-sm font-semibold text-foreground truncate">
-                  {reel.username || `${reel.source}_reels`}
-                </span>
-              </div>
+              )}
               {reel.title && <p className="text-sm text-foreground font-medium leading-snug">{reel.title}</p>}
               {reel.description && <p className="text-xs text-muted-foreground mt-1 leading-relaxed">{reel.description}</p>}
               <div className="mt-2 flex flex-wrap gap-2 text-xs text-muted-foreground">
@@ -443,14 +472,28 @@ export const ReelPlayer = memo(function ReelPlayer({
   // ── Profile info ──────────────────────────────────────────────────────────
   const ProfileInfo = ({ overlay }: { overlay: boolean }) => (
     <div className={overlay ? "pointer-events-auto" : "pointer-events-auto"}>
-      <div className="flex items-center gap-3">
-        <div className="ig-gradient-bg flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white">
-          {(reel.username || reel.source)[0]?.toUpperCase()}
+      {reel.source === "satyamrojha" ? (
+        <Link 
+          to={`/creator/${encodeURIComponent(reel.username || reel.source)}` as any}
+          className="flex items-center gap-3 w-fit cursor-pointer hover:opacity-80 transition-opacity"
+        >
+          <div className="ig-gradient-bg flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white">
+            {(reel.username || reel.source)[0]?.toUpperCase()}
+          </div>
+          <span className={`text-sm font-bold truncate max-w-[180px] ${overlay ? "text-white drop-shadow-md" : "text-twilight-navy dark:text-cream-linen"}`}>
+            {reel.username || `${reel.source}_reels`}
+          </span>
+        </Link>
+      ) : (
+        <div className="flex items-center gap-3">
+          <div className="ig-gradient-bg flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white">
+            {(reel.username || reel.source)[0]?.toUpperCase()}
+          </div>
+          <span className={`text-sm font-bold truncate max-w-[180px] ${overlay ? "text-white drop-shadow-md" : "text-twilight-navy dark:text-cream-linen"}`}>
+            {reel.username || `${reel.source}_reels`}
+          </span>
         </div>
-        <span className={`text-sm font-bold truncate max-w-[180px] ${overlay ? "text-white drop-shadow-md" : "text-twilight-navy dark:text-cream-linen"}`}>
-          {reel.username || `${reel.source}_reels`}
-        </span>
-      </div>
+      )}
       {reel.title && (
         <p className={`mt-2 text-sm leading-snug break-words ${overlay ? "text-white/90 drop-shadow" : "text-twilight-navy/90 dark:text-cream-linen/90"}`}>
           {reel.title}
