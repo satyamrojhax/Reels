@@ -70,6 +70,16 @@ function AboutPage() {
           </p>
         </div>
 
+        {/* Open Source */}
+        <div className="paper-card p-6">
+          <h2 className="font-display text-xl lowercase text-cocoa dark:text-cream">
+            open source
+          </h2>
+          <p className="mt-3 text-sm text-charcoal/70 dark:text-cream/70 leading-relaxed">
+            InstantReels is completely open source! Anyone can contribute, use, and modify the code. We believe in building together with the community. Check out our GitHub repository to get involved, submit issues, or create pull requests.
+          </p>
+        </div>
+
         {/* Credits */}
         <div className="paper-card p-6">
           <h2 className="font-display text-xl lowercase text-cocoa dark:text-cream">credits</h2>

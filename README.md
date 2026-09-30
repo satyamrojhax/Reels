@@ -124,7 +124,13 @@ npm run build
 
 ## License
 
-This project is private and proprietary.
+This project is open-source and licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+## Contributing
+
+We welcome contributions! InstantReels is completely open source. Anyone can contribute and use it.
+Please read our [Contributing Guidelines](CONTRIBUTING.md) to get started.
+For security issues, see our [Security Policy](SECURITY.md).
 
 ## Contact
 
