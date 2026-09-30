@@ -298,7 +298,7 @@ function ReelsPage() {
   return (
     <div className="relative h-[100dvh] w-full bg-background overflow-hidden">
       {/* Category Pills */}
-      <div className="absolute left-0 right-0 top-14 z-30 flex w-full justify-center px-4 md:top-6 pointer-events-none">
+      <div className="absolute left-0 right-0 top-14 z-30 flex w-full justify-center px-4 md:top-6 md:justify-end md:pr-8 pointer-events-none">
         <div className="no-scrollbar flex items-center justify-center gap-2 overflow-x-auto sm:gap-3 pointer-events-auto">
           {(["all", "latest", "local", "trending"] as string[]).map((f) => (
             <button
@@ -397,6 +397,7 @@ function ReelsPage() {
                 onToggleMute={toggleMute}
                 onEnded={handleReelEnd}
                 onWatched={bumpWatched}
+                feedType={filter}
               />
             ) : (
               <div key={`ph::${r.id}`} className="h-full w-full bg-background">

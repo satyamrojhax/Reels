@@ -21,6 +21,9 @@ export const KEYS = {
   lastReelIdx: "ig.last_reel_idx",
   unlocks: "ig.unlocks",
   randomMode: "ig.random_mode",
+  favorites: "ig.favorites",
+  volume: "ig.volume",
+  history: "ig.history",
 } as const;
 
 export const isBrowser = () => typeof window !== "undefined";
@@ -142,4 +145,57 @@ export function getRandomMode(): boolean {
 
 export function setRandomMode(value: boolean): void {
   set(KEYS.randomMode, value);
+}
+
+export type FavoriteCreator = { username: string; timestamp: number };
+
+export function getFavorites(): FavoriteCreator[] {
+  const data = get<any[]>(KEYS.favorites, []);
+  return data.map(item => {
+    if (typeof item === "string") {
+      return { username: item, timestamp: Date.now() };
+    }
+    return item as FavoriteCreator;
+  });
+}
+export function setFavorites(list: FavoriteCreator[]) {
+  set(KEYS.favorites, list);
+}
+export function isFavorite(username: string): boolean {
+  return getFavorites().some(f => f.username === username);
+}
+export function getFavoriteSince(username: string): number | null {
+  const f = getFavorites().find(f => f.username === username);
+  return f ? f.timestamp : null;
+}
+export function toggleFavorite(username: string): boolean {
+  const current = getFavorites();
+  const exists = current.some(f => f.username === username);
+  if (exists) {
+    setFavorites(current.filter(f => f.username !== username));
+  } else {
+    setFavorites([{ username, timestamp: Date.now() }, ...current]);
+  }
+  return !exists;
+}
+
+export function getVolume(): number {
+  return get<number>(KEYS.volume, 1);
+}
+
+export function setVolumeState(value: number): void {
+  set(KEYS.volume, value);
+}
+
+export function getHistory(): Reel[] {
+  return get<Reel[]>(KEYS.history, []);
+}
+
+export function addToHistory(reel: Reel): void {
+  const list = getHistory();
+  const idx = list.findIndex((r) => r.id === reel.id);
+  if (idx >= 0) list.splice(idx, 1);
+  list.unshift(reel);
+  if (list.length > 100) list.pop();
+  set(KEYS.history, list);
 }

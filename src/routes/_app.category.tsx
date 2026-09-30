@@ -39,6 +39,11 @@ function CategoryPage() {
     return () => window.removeEventListener("coins-change", handleCoinsChange);
   }, []);
 
+  // Force fetch fresh data every time the category/filter changes or the page is visited
+  useEffect(() => {
+    queryClient.removeQueries({ queryKey: ["reels-feed"] }); // wipe all to prevent returning cached data for other filters
+  }, [filter, queryClient]);
+
   const {
     data,
     fetchNextPage,
@@ -54,9 +59,9 @@ function CategoryPage() {
     queryFn: ({ pageParam }) => fetchReelsPage(pageParam, filter),
     initialPageParam: 1,
     getNextPageParam: (last) => last.nextPage,
-    staleTime: categoryParam === "Explore" ? 0 : 30 * 60_000,
+    staleTime: 0,
     gcTime: 60 * 60_000,
-    refetchOnMount: categoryParam === "Explore" ? "always" : true,
+    refetchOnMount: "always",
     retry: 3,
     retryDelay: (i) => Math.min(1000 * 2 ** i, 8000),
   });
@@ -225,9 +230,7 @@ function CategoryPage() {
             onChange={(e) => {
               const val = e.target.value;
               if (val) {
-                if (val === "Explore") {
-                  queryClient.invalidateQueries({ queryKey: ["reels-feed", "Explore"] });
-                }
+                queryClient.removeQueries({ queryKey: ["reels-feed"] });
                 navigate({ search: (prev) => ({ ...prev, c: val }), replace: true });
               }
             }}
@@ -299,6 +302,7 @@ function CategoryPage() {
                 onToggleMute={toggleMute}
                 onEnded={handleReelEnd}
                 onWatched={bumpWatched}
+                feedType={filter}
               />
             ) : (
               <div key={`ph::${r.id}`} className="h-full w-full bg-background">

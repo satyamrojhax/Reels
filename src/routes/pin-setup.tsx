@@ -149,7 +149,7 @@ function PinSetupPage() {
               autoFocus
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="e.g. Satyam RojhaX"
+              placeholder="e.g. LFRDCA"
               maxLength={80}
               className="w-full rounded-lg border-[1.5px] border-foreground/30 bg-background px-4 py-3 text-lg text-foreground placeholder:text-foreground/40 outline-none transition focus:bg-muted"
             />

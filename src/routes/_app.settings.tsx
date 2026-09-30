@@ -31,7 +31,8 @@ import {
   BadgeCheck,
   Gift,
   Heart,
-  Bookmark
+  Bookmark,
+  ShoppingBag
 } from "lucide-react";
 
 export const Route = createFileRoute("/_app/settings")({
@@ -165,6 +166,22 @@ function SettingsPage() {
         </div>
       </section>
 
+      {/* Activity */}
+      <section className="paper-card mt-4 p-6">
+        <h2 className="text-[11px] font-medium uppercase tracking-[0.2em] text-charcoal/60 dark:text-cream/60">
+          activity
+        </h2>
+        <div className="mt-3 flex flex-col gap-2">
+          <Link
+            to="/history"
+            className="flex items-center gap-3 rounded-lg border-[1.5px] border-charcoal/30 px-4 py-3 text-sm text-cocoa transition hover:bg-dew dark:border-cream/30 dark:text-cream dark:hover:bg-secondary"
+          >
+            <Eye className="h-5 w-5" />
+            Watched History
+          </Link>
+        </div>
+      </section>
+
       {/* Playback */}
       <section className="mt-4">
         <div className="paper-card p-6">
@@ -219,6 +236,24 @@ function SettingsPage() {
           </button>
         </section>
       )}
+
+      {/* Shop */}
+      <section className="mt-4">
+        <Link
+          to="/shop"
+          className="paper-card flex w-full items-center justify-between p-5 text-left transition hover:bg-dew dark:hover:bg-secondary"
+        >
+          <div>
+            <div className="font-display text-lg lowercase text-cocoa dark:text-cream">
+              shop
+            </div>
+            <div className="text-sm text-charcoal/70 dark:text-cream/70">
+              browse the store and redeem your coins.
+            </div>
+          </div>
+          <ShoppingBag className="h-5 w-5 text-cocoa dark:text-cream" />
+        </Link>
+      </section>
 
       {/* Bookmarks & Likes */}
       <section className="mt-4 space-y-3">

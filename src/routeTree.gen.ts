@@ -24,6 +24,8 @@ import { Route as AppRedeemRouteImport } from './routes/_app.redeem'
 import { Route as AppMyCoursesRouteImport } from './routes/_app.my-courses'
 import { Route as AppLikedRouteImport } from './routes/_app.liked'
 import { Route as AppHomeRouteImport } from './routes/_app.home'
+import { Route as AppHistoryRouteImport } from './routes/_app.history'
+import { Route as AppFavoritesRouteImport } from './routes/_app.favorites'
 import { Route as AppCategoryRouteImport } from './routes/_app.category'
 import { Route as AppAboutRouteImport } from './routes/_app.about'
 import { Route as AppEnglishCourseIndexRouteImport } from './routes/_app.english-course.index'
@@ -105,6 +107,16 @@ const AppHomeRoute = AppHomeRouteImport.update({
   path: '/home',
   getParentRoute: () => AppRoute,
 } as any)
+const AppHistoryRoute = AppHistoryRouteImport.update({
+  id: '/history',
+  path: '/history',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppFavoritesRoute = AppFavoritesRouteImport.update({
+  id: '/favorites',
+  path: '/favorites',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppCategoryRoute = AppCategoryRouteImport.update({
   id: '/category',
   path: '/category',
@@ -145,6 +157,8 @@ export interface FileRoutesByFullPath {
   '/pin-setup': typeof PinSetupRoute
   '/about': typeof AppAboutRoute
   '/category': typeof AppCategoryRoute
+  '/favorites': typeof AppFavoritesRoute
+  '/history': typeof AppHistoryRoute
   '/home': typeof AppHomeRoute
   '/liked': typeof AppLikedRoute
   '/my-courses': typeof AppMyCoursesRoute
@@ -167,6 +181,8 @@ export interface FileRoutesByTo {
   '/pin-setup': typeof PinSetupRoute
   '/about': typeof AppAboutRoute
   '/category': typeof AppCategoryRoute
+  '/favorites': typeof AppFavoritesRoute
+  '/history': typeof AppHistoryRoute
   '/home': typeof AppHomeRoute
   '/liked': typeof AppLikedRoute
   '/my-courses': typeof AppMyCoursesRoute
@@ -191,6 +207,8 @@ export interface FileRoutesById {
   '/pin-setup': typeof PinSetupRoute
   '/_app/about': typeof AppAboutRoute
   '/_app/category': typeof AppCategoryRoute
+  '/_app/favorites': typeof AppFavoritesRoute
+  '/_app/history': typeof AppHistoryRoute
   '/_app/home': typeof AppHomeRoute
   '/_app/liked': typeof AppLikedRoute
   '/_app/my-courses': typeof AppMyCoursesRoute
@@ -215,6 +233,8 @@ export interface FileRouteTypes {
     | '/pin-setup'
     | '/about'
     | '/category'
+    | '/favorites'
+    | '/history'
     | '/home'
     | '/liked'
     | '/my-courses'
@@ -237,6 +257,8 @@ export interface FileRouteTypes {
     | '/pin-setup'
     | '/about'
     | '/category'
+    | '/favorites'
+    | '/history'
     | '/home'
     | '/liked'
     | '/my-courses'
@@ -260,6 +282,8 @@ export interface FileRouteTypes {
     | '/pin-setup'
     | '/_app/about'
     | '/_app/category'
+    | '/_app/favorites'
+    | '/_app/history'
     | '/_app/home'
     | '/_app/liked'
     | '/_app/my-courses'
@@ -391,6 +415,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppHomeRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/history': {
+      id: '/_app/history'
+      path: '/history'
+      fullPath: '/history'
+      preLoaderRoute: typeof AppHistoryRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/favorites': {
+      id: '/_app/favorites'
+      path: '/favorites'
+      fullPath: '/favorites'
+      preLoaderRoute: typeof AppFavoritesRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/category': {
       id: '/_app/category'
       path: '/category'
@@ -439,6 +477,8 @@ declare module '@tanstack/react-router' {
 interface AppRouteChildren {
   AppAboutRoute: typeof AppAboutRoute
   AppCategoryRoute: typeof AppCategoryRoute
+  AppFavoritesRoute: typeof AppFavoritesRoute
+  AppHistoryRoute: typeof AppHistoryRoute
   AppHomeRoute: typeof AppHomeRoute
   AppLikedRoute: typeof AppLikedRoute
   AppMyCoursesRoute: typeof AppMyCoursesRoute
@@ -457,6 +497,8 @@ interface AppRouteChildren {
 const AppRouteChildren: AppRouteChildren = {
   AppAboutRoute: AppAboutRoute,
   AppCategoryRoute: AppCategoryRoute,
+  AppFavoritesRoute: AppFavoritesRoute,
+  AppHistoryRoute: AppHistoryRoute,
   AppHomeRoute: AppHomeRoute,
   AppLikedRoute: AppLikedRoute,
   AppMyCoursesRoute: AppMyCoursesRoute,

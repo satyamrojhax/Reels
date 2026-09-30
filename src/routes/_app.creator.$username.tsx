@@ -3,9 +3,9 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import { fetchCreatorReelsPage, type Reel } from "@/lib/reels";
 import { ReelPlayer } from "@/components/reel-player";
-import { KEYS, get, set, getAutoScroll } from "@/lib/storage";
+import { KEYS, get, set, getAutoScroll, getFavoriteSince, toggleFavorite } from "@/lib/storage";
 import { useVideoPrewarmer } from "@/hooks/use-video-prewarmer";
-import { AlertTriangle, RefreshCw, ChevronLeft, ChevronUp, ChevronDown, Play, Heart } from "lucide-react";
+import { AlertTriangle, RefreshCw, ChevronLeft, ChevronUp, ChevronDown, Play, Heart, ImageOff } from "lucide-react";
 
 export const Route = createFileRoute("/_app/creator/$username")({
   component: CreatorPage,
@@ -42,10 +42,19 @@ function CreatorPage() {
   const slideRefs = useRef<Array<HTMLElement | null>>([]);
   const [activeIdx, setActiveIdx] = useState(0);
   const [muted, setMuted] = useState(true);
+  const [favSince, setFavSince] = useState<number | null>(null);
 
   useEffect(() => {
     setMuted(get<boolean>(KEYS.muted, true));
-  }, []);
+    setFavSince(getFavoriteSince(username));
+  }, [username]);
+
+  const handleFollow = () => {
+    toggleFavorite(username);
+    setFavSince(getFavoriteSince(username));
+  };
+
+
 
   const toggleMute = useCallback(() => {
     setMuted((m) => {
@@ -133,9 +142,10 @@ function CreatorPage() {
         {/* Back Button */}
         <button
           onClick={() => setPlayingIdx(null)}
-          className="absolute left-4 top-6 z-50 flex h-10 w-10 items-center justify-center rounded-full bg-black/40 text-white backdrop-blur-md transition-all hover:bg-black/60"
+          className="absolute left-4 top-14 z-50 flex h-10 w-10 items-center justify-center rounded-full bg-black/40 text-white backdrop-blur-md transition-all hover:bg-black/60 md:top-6 md:left-8 md:h-12 md:w-auto md:px-5 md:gap-2 shadow-xl border border-white/10"
         >
-          <ChevronLeft className="h-6 w-6" />
+          <ChevronLeft className="h-6 w-6 md:h-5 md:w-5" />
+          <span className="hidden md:block font-semibold">Back</span>
         </button>
 
         {/* Desktop Navigation Arrows */}
@@ -219,12 +229,18 @@ function CreatorPage() {
       {/* Sticky Header & Tabs */}
       <div className="sticky top-0 z-20 flex flex-col bg-background/95 backdrop-blur-md shadow-sm">
         <div className="flex items-center justify-between border-b border-border px-4 py-3">
-          <div className="flex items-center gap-3">
-            <button onClick={() => window.history.back()} className="p-1 -ml-1 text-foreground">
+          <div className="flex items-center gap-3 min-w-0 flex-1 mr-3">
+            <button onClick={() => window.history.back()} className="p-1 -ml-1 shrink-0 text-foreground">
               <ChevronLeft className="h-6 w-6" />
             </button>
-            <h1 className="text-lg font-bold text-foreground">@{username}</h1>
+            <h1 className="text-lg font-bold text-foreground truncate">@{username}</h1>
           </div>
+          <button 
+             onClick={handleFollow}
+             className={`shrink-0 flex items-center justify-center px-4 py-1.5 rounded-full text-xs font-bold transition-all border ${favSince ? "bg-muted border-border text-foreground hover:bg-muted/80" : "bg-cobalt-pop border-cobalt-pop text-white hover:bg-cobalt-pop/90"}`}
+          >
+            {favSince ? "following" : "follow"}
+          </button>
         </div>
 
         <div className="flex border-b border-border">
@@ -283,12 +299,7 @@ function CreatorPage() {
                   }, 50);
                 }}
               >
-                <img
-                  src={reel.thumbnail}
-                  alt={reel.title || "Reel thumbnail"}
-                  className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                  loading="lazy"
-                />
+                <CreatorThumb src={reel.thumbnail} alt={reel.title || "Reel thumbnail"} />
                 <div className="absolute inset-0 bg-black/10 transition-opacity md:group-hover:bg-black/40" />
                 
                 {/* Views Counter (Hidden on PC hover) */}
@@ -333,4 +344,35 @@ function formatViews(views: number) {
   if (views >= 1000000) return (views / 1000000).toFixed(1) + "M";
   if (views >= 1000) return (views / 1000).toFixed(1) + "K";
   return views.toString();
+}
+
+/** Thumbnail with graceful fallback for mobile CORS / load failures */
+function CreatorThumb({ src, alt }: { src?: string; alt: string }) {
+  const [failed, setFailed] = useState(false);
+  const [loaded, setLoaded] = useState(false);
+
+  if (!src || failed) {
+    return (
+      <div className="h-full w-full flex items-center justify-center bg-gradient-to-br from-muted to-muted-foreground/20">
+        <ImageOff className="h-8 w-8 text-muted-foreground/40" />
+      </div>
+    );
+  }
+
+  return (
+    <>
+      {!loaded && (
+        <div className="absolute inset-0 bg-muted animate-pulse" />
+      )}
+      <img
+        src={src}
+        alt={alt}
+        className={`h-full w-full object-cover transition-all duration-300 group-hover:scale-105 ${loaded ? "opacity-100" : "opacity-0"}`}
+        loading="lazy"
+        decoding="async"
+        onError={() => setFailed(true)}
+        onLoad={() => setLoaded(true)}
+      />
+    </>
+  );
 }

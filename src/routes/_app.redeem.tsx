@@ -52,7 +52,7 @@ function RedeemPage() {
 
     // Format telegram message
     const message = `Hello, I want to redeem my coins.\n\nName: ${name}\nCoins Redeemed: ${amount} (₹${rupees})\nUPI ID/Number: ${upi}`;
-    const telegramUrl = `https://t.me/satyamrojha?text=${encodeURIComponent(message)}`;
+    const telegramUrl = `https://t.me/kritilfrdca?text=${encodeURIComponent(message)}`;
     
     window.open(telegramUrl, "_blank");
     

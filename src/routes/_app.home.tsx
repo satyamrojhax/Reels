@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/use-auth";
-import { Play, Compass, Heart, Settings, Sparkles, Mic } from "lucide-react";
+import { Play, Compass, Heart, Settings, Sparkles, Mic, WandSparkles } from "lucide-react";
 
 export const Route = createFileRoute("/_app/home")({
   component: HomePage,
@@ -27,6 +27,10 @@ function HomePage() {
           <Link to="/reels" className="btn-pill">
             <Play className="h-4 w-4" strokeWidth={2.25} />
             watch reels
+          </Link>
+          <Link to="/category" className="btn-pill">
+            <WandSparkles className="h-4 w-4" strokeWidth={2.25} />
+            instant reels
           </Link>
           <Link to="/skills" className="btn-pill">
             <Compass className="h-4 w-4" strokeWidth={2.25} />
@@ -66,7 +70,7 @@ function HomePage() {
         <p className="font-display text-3xl lowercase md:text-4xl">
           that's all for now — go tap something.
         </p>
-        <p className="mt-2 text-sm opacity-80">Cutiefy · a warm little corner of the internet.</p>
+        <p className="mt-2 text-sm opacity-80">InstantReels · A Product By <a href="https://lfrdcatechnologies.cc.cd" target="_blank" rel="noopener noreferrer" className="underline hover:opacity-80 transition">LFRDCA Technologies</a></p>
       </footer>
     </div>
   );

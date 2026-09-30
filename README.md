@@ -93,7 +93,7 @@ The app uses a PIN-based authentication system:
 
 ## Credits
 
-Designed and developed by **Satyam RojhaX**
+Designed and developed by **LFRDCA**
 
 ## Deployment
 

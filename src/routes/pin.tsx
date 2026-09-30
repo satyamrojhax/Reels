@@ -86,12 +86,12 @@ function PinPage() {
 
         <div className="mt-8 flex flex-wrap gap-3">
           <a
-            href="https://t.me/satyamrojha"
+            href="https://t.me/kritilfrdca"
             target="_blank"
             rel="noopener noreferrer"
             className="btn-pill"
           >
-            contact admin
+            contact Us
           </a>
         </div>
       </div>

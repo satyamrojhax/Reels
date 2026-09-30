@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Home, Film, Heart, Bookmark, Settings, ShoppingBag, BadgeCheck, Compass, PlaySquare, Menu, X, Mic, Instagram, WandSparkles } from "lucide-react";
+import { Home, Film, Heart, Bookmark, Settings, ShoppingBag, BadgeCheck, Compass, PlaySquare, Menu, X, Mic, Instagram, WandSparkles, Users } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { hasUnlocked } from "@/lib/storage";
 import { useState } from "react";
@@ -7,7 +7,6 @@ import { useState } from "react";
 const bottomItems: { to: any; label: string; icon: LucideIcon }[] = [
   { to: "/home", label: "home", icon: Home },
   { to: "/reels", label: "reels", icon: Film },
-  { to: "/shop", label: "shop", icon: ShoppingBag },
   { to: "/skills", label: "skills", icon: Compass },
   { to: "/my-courses", label: "courses", icon: PlaySquare },
   { to: "/settings", label: "settings", icon: Settings },
@@ -15,9 +14,9 @@ const bottomItems: { to: any; label: string; icon: LucideIcon }[] = [
 
 const sidebarItems: { to: any; label: string; icon: LucideIcon }[] = [
   { to: "/home", label: "home", icon: Home },
-  { to: "/category", label: "for you", icon: WandSparkles },
+  { to: "/category", label: "instant reels", icon: WandSparkles },
   { to: "/reels", label: "reels", icon: Film },
-  { to: "/shop", label: "shop", icon: ShoppingBag },
+  { to: "/favorites", label: "favorites", icon: Users },
   { to: "/skills", label: "skills", icon: Compass },
   { to: "/english-course", label: "speaking", icon: Mic },
   { to: "/my-courses", label: "my courses", icon: PlaySquare },
@@ -26,14 +25,12 @@ const sidebarItems: { to: any; label: string; icon: LucideIcon }[] = [
 
 const allItems = [
   { to: "/home", label: "home", icon: Home },
-  { to: "/category", label: "for you", icon: WandSparkles },
+  { to: "/category", label: "instant reels", icon: WandSparkles },
   { to: "/reels", label: "reels", icon: Film },
-  { to: "/shop", label: "shop", icon: ShoppingBag },
   { to: "/skills", label: "skills", icon: Compass },
   { to: "/english-course", label: "speaking", icon: Mic },
   { to: "/my-courses", label: "my courses", icon: PlaySquare },
-  { to: "/liked", label: "liked", icon: Heart },
-  { to: "/saved", label: "saved", icon: Bookmark },
+  { to: "/favorites", label: "favorites", icon: Users },
   { to: "/settings", label: "settings", icon: Settings },
 ];
 
@@ -43,7 +40,7 @@ function BrandMark({ size = 36 }: { size?: number }) {
       className="font-script leading-none text-twilight-navy dark:text-cream-linen"
       style={{ fontSize: size, transform: "translateY(2px)" }}
     >
-      Cutiefy
+      InstantReels
     </span>
   );
 }
@@ -70,11 +67,10 @@ export function Sidebar({ username }: { username: string | null }) {
             <Link
               key={it.to}
               to={it.to}
-              className={`group relative flex items-center gap-4 rounded-md px-3 py-2.5 text-[15px] transition ${
-                active
-                  ? "bg-periwinkle-sky text-twilight-navy dark:bg-secondary dark:text-cream-linen"
-                  : "text-twilight-navy hover:bg-periwinkle-sky/30 dark:text-cream-linen/80 dark:hover:bg-secondary/60"
-              }`}
+              className={`group relative flex items-center gap-4 rounded-md px-3 py-2.5 text-[15px] transition ${active
+                ? "bg-periwinkle-sky text-twilight-navy dark:bg-secondary dark:text-cream-linen"
+                : "text-twilight-navy hover:bg-periwinkle-sky/30 dark:text-cream-linen/80 dark:hover:bg-secondary/60"
+                }`}
             >
               <Icon className="h-[22px] w-[22px] shrink-0" strokeWidth={active ? 2.25 : 1.75} />
               <span className={`whitespace-nowrap transition-opacity duration-300 opacity-0 group-hover/sidebar:opacity-100 ${active ? "font-medium" : ""}`}>
@@ -118,9 +114,8 @@ export function BottomNav() {
             key={it.to}
             to={it.to}
             replace={true}
-            className={`flex h-10 min-w-10 items-center justify-center rounded-full px-3 text-twilight-navy transition dark:text-cream-linen ${
-              active ? "bg-periwinkle-sky dark:bg-secondary" : ""
-            }`}
+            className={`flex h-10 min-w-10 items-center justify-center rounded-full px-3 text-twilight-navy transition dark:text-cream-linen ${active ? "bg-periwinkle-sky dark:bg-secondary" : ""
+              }`}
           >
             <Icon className="h-5 w-5" strokeWidth={active ? 2.25 : 1.75} />
             {active && <span className="ml-2 text-xs lowercase">{it.label}</span>}
@@ -152,7 +147,7 @@ export function Footer() {
 export function MobileHeader() {
   const [open, setOpen] = useState(false);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  
+
   return (
     <>
       <header className="fixed top-0 left-0 right-0 z-40 flex h-14 items-center justify-between border-b border-twilight-navy/10 bg-background/80 px-4 backdrop-blur-md md:hidden dark:border-periwinkle-sky/10">
@@ -166,10 +161,10 @@ export function MobileHeader() {
           <Menu className="h-6 w-6" />
         </button>
       </header>
-      
+
       {open && (
         <div className="fixed inset-0 z-50 flex md:hidden">
-          <div 
+          <div
             className="fixed inset-0 bg-background/80 backdrop-blur-sm"
             onClick={() => setOpen(false)}
           />
@@ -192,11 +187,10 @@ export function MobileHeader() {
                     key={it.to}
                     to={it.to}
                     onClick={() => setOpen(false)}
-                    className={`flex items-center gap-3 rounded-md px-4 py-3 text-sm font-medium transition ${
-                      active
-                        ? "bg-periwinkle-sky text-twilight-navy dark:bg-secondary dark:text-cream-linen"
-                        : "text-twilight-navy/80 hover:bg-slate-mist/20 dark:text-cream-linen/80 dark:hover:bg-secondary/60"
-                    }`}
+                    className={`flex items-center gap-3 rounded-md px-4 py-3 text-sm font-medium transition ${active
+                      ? "bg-periwinkle-sky text-twilight-navy dark:bg-secondary dark:text-cream-linen"
+                      : "text-twilight-navy/80 hover:bg-slate-mist/20 dark:text-cream-linen/80 dark:hover:bg-secondary/60"
+                      }`}
                   >
                     <Icon className="h-5 w-5" strokeWidth={active ? 2.25 : 1.75} />
                     {it.label}

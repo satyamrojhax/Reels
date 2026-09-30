@@ -3,7 +3,7 @@ import { videoCache } from "./video-cache";
 
 export type Reel = {
   id: string;
-  source: "v1" | "v2" | "v4" | "local" | "insta_" | "satyamrojha";
+  source: "v1" | "v2" | "v4" | "local" | "insta_";
   videoUrl: string;
   thumbnail?: string;
   title?: string;
@@ -316,9 +316,9 @@ export async function fetchReelsPage(
   // Full feed-page cache — covers entire assembled page including local DB slices
   const feedCacheKey = `feed::${filter}::p${page}`;
 
-  // Only use feed cache in non-random mode (random always produces different results)
+  // Only use feed cache in non-random mode, and NOT for categories (which need fresh data on navigation)
   const isRandom = getRandomMode();
-  if (!isRandom) {
+  if (!isRandom && !filter.startsWith("category:")) {
     const cached = await videoCache.get<{ items: Reel[]; nextPage: number }>(feedCacheKey);
     if (cached) return cached;
   }
@@ -421,8 +421,8 @@ export async function fetchReelsPage(
 
   const result = { items: deduped, nextPage: page + 1 };
 
-  // Cache the assembled page
-  if (!isRandom) {
+  // Cache the assembled page (except for random mode and categories)
+  if (!isRandom && !filter.startsWith("category:")) {
     videoCache.set(feedCacheKey, result).catch(() => { });
   }
 

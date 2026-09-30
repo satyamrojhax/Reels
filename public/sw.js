@@ -71,6 +71,8 @@ self.addEventListener("fetch", (event) => {
     /\.(mp4|webm|m3u8|ts|mov|avi|mkv)(\?|\/|$)/i.test(url.pathname) ||
     url.hostname.includes("cdn") ||
     url.hostname.includes("media") ||
+    url.hostname.includes("viraly.wtf") ||
+    url.hostname.includes("localhost") ||
     url.searchParams.has("range");
   if (isVideoUrl) return;
 

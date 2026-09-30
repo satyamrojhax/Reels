@@ -368,3 +368,58 @@
 .ig-gradient-bg {
   background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285aeb 90%);
 }
+
+/* ── Smooth scrolling & performance ─────────────────────────────── */
+html {
+  scroll-behavior: smooth;
+}
+
+/* GPU-accelerate snap-scroll containers for buttery-smooth scrolling */
+.snap-y {
+  -webkit-overflow-scrolling: touch;
+  will-change: scroll-position;
+}
+
+/* GPU-accelerate video elements to prevent jank during playback */
+video {
+  will-change: transform;
+  transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+/* Prevent tap-highlight flash on mobile */
+button, a, [role="button"] {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Smoother image loading transitions */
+img {
+  will-change: opacity;
+}
+
+/* Volume slider custom thumb */
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: white;
+  cursor: pointer;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+  transition: transform 0.15s ease;
+}
+input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+input[type="range"]::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: white;
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+}
+

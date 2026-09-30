@@ -70,7 +70,6 @@ export function CoursePlayer({ videoUrl, posterUrl, title, onEnded }: CoursePlay
         ref={playerRef}
         title={title}
         src={mediaSrc as any}
-        crossOrigin
         playsInline
         className="h-full w-full"
         onPlay={() => setIsPlaying(true)}

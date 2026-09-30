@@ -29,7 +29,6 @@ function LoginPage() {
       <div className="w-full max-w-md">
         <div className="mb-8 flex items-center gap-2 text-foreground">
           <BrandMark size={32} />
-          <span className="font-display text-2xl lowercase text-foreground">reels.</span>
         </div>
         <p className="font-display text-destructive text-xl lowercase italic">first, a name —</p>
         <h1 className="mt-2 font-display text-[56px] leading-[1.05] lowercase text-foreground">
@@ -48,7 +47,7 @@ function LoginPage() {
               autoFocus
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="e.g. Satyam RojhaX"
+              placeholder="e.g. LFRDCA"
               className="w-full rounded-lg border-[1.5px] border-foreground/30 bg-background px-4 py-3 text-lg text-foreground placeholder:text-foreground/40 outline-none transition focus:bg-muted"
             />
           </label>
