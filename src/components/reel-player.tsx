@@ -75,7 +75,7 @@ export const ReelPlayer = memo(function ReelPlayer({
   const [isDesktop, setIsDesktop] = useState(() =>
     typeof window !== "undefined" ? window.innerWidth >= 768 : false
   );
-  
+
   const isPortrait = useMemo(() => {
     const [w, h] = videoRatio.split("/").map(s => parseFloat(s.trim()));
     if (isNaN(w) || isNaN(h)) return true;
@@ -139,7 +139,7 @@ export const ReelPlayer = memo(function ReelPlayer({
     if (active) {
       if (!hasPlayedRef.current) v.currentTime = 0;
       hasPlayedRef.current = true;
-      v.play().catch(() => {});
+      v.play().catch(() => { });
       setPaused(false);
       if (!watchedFired.current) {
         watchedFired.current = true;
@@ -189,7 +189,7 @@ export const ReelPlayer = memo(function ReelPlayer({
       confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 }, zIndex: 9999 });
     if (localStorage.getItem("ig.meme_sounds") === "true") {
       const a = new Audio("https://www.myinstants.com/media/sounds/bruh.mp3");
-      a.volume = 0.5; a.play().catch(() => {});
+      a.volume = 0.5; a.play().catch(() => { });
     }
     if (navigator.vibrate) navigator.vibrate(50);
   };
@@ -225,7 +225,7 @@ export const ReelPlayer = memo(function ReelPlayer({
     if (suppressClickRef.current) return;
     const v = videoRef.current;
     if (!v) return;
-    if (v.paused) { v.play().catch(() => {}); setPaused(false); }
+    if (v.paused) { v.play().catch(() => { }); setPaused(false); }
     else { v.pause(); setPaused(true); }
   };
 
@@ -234,7 +234,7 @@ export const ReelPlayer = memo(function ReelPlayer({
     try {
       if (navigator.share) await navigator.share({ title: reel.title ?? "Watch this reel", url });
       else await navigator.clipboard.writeText(url);
-    } catch {}
+    } catch { }
   };
 
   const copyLink = () => { navigator.clipboard.writeText(reel.videoUrl); setShowMenu(false); };
@@ -243,7 +243,7 @@ export const ReelPlayer = memo(function ReelPlayer({
     setShowMenu(false);
     const s = encodeURIComponent(`Report Reel: ${reel.title ?? "Unknown"}`);
     const b = encodeURIComponent(`Title: ${reel.title ?? "Unknown"}\nSource: ${reel.source}\nURL: ${reel.videoUrl}`);
-    window.location.href = `mailto:epowerxlabs@gmail.com?subject=${s}&body=${b}`;
+    window.location.href = `mailto:lfrdcatechnologies@outlook.com?subject=${s}&body=${b}`;
   };
 
   const toggleAutoScroll = () => {
@@ -361,10 +361,10 @@ export const ReelPlayer = memo(function ReelPlayer({
               if (val === 0 && !muted) onToggleMute();
             }}
             onClick={(e) => e.stopPropagation()}
-            onPointerDown={(e) => { 
-              e.stopPropagation(); 
+            onPointerDown={(e) => {
+              e.stopPropagation();
               (e.target as HTMLElement).setPointerCapture(e.pointerId);
-              setVolumeInteracting(true); 
+              setVolumeInteracting(true);
             }}
             onPointerUp={(e) => {
               (e.target as HTMLElement).releasePointerCapture(e.pointerId);
@@ -419,7 +419,7 @@ export const ReelPlayer = memo(function ReelPlayer({
             <div className="overflow-y-auto">
               {/* Video details */}
               <div className="px-4 pt-2 pb-3 border-b border-border">
-                <Link 
+                <Link
                   to={`/creator/${encodeURIComponent(reel.username || reel.source)}` as any}
                   className="flex items-center gap-3 mb-2 w-fit cursor-pointer hover:opacity-80 transition-opacity"
                 >
@@ -474,7 +474,7 @@ export const ReelPlayer = memo(function ReelPlayer({
           <div className="relative w-64 rounded-2xl bg-popover border border-border shadow-2xl overflow-hidden z-10 animate-in zoom-in-95 duration-200 pointer-events-auto">
             {/* Video details */}
             <div className="px-4 py-3 border-b border-border bg-muted/30">
-              <Link 
+              <Link
                 to={`/creator/${encodeURIComponent(reel.username || reel.source)}` as any}
                 className="flex items-center gap-3 mb-2 w-fit cursor-pointer hover:opacity-80 transition-opacity"
               >
@@ -531,7 +531,7 @@ export const ReelPlayer = memo(function ReelPlayer({
   const ProfileInfo = ({ overlay }: { overlay: boolean }) => (
     <div className={overlay ? "pointer-events-auto" : "pointer-events-auto"}>
       <div className="flex items-center gap-3 w-fit">
-        <Link 
+        <Link
           to={`/creator/${encodeURIComponent(reel.username || reel.source)}` as any}
           className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity"
         >
@@ -543,13 +543,13 @@ export const ReelPlayer = memo(function ReelPlayer({
           </span>
         </Link>
         {showFollowButton && reel.source !== "local" && (
-          <button 
-             onClick={(e) => {
-                e.stopPropagation();
-                const fav = toggleFavorite(reel.username || reel.source);
-                setIsFav(fav);
-             }}
-             className={`ml-1 px-3 py-1 rounded-full text-[11px] font-bold transition-all border ${isFav ? (overlay ? "bg-white/20 border-white/30 text-white hover:bg-white/30" : "bg-muted border-border text-foreground hover:bg-muted/80") : "bg-cobalt-pop border-cobalt-pop text-white hover:bg-cobalt-pop/90"}`}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              const fav = toggleFavorite(reel.username || reel.source);
+              setIsFav(fav);
+            }}
+            className={`ml-1 px-3 py-1 rounded-full text-[11px] font-bold transition-all border ${isFav ? (overlay ? "bg-white/20 border-white/30 text-white hover:bg-white/30" : "bg-muted border-border text-foreground hover:bg-muted/80") : "bg-cobalt-pop border-cobalt-pop text-white hover:bg-cobalt-pop/90"}`}
           >
             {isFav ? "Following" : "Follow"}
           </button>
@@ -576,7 +576,7 @@ export const ReelPlayer = memo(function ReelPlayer({
   if (isDesktop) {
     return (
       <div className="relative h-full w-full flex items-center justify-center gap-4 px-4 overflow-hidden bg-background">
-      
+
         {/* Left — Profile info (Only for portrait) */}
         {isPortrait && (
           <div className="flex w-56 shrink-0 flex-col justify-end h-full pb-12 z-10">
@@ -604,21 +604,21 @@ export const ReelPlayer = memo(function ReelPlayer({
           )}
           <video {...videoProps} className="absolute inset-0 h-full w-full object-cover cursor-pointer" />
           <Overlays />
-          
+
           {/* Overlaid Profile info (bottom left inside the video - Only for landscape) */}
           {!isPortrait && (
             <div className="absolute bottom-4 left-4 z-20 w-3/4 max-w-[400px] pointer-events-none">
-               <div className="pointer-events-auto">
-                 <ProfileInfo overlay={true} />
-               </div>
+              <div className="pointer-events-auto">
+                <ProfileInfo overlay={true} />
+              </div>
             </div>
           )}
-          
+
           <MenuModal />
         </div>
 
         {/* Right — Action buttons */}
-        <div 
+        <div
           className="flex w-16 shrink-0 flex-col items-center justify-end pb-4 gap-5 z-10"
           style={{ height: "calc(100vh - 100px)", maxHeight: 850 }}
         >

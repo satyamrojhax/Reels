@@ -134,4 +134,4 @@ For security issues, see our [Security Policy](SECURITY.md).
 
 ## Contact
 
-For questions or support, contact: epowerxlabs@gmail.com
+For questions or support, contact: lfrdcatechnologies@outlook.com
